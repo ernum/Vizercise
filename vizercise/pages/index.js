@@ -4,25 +4,17 @@ export default function Home() {
   let [muscleSelected, setMuscleSelected] = useState(null);
   let [exerciseSelected, setExerciseSelected] = useState(null);
 
-  function noExerciseSelected() {
-    return (
-      <p className="absolute font-montserrat font-normal text-[24px] leading-7 left-[5%] top-[41.7%]">
-        Please select an exercise
-      </p>
-    );
+  function FirstVisualisation() {
+    return <></>;
   }
 
-  function RightBox() {
+  function SecondVisualisation() {
     if (exerciseSelected == null) {
-      return noExerciseSelected();
-    } else {
-      // TODO
-    }
-  }
-
-  function LeftBox() {
-    if (exerciseSelected == null) {
-      return noExerciseSelected();
+      return (
+        <p className="absolute font-montserrat font-normal text-[32px] leading-10 left-[23.6%] top-[41.4%]">
+          Please select an exercise
+        </p>
+      );
     } else {
       // TODO
     }
@@ -46,20 +38,11 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-        className="box-border absolute w-[23.1%] h-[35.1%] left-[48.6%] top-[55.4%]
+        className="box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[55.4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
-        {LeftBox()}
-      </div>
-
-      {/* Fourth Box */}
-      <div
-        className="box-border absolute w-[23.1%] h-[35.1%] left-[74.7%] top-[55.4%]
-        bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-        shadown-black/25"
-      >
-        {RightBox()}
+        {SecondVisualisation()}
       </div>
     </div>
   );
