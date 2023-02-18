@@ -5,3 +5,13 @@
 body {
     background-color: #FBF4EF;
 }
+
+@font-face {
+    font-family: 'Lato';
+    src: url('/fonts/lato/Lato-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('/fonts/montserrat/Montserrat-Regular.ttf') format('truetype');
+}
