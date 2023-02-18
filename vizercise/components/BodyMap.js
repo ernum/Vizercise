@@ -175,7 +175,7 @@ export default function BodyMap({ css, setCurrentMuscle }) {
     d3.selectAll(inputStr)
       .transition()
       .ease(d3.easeLinear)
-      .duration(500)
+      .duration(100)
       .attr("fill", "black")
       .style("cursor", "pointer");
   }
@@ -184,7 +184,7 @@ export default function BodyMap({ css, setCurrentMuscle }) {
     d3.selectAll(inputStr)
       .transition()
       .ease(d3.easeLinear)
-      .duration(500)
+      .duration(100)
       .attr("fill", "transparent");
   }
 

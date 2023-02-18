@@ -1,5 +1,6 @@
 import { useState } from "react";
 import BodyMap from "@/components/BodyMap";
+import ScatterPlot from "@/components/ScatterPlot";
 
 export default function Home() {
   let [currentMuscle, setCurrentMuscle] = useState(null);
@@ -42,7 +43,11 @@ export default function Home() {
         className="box-border absolute w-[49.3%] h-[47.1%] left-[48.6%] top-[4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
-      ></div>
+      >
+        <div className="absolute -top-[22%] left-[5%]">
+          <ScatterPlot currentMuscle={currentMuscle} />
+        </div>
+      </div>
 
       {/* Third Box */}
       <div
