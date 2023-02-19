@@ -80,6 +80,7 @@ export default function Plot({ currentMuscle }) {
         .transition()
         .duration("50")
         .attr("opacity", 1)
+        .style("cursor", "pointer");
     }
 
     function mouseOut() {
