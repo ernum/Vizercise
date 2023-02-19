@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { useState, useEffect, useRef } from "react";
-import { GetExercises } from "./Functions";
+import { GetExercises, GetExerciseById } from "./Functions";
 
 export default function Plot({ currentMuscle }) {
   //fetching
@@ -65,9 +65,29 @@ export default function Plot({ currentMuscle }) {
     .attr("cy", (d) => yScale(d[1]))
     .attr("transform", "translate(" + 5 + "," + -5 + ")")
     .attr("r", 7)
-    .style("fill", "#69b3a2")
-    .style("opacity", 0.5)
-    .style("stroke", "white");
+    .attr("fill", "#69b3a2")
+    .attr("opacity", 0.5)
+    .attr("stroke", "white")
+    .on("mouseover", mouseOver)
+    .on("mouseout", mouseOut);
+
+    function mouseOver() {
+      d3.select(this)
+        .append("title")
+        .text(GetExerciseById(this.id))
+
+      d3.select(this)
+        .transition()
+        .duration("50")
+        .attr("opacity", 1)
+    }
+
+    function mouseOut() {
+      d3.select(this)
+        .transition()
+        .duration("50")
+        .attr("opacity", 0.5)
+    }
 
   useEffect(() => {
     svg.selectAll("svg > *").remove();
