@@ -1,5 +1,3 @@
-import { data } from "autoprefixer";
-
 function GetExercises(currentMuscle) {
   const dataReq = require("../../viz_scraper/json-pop-1676574356.json");
   return currentMuscle == null
@@ -11,7 +9,7 @@ function GetExercises(currentMuscle) {
 
 function GetExerciseById(id) {
   const dataReq = require("../../viz_scraper/json-pop-1676574356.json");
-  return dataReq[id].name;
+  return dataReq[id];
 }
 
 export { GetExercises, GetExerciseById };

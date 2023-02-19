@@ -1,10 +1,15 @@
 import { useState } from "react";
 import BodyMap from "@/components/BodyMap";
 import ScatterPlot from "@/components/ScatterPlot";
+import DetailsList from "@/components/DetailsList";
 
 export default function Home() {
   let [currentMuscle, setCurrentMuscle] = useState(null);
   let [exerciseSelected, setExerciseSelected] = useState(null);
+
+  function onExerciseClicked(exerciseId) {
+    setExerciseSelected(exerciseId);
+  }
 
   function FirstVisualisation() {
     return <></>;
@@ -18,7 +23,10 @@ export default function Home() {
         </p>
       );
     } else {
-      // TODO
+      return (
+        <DetailsList
+          exerciseId={exerciseSelected}/>
+      )
     }
   }
 
@@ -45,7 +53,10 @@ export default function Home() {
         shadown-black/25"
       >
         <div className="absolute -top-[22%] left-[5%]">
-          <ScatterPlot currentMuscle={currentMuscle} />
+          <ScatterPlot 
+            currentMuscle={currentMuscle} 
+            onClick={onExerciseClicked}
+          />
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { useState, useEffect, useRef } from "react";
 import { GetExercises, GetExerciseById } from "./Functions";
 
-export default function Plot({ currentMuscle }) {
+export default function Plot({ currentMuscle, onClick }) {
   //fetching
   const source = "/scraped-data.json";
   const [data, setData] = useState();
@@ -69,12 +69,13 @@ export default function Plot({ currentMuscle }) {
     .attr("opacity", 0.5)
     .attr("stroke", "white")
     .on("mouseover", mouseOver)
-    .on("mouseout", mouseOut);
+    .on("mouseout", mouseOut)
+    .on("click", clickEvent);
 
     function mouseOver() {
       d3.select(this)
         .append("title")
-        .text(GetExerciseById(this.id))
+        .text(GetExerciseById(this.id).name)
 
       d3.select(this)
         .transition()
@@ -88,6 +89,10 @@ export default function Plot({ currentMuscle }) {
         .transition()
         .duration("50")
         .attr("opacity", 0.5)
+    }
+
+    function clickEvent() {
+      onClick(d3.select(this).attr("id"));
     }
 
   useEffect(() => {
