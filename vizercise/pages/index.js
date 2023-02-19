@@ -11,6 +11,10 @@ export default function Home() {
     setExerciseSelected(exerciseId);
   }
 
+  function onMuscleClicked(muscle) {
+    setCurrentMuscle(muscle);
+  }
+
   function FirstVisualisation() {
     return <></>;
   }
@@ -41,7 +45,7 @@ export default function Home() {
         <div>
           <BodyMap
             css={"absolute w-[50%] h-[86%] top-[13%] left-[22%]"}
-            setCurrentMuscle={setCurrentMuscle}
+            onClick={onMuscleClicked}
           />
         </div>
       </div>
