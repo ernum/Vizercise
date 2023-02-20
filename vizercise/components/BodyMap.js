@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
 
-export default function BodyMap({ css, setCurrentMuscle }) {
+export default function BodyMap({ css, onClick }) {
   const backBody = "/back_body_highlighted.svg";
   const frontEmpty = "/front_empty.svg";
   const frontString = "Show back";
@@ -189,7 +189,7 @@ export default function BodyMap({ css, setCurrentMuscle }) {
   }
 
   function handleMuscleClick(inputStr) {
-    setCurrentMuscle(inputStr);
+    onClick(inputStr);
   }
 
   function handleClick() {
