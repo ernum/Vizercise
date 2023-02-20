@@ -14,12 +14,8 @@ export default function Home() {
   function onMuscleClicked(muscle) {
     setCurrentMuscle(muscle);
   }
-
-  function FirstVisualisation() {
-    return <></>;
-  }
-
-  function SecondVisualisation() {
+  
+  function ExerciseVisualisation() {
     if (exerciseSelected == null) {
       return (
         <p className="absolute font-montserrat font-normal text-[32px] leading-10 left-[23.6%] top-[41.4%]">
@@ -70,7 +66,7 @@ export default function Home() {
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
-        {SecondVisualisation()}
+        {ExerciseVisualisation()}
       </div>
     </div>
   );
