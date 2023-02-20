@@ -12,7 +12,7 @@ export default function Plot({ currentMuscle, onClick }) {
     const unMappedData = GetExercises(currentMuscle);
     const mappedData = unMappedData.map(function (exerciseDetail) {
       return [exerciseDetail.id, exerciseDetail.popularity];
-    })
+    });
     setData(mappedData);
   }
 
@@ -72,28 +72,23 @@ export default function Plot({ currentMuscle, onClick }) {
       .on("click", clickEvent);
   }
 
-    function mouseOver() {
-      d3.select(this)
-        .append("title")
-        .text(GetExerciseById(this.id).name)
+  function mouseOver() {
+    d3.select(this).append("title").text(GetExerciseById(this.id).name);
 
-      d3.select(this)
-        .transition()
-        .duration("50")
-        .attr("opacity", 1)
-        .style("cursor", "pointer");
-    }
+    d3.select(this)
+      .transition()
+      .duration("50")
+      .attr("opacity", 1)
+      .style("cursor", "pointer");
+  }
 
-    function mouseOut() {
-      d3.select(this)
-        .transition()
-        .duration("50")
-        .attr("opacity", 0.5)
-    }
+  function mouseOut() {
+    d3.select(this).transition().duration("50").attr("opacity", 0.5);
+  }
 
-    function clickEvent() {
-      onClick(d3.select(this).attr("id"));
-    }
+  function clickEvent() {
+    onClick(d3.select(this).attr("id"));
+  }
 
   useEffect(() => {
     svg.selectAll("svg > *").remove();
@@ -104,5 +99,11 @@ export default function Plot({ currentMuscle, onClick }) {
     drawScatter();
   }, [data]);
 
-  return <svg ref={svgRef}></svg>;
+  return (
+    <div className="flex overflow-x-auto overflow-y-auto overflow-hidden">
+      <div className="relative mx-auto">
+        <svg ref={svgRef}></svg>;
+      </div>
+    </div>
+  );
 }

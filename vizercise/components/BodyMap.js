@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import Script from "next/script";
 import { useEffect, useState } from "react";
 
 export default function BodyMap({ css, onClick }) {
@@ -208,7 +209,7 @@ export default function BodyMap({ css, onClick }) {
 
   return (
     <div>
-      <script src="https://d3js.org/d3.v7.min.js"></script>
+      <Script src="https://d3js.org/d3.v7.min.js" />
       {/* <button onClick={handleClick}>{buttonString}</button> */}
       {drawBody()}
     </div>
