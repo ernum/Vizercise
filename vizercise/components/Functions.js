@@ -1,6 +1,5 @@
-const dataReq = require("../../viz_scraper/json-pop-1676574356.json");
-
 function GetExercises(currentMuscle) {
+  const dataReq = require("../../viz_scraper/json-pop-1676574356.json");
   return currentMuscle == null
     ? dataReq
     : dataReq.filter((exercise) =>
@@ -8,8 +7,4 @@ function GetExercises(currentMuscle) {
       );
 }
 
-function GetExerciseById(id) {
-  return dataReq[id];
-}
-
-export { GetExercises, GetExerciseById };
+export { GetExercises };

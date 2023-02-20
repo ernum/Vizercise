@@ -1,21 +1,16 @@
 import { useState } from "react";
 import BodyMap from "@/components/BodyMap";
 import ScatterPlot from "@/components/ScatterPlot";
-import DetailsList from "@/components/DetailsList";
 
 export default function Home() {
   let [currentMuscle, setCurrentMuscle] = useState(null);
   let [exerciseSelected, setExerciseSelected] = useState(null);
 
-  function onExerciseClicked(exerciseId) {
-    setExerciseSelected(exerciseId);
+  function FirstVisualisation() {
+    return <></>;
   }
 
-  function onMuscleClicked(muscle) {
-    setCurrentMuscle(muscle);
-  }
-  
-  function ExerciseVisualisation() {
+  function SecondVisualisation() {
     if (exerciseSelected == null) {
       return (
         <p className="absolute font-montserrat font-normal text-[32px] leading-10 left-[23.6%] top-[41.4%]">
@@ -23,10 +18,7 @@ export default function Home() {
         </p>
       );
     } else {
-      return (
-        <DetailsList
-          exerciseId={exerciseSelected}/>
-      )
+      // TODO
     }
   }
 
@@ -41,7 +33,7 @@ export default function Home() {
         <div>
           <BodyMap
             css={"absolute w-[50%] h-[86%] top-[13%] left-[22%]"}
-            onClick={onMuscleClicked}
+            setCurrentMuscle={setCurrentMuscle}
           />
         </div>
       </div>
@@ -53,10 +45,7 @@ export default function Home() {
         shadown-black/25"
       >
         <div className="absolute -top-[22%] left-[5%]">
-          <ScatterPlot 
-            currentMuscle={currentMuscle} 
-            onClick={onExerciseClicked}
-          />
+          <ScatterPlot currentMuscle={currentMuscle} />
         </div>
       </div>
 
@@ -66,7 +55,7 @@ export default function Home() {
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
-        {ExerciseVisualisation()}
+        {SecondVisualisation()}
       </div>
     </div>
   );
