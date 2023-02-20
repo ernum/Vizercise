@@ -100,9 +100,9 @@ export default function Plot({ currentMuscle, onClick }) {
   }, [data]);
 
   return (
-    <div className="flex overflow-x-auto overflow-y-auto overflow-hidden">
-      <div className="relative mx-auto">
-        <svg ref={svgRef}></svg>;
+    <div className="flex overflow-auto w-full h-full">
+      <div className="relative mx-auto my-auto">
+        <svg ref={svgRef}></svg>
       </div>
     </div>
   );
