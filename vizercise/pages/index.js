@@ -1,7 +1,7 @@
 import { useState } from "react";
-import BodyMap from "@/components/BodyMap";
-import ScatterPlot from "@/components/ScatterPlot";
-import DetailsList from "@/components/DetailsList";
+import BodyMap from "../components/BodyMap";
+import ScatterPlot from "../components/ScatterPlot";
+import DetailsList from "../components/DetailsList";
 
 export default function Home() {
   let [currentMuscle, setCurrentMuscle] = useState(null);
