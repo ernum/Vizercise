@@ -1,7 +1,6 @@
 import * as d3 from "d3";
 import Script from "next/script";
 import { useEffect, useState } from "react";
-import musclesConst from "@/public/musclesConst";
 
 export default function BodyMap({ css, onClick }) {
   const backBody = "/back_body_highlighted.svg";
@@ -40,14 +39,10 @@ export default function BodyMap({ css, onClick }) {
   const quad_inner =
     "M 138.5 466.7 C 143.4 470.1 146.5 482.6 146.9 496.6 C 147 500.6 147.5 517.1 144.3 530.9 C 141.1 546.2 138.9 552.2 137.3 556.8 C 135.5 560.9 132.5 571 130.1 570.5 C 127.2 569.5 126.1 562.6 126.6 554.7 C 127.8 535.2 130 516.5 132.7 504.6 C 135.7 491.8 138.5 477.4 138.2 472.1 C 138.1 469.7 137.8 466.5 138.4 466.6";
 
-  const maleFront = musclesConst[0];
-
-
   const [body, setBody] = useState(frontEmpty);
   const [buttonString, setString] = useState(frontString);
 
   function drawBody() {
-    console.log(maleFront);
     return body === frontEmpty ? drawFront() : drawBack();
   }
 
