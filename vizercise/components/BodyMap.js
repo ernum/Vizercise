@@ -22,20 +22,21 @@ export default function BodyMap({ css, onClick }) {
 
   // the value of body decides what is rendered
   const [body, setBody] = useState(frontMaleEmpty);
-  const [orientationString, setOrientationString] = useState(frontString);
-  const [genderString, setGenderString] = useState(maleString);
-  // these 2 are used to decide if we're using male or female versions of muscles
-  const [frontMuscles, setFrontMuscles] = useState(frontMusclesMale);
-  const [backMuscles, setBackMuscles] = useState(backMusclesMale);
+  const isMale = (body === frontMaleEmpty || body === backMaleEmpty) ? true : false;
+  const isForwardFacing = (body === frontMaleEmpty || body === frontFemaleEmpty) ? true : false;
+  const orientationString = (isForwardFacing) ? frontString : backString;
+  const genderString = (isMale) ? maleString : femaleString;
+  const frontMuscles = (isMale) ? frontMusclesMale : frontMusclesFemale;
+  const backMuscles = (isMale) ? backMusclesMale : backMusclesFemale;
 
-  function drawBody() {
-    return (body === frontMaleEmpty || body === frontFemaleEmpty) ? drawFront() : drawBack();
+  function drawBody(bodyArg) {
+    return (isForwardFacing) ? drawFront(bodyArg) : drawBack(bodyArg);
   }
 
-  function drawFront() {
+  function drawFront(bodyArg) {
     return (
       <svg className={css} viewBox="0 0 330 860">
-        <image href={body} width="330" height="860" />
+        <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
           id="Traps"
@@ -164,10 +165,10 @@ export default function BodyMap({ css, onClick }) {
     );
   }
 
-  function drawBack() {
+  function drawBack(bodyArg) {
     return (
       <svg className={css} viewBox="0 0 330 860">
-        <image href={body} width="330" height="860" />
+        <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
           id="Traps"
@@ -320,62 +321,39 @@ export default function BodyMap({ css, onClick }) {
 
   // handles clicks on orientation (show front/back) button 
   function handleOrientationClick() {
-    if (body === frontMaleEmpty) {
-      setBody(backMaleEmpty);
-      setBackMuscles(backMusclesMale);
-      setOrientationString(backString);
-    } 
-    else if (body === backMaleEmpty) {
-      setBody(frontMaleEmpty);
-      setFrontMuscles(frontMusclesMale);
-      setOrientationString(frontString);
-    } 
-    else if (body === frontFemaleEmpty) {
-      setBody(backFemaleEmpty);
-      setBackMuscles(backMusclesFemale);
-      setOrientationString(backString);
-    } 
+    if (isMale) {
+      isForwardFacing ? setBody(backMaleEmpty) : setBody(frontMaleEmpty);
+    }
     else {
-      setBody(frontFemaleEmpty);
-      setFrontMuscles(frontMusclesFemale);
-      setOrientationString(frontString);
+      isForwardFacing ? setBody(backFemaleEmpty) : setBody(frontFemaleEmpty);
     }
   }
 
   // handles clicks on gender button
   function handleGenderClick() {
-    if (body === frontMaleEmpty) {
-      setBody(frontFemaleEmpty);
-      setFrontMuscles(frontMusclesFemale);
-      setGenderString(femaleString);
-    }
-    else if (body === frontFemaleEmpty) {
-      setBody(frontMaleEmpty);
-      setFrontMuscles(frontMusclesMale);
-      setGenderString(maleString);
-    }
-    else if (body === backMaleEmpty) {
-      setBody(backFemaleEmpty);
-      setBackMuscles(backMusclesFemale);
-      setGenderString(femaleString);
+    if (isForwardFacing) {
+      isMale ? setBody(frontFemaleEmpty) : setBody(frontMaleEmpty);
     }
     else {
-      setBody(backMaleEmpty);
-      setBackMuscles(backMusclesMale);
-      setGenderString(maleString);
+      isMale ? setBody(backFemaleEmpty) : setBody(backMaleEmpty);
     }
   }
 
+  /*  Tried this as a feeble attempt at solving first switch lag (to no avail)
   useEffect(() => {
-    drawBody();
-  }, [body]);
-
+    drawBack(backFemaleEmpty);
+    drawBack(backMaleEmpty);
+    drawFront(frontFemaleEmpty);
+    drawFront(frontMaleEmpty);
+  }, [])
+  */
+ 
   return (
     <div>
       <Script src="https://d3js.org/d3.v7.min.js" />
       { <button onClick={handleOrientationClick}>{orientationString}</button> }
       { <button onClick={handleGenderClick}>{genderString}</button> }
-      {drawBody()}
+      {drawBody(body)}
     </div>
   );
 }
