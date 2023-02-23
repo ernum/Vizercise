@@ -3,24 +3,6 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 import musclesConst from "@/public/musclesConst";
 
-/*      UNIQUE MUSCLE GROUPS FROM SCRAPED-DATA.JSON
-    0: "Biceps"
-    1: "Shoulders"
-    2: "Quads"
-    3: "Chest"
-    4: "Triceps"
-    5: "Glutes"
-    6: "Lats"
-    7: "Hamstrings"
-    8: "Traps"
-    9: "Forearms"
-    10: "Traps (mid-back)" - this one is always listed where traps is listed in same category
-    11: "Lower back"
-    12: "Calves"
-    13: "Abdominals"
-    14: "Obliques"
-*/
-
 export default function BodyMap({ css, onClick }) {
   const frontMaleEmpty = "/front_male_empty.svg";
   const backMaleEmpty = "/back_male_empty.svg";
@@ -32,30 +14,28 @@ export default function BodyMap({ css, onClick }) {
   const femaleString = "Show male";
   const mirror = "translate(330, 0) scale(-1, 1)";
 
+  // musclesConst holds all the different muscle svg paths
   const frontMusclesMale = musclesConst[0];
   const backMusclesMale = musclesConst[1];
   const frontMusclesFemale = musclesConst[2];
   const backMusclesFemale = musclesConst[3];
-    
+
+  // the value of body decides what is rendered
   const [body, setBody] = useState(frontMaleEmpty);
-  const [buttonString, setString] = useState(frontString);
-
-  //const [isForwardFacing, setIsForwardFacing] = useState(true);
-  //const [isMale, setIsMale] = useState(true);
-
-  const [frontBody, setFrontBody] = useState(frontMaleEmpty);
-  const [backBody, setBackBody] = useState(backMaleEmpty);
+  const [orientationString, setOrientationString] = useState(frontString);
+  const [genderString, setGenderString] = useState(maleString);
+  // these 2 are used to decide if we're using male or female versions of muscles
   const [frontMuscles, setFrontMuscles] = useState(frontMusclesMale);
   const [backMuscles, setBackMuscles] = useState(backMusclesMale);
 
   function drawBody() {
-    return body === frontMaleEmpty ? drawFront() : drawBack();
+    return (body === frontMaleEmpty || body === frontFemaleEmpty) ? drawFront() : drawBack();
   }
 
   function drawFront() {
     return (
       <svg className={css} viewBox="0 0 330 860">
-        <image href={frontBody} width="330" height="860" />
+        <image href={body} width="330" height="860" />
         <g
           className="traps"
           id="Traps"
@@ -187,7 +167,7 @@ export default function BodyMap({ css, onClick }) {
   function drawBack() {
     return (
       <svg className={css} viewBox="0 0 330 860">
-        <image href={backMaleEmpty} width="330" height="860" />
+        <image href={body} width="330" height="860" />
         <g
           className="traps"
           id="Traps"
@@ -338,13 +318,51 @@ export default function BodyMap({ css, onClick }) {
     onClick(inputStr);
   }
 
-  function handleClick() {
+  // handles clicks on orientation (show front/back) button 
+  function handleOrientationClick() {
     if (body === frontMaleEmpty) {
       setBody(backMaleEmpty);
-      setString(backString);
-    } else {
+      setBackMuscles(backMusclesMale);
+      setOrientationString(backString);
+    } 
+    else if (body === backMaleEmpty) {
       setBody(frontMaleEmpty);
-      setString(frontString);
+      setFrontMuscles(frontMusclesMale);
+      setOrientationString(frontString);
+    } 
+    else if (body === frontFemaleEmpty) {
+      setBody(backFemaleEmpty);
+      setBackMuscles(backMusclesFemale);
+      setOrientationString(backString);
+    } 
+    else {
+      setBody(frontFemaleEmpty);
+      setFrontMuscles(frontMusclesFemale);
+      setOrientationString(frontString);
+    }
+  }
+
+  // handles clicks on gender button
+  function handleGenderClick() {
+    if (body === frontMaleEmpty) {
+      setBody(frontFemaleEmpty);
+      setFrontMuscles(frontMusclesFemale);
+      setGenderString(femaleString);
+    }
+    else if (body === frontFemaleEmpty) {
+      setBody(frontMaleEmpty);
+      setFrontMuscles(frontMusclesMale);
+      setGenderString(maleString);
+    }
+    else if (body === backMaleEmpty) {
+      setBody(backFemaleEmpty);
+      setBackMuscles(backMusclesFemale);
+      setGenderString(femaleString);
+    }
+    else {
+      setBody(backMaleEmpty);
+      setBackMuscles(backMusclesMale);
+      setGenderString(maleString);
     }
   }
 
@@ -355,7 +373,8 @@ export default function BodyMap({ css, onClick }) {
   return (
     <div>
       <Script src="https://d3js.org/d3.v7.min.js" />
-      { <button onClick={handleClick}>{buttonString}</button> }
+      { <button onClick={handleOrientationClick}>{orientationString}</button> }
+      { <button onClick={handleGenderClick}>{genderString}</button> }
       {drawBody()}
     </div>
   );
