@@ -46,7 +46,7 @@ export default function Home() {
                     </p>
                     <p className='py-2 font-medium'>Grips: {exercise.grips}</p>
                     <p className='py-2 font-medium'>
-                      Mechanic: {exercise.mechp}
+                      Mechanic: {exercise.mechanic}
                     </p>
                     <p className='py-2 font-medium'>Force: {exercise.force}</p>
                     <p className='py-2 font-medium'>
