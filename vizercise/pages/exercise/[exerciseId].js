@@ -19,35 +19,41 @@ export default function Home() {
           return (
             <div className='flex h-screen'>
               <div
-                className=' shadow-2xl bg-white rounded-3xl w-1/4
-                p-20 m-auto'
+                className=' flex shadow-2xl bg-white rounded-3xl w-1/4
+                 m-auto'
                 key={exercise.id}>
-                <iframe
-                  className='m-auto rounded-xl shadow-inner'
-                  src={exercise.video}
-                  width='400px'
-                  height='225px'
-                  allow='autoplay; encrypted-media'
-                  allowFullScreen
-                  title='video'></iframe>
-                <h1 className='text-center p-2 text-3xl text-neutral-600 font-medium'>
-                  {exercise.name}
-                </h1>
-                <p className='py-2 font-bold text-lg font-lato'>
-                  Equipment: {exercise.equipment}{" "}
-                </p>
-                <p className='py-2 font-medium'>
-                  Difficulty:{" "}
-                  <span className={difficultyColor(exercise.difficulty)}>
-                    {exercise.difficulty}
-                  </span>
-                </p>
-                <p className='py-2 font-medium'>Grips: {exercise.grips}</p>
-                <p className='py-2 font-medium'>Mechanic: {exercise.mechp}</p>
-                <p className='py-2 font-medium'>Force: {exercise.force}</p>
-                <p className='py-2 font-medium'>
-                  Instructions: {exercise.howTo}
-                </p>
+                <div className='pt-20'>
+                  <iframe
+                    className='m-auto rounded-xl'
+                    src={exercise.video}
+                    width='400px'
+                    height='225px'
+                    allow='autoplay; encrypted-media'
+                    allowFullScreen
+                    title='video'></iframe>
+                  <div className='p-20'>
+                    <h1 className='text-center p-2 text-3xl text-neutral-600 font-medium'>
+                      {exercise.name}
+                    </h1>
+                    <p className='py-2 font-bold text-lg font-lato'>
+                      Equipment: {exercise.equipment}{" "}
+                    </p>
+                    <p className='py-2 font-medium'>
+                      Difficulty:{" "}
+                      <span className={difficultyColor(exercise.difficulty)}>
+                        {exercise.difficulty}
+                      </span>
+                    </p>
+                    <p className='py-2 font-medium'>Grips: {exercise.grips}</p>
+                    <p className='py-2 font-medium'>
+                      Mechanic: {exercise.mechp}
+                    </p>
+                    <p className='py-2 font-medium'>Force: {exercise.force}</p>
+                    <p className='py-2 font-medium'>
+                      Instructions: {exercise.howTo}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           );

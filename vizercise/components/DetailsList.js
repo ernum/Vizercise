@@ -72,10 +72,7 @@ export default function DetailsList(props) {
       </div>
     );
   }
-  /*onClick={() =>
-                        clickHandler(GetExerciseById(exerciseId).id)
-                      } */
-
+  
   return (
     <div>
       <div>{drawTable(props.exerciseId)}</div>
