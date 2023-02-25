@@ -17,11 +17,10 @@ export default function Home() {
       let displayData = dataRespons.map(function (exercise) {
         if (exercise.id == exerciseId)
           return (
-            <div className='flex h-screen'>
+            <div key={exercise.id} className='flex h-screen'>
               <div
                 className=' flex shadow-2xl bg-white rounded-3xl w-1/4
-                 m-auto'
-                key={exercise.id}>
+                 m-auto'>
                 <div className='pt-20'>
                   <iframe
                     className='m-auto rounded-xl'
