@@ -29,7 +29,7 @@ export default function CirclePacking(props) {
     }
 
     function drawChart() {
-        d3.select("#circlePackChart")
+        d3.select("#circlePackContainer")
             .remove();
 
         const root = pack(exerciseData)
@@ -39,27 +39,72 @@ export default function CirclePacking(props) {
         const svg = d3.select(svgRef.current)
             .style("background", d3.interpolateOranges(0.1))
             .append("svg")
-                .attr("id", "circlePackChart")
+                .attr("id", "circlePackContainer")
                 .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
                 .style("display", "block")
                 .style("margin", "0 -14px")
-                .style("cursor", "pointer")
-                .on("click", (event) => zoom(event, root));
-
+                .style("cursor", "pointer");
+        
+        d3.select("#outerSvg")
+            .on("click", function(event) {
+                    if (focus !== root) {
+                        (zoom(event, root), event.stopPropagation());
+                        switchOffPointerEvents("#leaf");
+                        switchOnPointerEvents("#node");
+                    }
+                }
+            )
+        
         const node = svg.append("g")
             .attr("id", "realRoot")
             .selectAll("circle")
             .data(root.descendants().slice(1))
             .join("circle")
-                .attr("className", d => d.children ? "node" : "leaf node")
+                .attr("className", d => d.children ? "node" : "leaf")
+                .attr("id", d => d.children ? "node" : "leaf")
                 .attr("fill", d => d.children ? d3.interpolateOranges(0.3) : d3.interpolateOranges(0.5))
-                .attr("pointer-events", d => !d.children ? "none" : null)
+                .attr("pointer-events", null)
                 .attr("transform", d => `translate(${d.x},${d.y})`)
-                .on("mouseover", function() { d3.select(this).attr("stroke", "#000"); })
-                .on("mouseout", function() { d3.select(this).attr("stroke", null); })
-                .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()));
+                .on("mouseover", function() { 
+                    if (focus === root) {
+                        switchOffPointerEvents("#leaf");
+                        d3.select(this).attr("className") === "node" &&  
+                        d3.select(this).attr("stroke", "#000");
+                    }
+                    else {
+                        switchOnPointerEvents("#leaf");
+                        d3.select(this).attr("className") === "leaf" && 
+                        d3.select(this).attr("stroke", "#000"); 
+                    }
+                })
+                .on("mouseout", function() { 
+                    switchOnPointerEvents("#leaf");
+                    d3.select(this).attr("stroke", null);
+                });
+                
+        d3.selectAll("#node")
+            .on("click", function(event, d) {
+                (zoom(event, d), event.stopPropagation())
+                switchOffPointerEvents("#node")
+            });
+
+        d3.selectAll("#leaf")
+            .on("click", function(event, d) {
+                    (focus !== root && console.log("hello"), event.stopPropagation());
+                }
+            )
 
         zoomTo([root.x, root.y, root.r * 2]);
+
+        function switchOffPointerEvents(nodeOrLeaf) {
+            d3.selectAll(nodeOrLeaf)
+                .attr("pointer-events", "none");
+        }
+
+        function switchOnPointerEvents(nodeOrLeaf) {
+            d3.selectAll(nodeOrLeaf)
+                .attr("pointer-events", null);
+        }
 
         function zoomTo(v) {
             const k = width / v[2];       
@@ -80,7 +125,8 @@ export default function CirclePacking(props) {
     };
 
     return (
-        <svg 
+        <svg
+            id="outerSvg"
             className={props.css} 
             ref={svgRef}
             width={width+10}
