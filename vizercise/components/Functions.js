@@ -28,7 +28,7 @@ function getGroupedData(attribute) {
 
 const temp = getGroupedData("equipment");
 
-var dataByEquipment = {
+const dataByEquipment = {
   "name": "exercises",
   "children": [
     {
@@ -74,7 +74,28 @@ var dataByEquipment = {
   ]
 }
 
-function getDataOfc() {
+const normConst = 3;
+
+function normalizePopularity() {
+  temp.children[0].Band.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Barbell.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Bodyweight.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Cable.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Dumbbell.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Kettlebell.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Machine.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Plate.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].Stretch.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+  temp.children[0].TRX.forEach((elem) => { (elem.popularity += normConst) / normConst; });
+}
+
+//
+//    This is terrible and must be fixed. Must not update popularity on every re-render
+//    as it does now. Leaving it as is in order to have time to implement other core functionality.
+//
+
+function getDataOfc(dataArg) {
+  normalizePopularity();
   temp.children[0].Band.forEach((elem) => dataByEquipment.children[0].children.push(elem));
   temp.children[0].Barbell.forEach((elem) => dataByEquipment.children[1].children.push(elem));
   temp.children[0].Bodyweight.forEach((elem) => dataByEquipment.children[2].children.push(elem));
@@ -88,7 +109,7 @@ function getDataOfc() {
   return dataByEquipment;
 }
 
-const exerciseData = getDataOfc();
+const exerciseDataByEquipment = getDataOfc();
 
 function GetUniqueAttributes(attribute) {
   var lookup = {};
@@ -122,4 +143,4 @@ function GetExercisesByEquipment(equipmentArg) {
 
 export {  GetExercises, GetExerciseById, dataByEquipment,
           GetUniqueAttributes, dataReq, GetArrayByAttribute, 
-          exerciseData };
+          exerciseDataByEquipment };
