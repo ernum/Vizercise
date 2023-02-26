@@ -49,7 +49,10 @@ export default function Home() {
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
-        <CirclePacking css={"absolute w-[90%] h-[86%] top-[13%] left-[5%]"}/>
+        <CirclePacking 
+          css={"absolute w-[90%] h-[86%] top-[13%] left-[5%]"}
+          currentMuscle={currentMuscle}
+        />
       </div>
 
       {/* Third Box */}
