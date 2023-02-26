@@ -1,50 +1,19 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
+import { exerciseDataByEquipment } from "./Functions";
 
 export default function CirclePacking(props) {
     const svgRef = useRef();
     const width = 500;
     const height = 500;
-
-    const testData = {
-        "name": "top",
-        "children": [
-            {
-            "name": "2A",
-            "children": [
-                {"name": "2AA", "stat": 1},
-                {"name": "2AB", "stat": 1},
-                {"name": "2AC", "stat": 1}
-            ]},
-            {
-            "name": "2B",
-            "children": [
-                {"name": "2BA", "stat": 1},
-                {"name": "2BB", "stat": 1},
-                {"name": "2BC", "stat": 2},
-                {"name": "2BD", "stat": 3}
-            ]},
-            {
-            "name": "2C",
-            "children": [
-                {"name": "2CA", "stat": 1},
-                {"name": "2CB", "stat": 1},
-                {"name": "2CC", "stat": 1},
-                {"name": "2CD", "stat": 1},
-                {"name": "2CE", "stat": 2},
-                {"name": "2CF", "stat": 2},
-                {"name": "2CG", "stat": 2},
-                {"name": "2CH", "stat": 4},
-                {"name": "2CI", "stat": 4},
-                {"name": "2CJ", "stat": 8}
-                ]},
-    ]};
+    const popularityNorm = 4;
+    const [exerciseData, setExerciseData] = useState(exerciseDataByEquipment);
 
     useEffect(() => {
         if (svgRef.current) {
             const svg = d3.select(svgRef.current);
             d3.format(",d");
-            drawChart(svg);
+            drawChart(svg);       
         }   
     }, [svgRef]);
 
@@ -54,7 +23,7 @@ export default function CirclePacking(props) {
             .size([width, height])
             .padding(3)
         (d3.hierarchy(data)
-            .sum(d => d.hasOwnProperty("stat") ? d.stat : 0)
+            .sum(d => d.hasOwnProperty("popularity") ? d.popularity + popularityNorm : 0)
             .sort((a,b) => b.value - a.value))
         )
     }
@@ -63,7 +32,7 @@ export default function CirclePacking(props) {
         d3.select("#circlePackChart")
             .remove();
 
-        const root = pack(testData)
+        const root = pack(exerciseData)
         let focus = root;
         let view;
         

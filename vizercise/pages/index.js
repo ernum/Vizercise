@@ -1,9 +1,7 @@
 import { useState } from "react";
 import BodyMap from "../components/BodyMap";
-import ScatterPlot from "../components/ScatterPlot";
 import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/components/CirclePacking";
-import CirclePackingChart from "@/components/CirclePackingChart";
 
 export default function Home() {
   let [currentMuscle, setCurrentMuscle] = useState(null);
