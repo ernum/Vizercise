@@ -18,7 +18,7 @@ export default function CirclePacking(props) {
 
     useEffect(() => {
         setExerciseData(GetDataOfc(GetExercises(props.currentMuscle)));
-    }, [props])
+    }, [props.currentMuscle])
 
     function pack(data) {
         return (
@@ -38,7 +38,7 @@ export default function CirclePacking(props) {
         const root = pack(exerciseData)
         let focus = root;
         let view;
-        
+
         const svg = d3.select(svgRef.current)
             .style("background", d3.interpolateOranges(0.1))
             .append("svg")
@@ -57,13 +57,15 @@ export default function CirclePacking(props) {
                     }
                 }
             )
-        
+
+        // className and id should be switch but I can't figure out how to use 
+        // className with d3 selection so this is a temporary solution...
         const node = svg.append("g")
             .attr("id", "realRoot")
             .selectAll("circle")
             .data(root.descendants().slice(1))
             .join("circle")
-                .attr("className", d => d.children ? "node" : "leaf")
+                .attr("className", d => d.children ? "node" : d.data.id)
                 .attr("id", d => d.children ? "node" : "leaf")
                 .attr("fill", d => d.children ? d3.interpolateOranges(0.3) : d3.interpolateOranges(0.5))
                 .attr("pointer-events", null)
@@ -71,12 +73,12 @@ export default function CirclePacking(props) {
                 .on("mouseover", function() { 
                     if (focus === root) {
                         switchOffPointerEvents("#leaf");
-                        d3.select(this).attr("className") === "node" &&  
+                        d3.select(this).attr("id") === "node" &&  
                         d3.select(this).attr("stroke", "#000");
                     }
                     else {
                         switchOnPointerEvents("#leaf");
-                        d3.select(this).attr("className") === "leaf" && 
+                        d3.select(this).attr("id") === "leaf" && 
                         d3.select(this).attr("stroke", "#000"); 
                     }
                 })
@@ -104,7 +106,7 @@ export default function CirclePacking(props) {
 
         d3.selectAll("#leaf")
             .on("click", function(event, d) {
-                    (focus !== root && console.log("hello"), event.stopPropagation());
+                    (focus !== root && props.onClick(d3.select(this).attr("className")), event.stopPropagation());
             });
 
         zoomTo([root.x, root.y, root.r * 2]);

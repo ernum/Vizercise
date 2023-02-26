@@ -52,6 +52,7 @@ export default function Home() {
         <CirclePacking 
           css={"absolute w-[90%] h-[86%] top-[13%] left-[5%]"}
           currentMuscle={currentMuscle}
+          onClick={onExerciseClicked}
         />
       </div>
 
