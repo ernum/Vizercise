@@ -94,7 +94,7 @@ export default function CirclePacking(props) {
         .selectAll("text")
         .data(root.descendants())
         .join("text")
-            .style("fill-opacity", d => d.parent === root ? 1 : 0)
+            .style("fill-opacity", d => d.parent === root ? d.descendants().length > 1 ? 1 : 0 : 0)
             .style("display", d => d.parent === root ? "inline" : "none")
             .text(d => d.data.name);
             
