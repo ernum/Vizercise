@@ -1,4 +1,4 @@
-const dataReq = require("../../viz_scraper/json-pop-1676574356.json");
+const dataReq = require("../public/scraped-data.json");
 
 function GetExercises(currentMuscle) {
   return currentMuscle == null
