@@ -1,5 +1,3 @@
-import { group } from "d3";
-
 const dataReq = require("../../viz_scraper/json-pop-1676574356.json");
 
 function GetExercises(currentMuscle) {
@@ -30,51 +28,67 @@ function getGroupedData(attribute) {
 
 const temp = getGroupedData("equipment");
 
-const dataByEquipment = {
+var dataByEquipment = {
   "name": "exercises",
   "children": [
     {
       "name": "Band",
-      "children": [temp.children[0].Band]
+      "children": []
     },
     {
       "name": "Barbell",
-      "children": [temp.children[0].Barbell]
+      "children": []
     },
     {
       "name": "Bodyweight",
-      "children": [temp.children[0].Bodyweight]
+      "children": []
     },
     {
       "name": "Cable",
-      "children": [temp.children[0].Cable]
+      "children": []
     },
     {
       "name": "Dumbbell",
-      "children": [temp.children[0].Dumbbell]
+      "children": []
     },
     {
       "name": "Kettlebell",
-      "children": [temp.children[0].Kettlebell]
+      "children": []
     },
     {
       "name": "Machine",
-      "children": [temp.children[0].Machine]
+      "children": []
     },
     {
       "name": "Plate",
-      "children": [temp.children[0].Plate]
+      "children": []
     },
     {
       "name": "Stretch",
-      "children": [temp.children[0].Stretch]
+      "children": []
     },
     {
       "name": "TRX",
-      "children": [temp.children[0].TRX]
+      "children": []
     },
   ]
 }
+
+function getDataOfc() {
+  temp.children[0].Band.forEach((elem) => dataByEquipment.children[0].children.push(elem));
+  temp.children[0].Barbell.forEach((elem) => dataByEquipment.children[1].children.push(elem));
+  temp.children[0].Bodyweight.forEach((elem) => dataByEquipment.children[2].children.push(elem));
+  temp.children[0].Cable.forEach((elem) => dataByEquipment.children[3].children.push(elem));
+  temp.children[0].Dumbbell.forEach((elem) => dataByEquipment.children[4].children.push(elem));
+  temp.children[0].Kettlebell.forEach((elem) => dataByEquipment.children[5].children.push(elem));
+  temp.children[0].Machine.forEach((elem) => dataByEquipment.children[6].children.push(elem));
+  temp.children[0].Plate.forEach((elem) => dataByEquipment.children[7].children.push(elem));
+  temp.children[0].Stretch.forEach((elem) => dataByEquipment.children[8].children.push(elem));
+  temp.children[0].TRX.forEach((elem) => dataByEquipment.children[9].children.push(elem));
+  return dataByEquipment;
+}
+
+const exerciseData = getDataOfc();
 
 function GetUniqueAttributes(attribute) {
   var lookup = {};
@@ -106,4 +120,6 @@ function GetExercisesByEquipment(equipmentArg) {
   );
 }
 
-export {  GetExercises, GetExerciseById, dataByEquipment };
+export {  GetExercises, GetExerciseById, dataByEquipment,
+          GetUniqueAttributes, dataReq, GetArrayByAttribute, 
+          exerciseData };
