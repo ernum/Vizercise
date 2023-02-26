@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BodyMap from "../components/BodyMap";
-import ScatterPlot from "../components/ScatterPlot";
 import DetailsList from "../components/DetailsList";
+import CirclePacking from "@/components/CirclePacking";
 
 export default function Home() {
   let [currentMuscle, setCurrentMuscle] = useState(null);
@@ -49,7 +49,8 @@ export default function Home() {
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
-        <ScatterPlot
+        <CirclePacking 
+          css={"absolute w-[90%] h-[86%] top-[13%] left-[5%]"}
           currentMuscle={currentMuscle}
           onClick={onExerciseClicked}
         />
