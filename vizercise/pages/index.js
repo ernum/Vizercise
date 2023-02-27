@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BodyMap from "../components/BodyMap";
 import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/components/CirclePacking";
 
 export default function Home() {
-  let [currentMuscle, setCurrentMuscle] = useState(null);
-  let [exerciseSelected, setExerciseSelected] = useState(null);
+  const [currentMuscle, setCurrentMuscle] = useState(null);
+  const [exerciseSelected, setExerciseSelected] = useState(null);
+  const [selectedExercises, setSelectedExercises] = useState([]);
+
+  useEffect(() => {
+    // Could maybe be changed to show some type of "error message" for better user 
+    // feedback if user tries to add an exercise that is already in the list instead 
+    // of just disallowing it (current implementation).
+    exerciseSelected && !(selectedExercises.includes(exerciseSelected)) && 
+      setSelectedExercises([exerciseSelected, ...selectedExercises]);
+  }, [exerciseSelected]);
 
   function onExerciseClicked(exerciseId) {
     setExerciseSelected(exerciseId);
@@ -13,6 +22,11 @@ export default function Home() {
 
   function onMuscleClicked(muscle) {
     setCurrentMuscle(muscle);
+  }
+
+  function removeExercise(id) {
+    setSelectedExercises(selectedExercises.filter(
+      exerciseId => exerciseId != id));
   }
 
   function ExerciseVisualisation() {
@@ -23,7 +37,12 @@ export default function Home() {
         </p>
       );
     } else {
-      return <DetailsList exerciseId={exerciseSelected} />;
+      return (
+        <DetailsList 
+          selectedExercises={selectedExercises}
+          onExerciseRemoval={removeExercise}
+        />
+      )
     }
   }
 
@@ -58,7 +77,7 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-        className="box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[55.4%]
+        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[55.4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
