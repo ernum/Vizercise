@@ -37,12 +37,11 @@ export default function DetailsList(props) {
         </tr>
       )
     }
-
+    
     return (
       <div className='overflow-x-auto flex flex-col'>
         <div className='overflow-x-auto sm:-mx-6 lg:-mx-8'>
           <div className='py-2 inline-block min-w-full sm:px-6 lg:px-8'>
-            <div className='overflow-hidden'>
               <table className='min-w-full'>
                 <thead className='border-b'>
                   <tr>
@@ -84,7 +83,6 @@ export default function DetailsList(props) {
                   }
                 </tbody>
               </table>
-            </div>
           </div>
         </div>
       </div>

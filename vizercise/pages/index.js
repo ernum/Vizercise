@@ -77,7 +77,7 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-        className="box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[55.4%]
+        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[55.4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
