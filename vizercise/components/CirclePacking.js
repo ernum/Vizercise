@@ -67,7 +67,11 @@ export default function CirclePacking(props) {
             .join("circle")
                 .attr("className", d => d.children ? "node" : d.data.id)
                 .attr("id", d => d.children ? "node" : "leaf")
-                .attr("fill", d => d.children ? d3.interpolateOranges(0.3) : d3.interpolateOranges(0.5))
+                .attr("fill", d => d.children ? d3.interpolateOranges(0.3) : 
+                    d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
+                    d.data.difficulty === "Intermediate" ? 'gold' :
+                    d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
+                    d3.interpolateOranges(0.5))
                 .attr("pointer-events", null)
                 .attr("transform", d => `translate(${d.x},${d.y})`)
                 .on("mouseover", function() { 
