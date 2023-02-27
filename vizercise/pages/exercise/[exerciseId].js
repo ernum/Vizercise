@@ -17,10 +17,8 @@ export default function Home() {
         if (exercise.id == exerciseId)
           return (
             <div key={exercise.id} className='flex h-screen'>
-              <div
-                className=' flex shadow-2xl bg-white rounded-3xl w-1/4
-                 m-auto'>
-                <div className='pt-20'>
+              <div className='flex shadow-2xl bg-white rounded-3xl h-[85vh] w-1/2 m-auto min-w-min'>
+                <div className='overflow-auto p-10'>
                   <iframe
                     className='m-auto rounded-xl'
                     src={exercise.video}
@@ -29,7 +27,7 @@ export default function Home() {
                     allow='autoplay; encrypted-media'
                     allowFullScreen
                     title='video'></iframe>
-                  <div className='p-20'>
+                  <div className='p-10'>
                     <h1 className='text-center p-2 text-3xl text-neutral-600 font-medium'>
                       {exercise.name}
                     </h1>
