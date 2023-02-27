@@ -69,7 +69,7 @@ export default function Home() {
         shadown-black/25"
       >
         <CirclePacking 
-          css={"absolute w-[90%] h-[86%] top-[13%] left-[5%]"}
+          css={"rounded-[30px] absolute w-[100%] h-[100%] top-[0%] left-[0%]"}
           currentMuscle={currentMuscle}
           onClick={onExerciseClicked}
         />
