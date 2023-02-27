@@ -33,23 +33,17 @@ export default function Home() {
                     <h1 className='text-center p-2 text-3xl text-neutral-600 font-medium'>
                       {exercise.name}
                     </h1>
-                    <p className='py-2 font-bold text-lg font-lato'>
-                      Equipment: {exercise.equipment}{" "}
-                    </p>
-                    <p className='py-2 font-medium'>
-                      Difficulty:{" "}
+                    <p className='py-2 font-normal'><b>Equipment:</b> {exercise.equipment}{" "}</p>
+                    <p className='py-2 font-normal'> 
+                      <b>Difficulty:</b>{" "}
                       <span className={difficultyColor(exercise.difficulty)}>
                         {exercise.difficulty}
                       </span>
                     </p>
-                    <p className='py-2 font-medium'>Grips: {exercise.grips}</p>
-                    <p className='py-2 font-medium'>
-                      Mechanic: {exercise.mechanic}
-                    </p>
-                    <p className='py-2 font-medium'>Force: {exercise.force}</p>
-                    <p className='py-2 font-medium'>
-                      Instructions: {exercise.howTo}
-                    </p>
+                    <p className='py-2 font-normal'><b>Grips:</b> {exercise.grips}</p>
+                    <p className='py-2 font-normal'><b>Mechanic:</b> {exercise.mechanic}</p>
+                    <p className='py-2 font-normal'><b>Force:</b> {exercise.force}</p>
+                    <p className='py-2 font-normal'><b>Instructions:</b> {exercise.howTo}</p>
                   </div>
                 </div>
               </div>
