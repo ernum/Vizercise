@@ -88,7 +88,8 @@ export default function CirclePacking(props) {
                 });
 
         const label = svg.append("g")
-            .style("font", "18px sans-serif")
+            .style("font", "18px montserrat")
+            .style("font-weight", "700")
             .attr("pointer-events", "none")
             .attr("text-anchor", "middle")
         .selectAll("text")

@@ -15,3 +15,10 @@ body {
     font-family: 'Montserrat';
     src: url('/fonts/montserrat/Montserrat-Regular.ttf') format('truetype');
 }
+
+/* import bold montserrat font */
+@font-face {
+    font-family: 'Montserrat';
+    font-weight: 700;
+    src: url('/fonts/montserrat/Montserrat-Bold.ttf') format('truetype');
+}
