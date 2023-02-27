@@ -45,10 +45,10 @@ export default function DetailsList(props) {
                 </thead>
                 <tbody>
                   <tr className='border-b'>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
+                    <td className='px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium'>
                       <Link
                         href={`/exercise/${GetExerciseById(exerciseId).id}`}>
-                        <button>{GetExerciseById(exerciseId).name}</button>
+                        {GetExerciseById(exerciseId).name}
                       </Link>
                     </td>
                     <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
