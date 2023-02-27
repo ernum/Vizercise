@@ -1,13 +1,43 @@
-import { useEffect } from "react";
 import { GetExerciseById } from "./Functions";
 import Link from "next/link";
 
 export default function DetailsList(props) {
-  useEffect(() => {
-    drawTable(props.exerciseId);
-  }, [props]);
 
-  function drawTable(exerciseId) {
+  function drawTable(exerciseArray) {
+
+    function drawTableRow(exerciseId) {
+
+      const currentId = GetExerciseById(exerciseId).id;
+
+      function removeClickEvent() {
+        props.onExerciseRemoval(currentId);
+      }
+
+      return (
+        <tr className='border-b' key={currentId}>
+          <td><button onClick={removeClickEvent}>click to remove=)</button> </td>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium'>
+            <Link
+              href={`/exercise/${GetExerciseById(exerciseId).id}`}>
+              {GetExerciseById(exerciseId).name}
+            </Link>
+          </td>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+            {GetExerciseById(exerciseId).equipment}
+          </td>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+            {GetExerciseById(exerciseId).difficulty}
+          </td>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+            {GetExerciseById(exerciseId).mechanic}
+          </td>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+            {GetExerciseById(exerciseId).force}
+          </td>
+        </tr>
+      )
+    }
+
     return (
       <div className='overflow-x-auto flex flex-col'>
         <div className='overflow-x-auto sm:-mx-6 lg:-mx-8'>
@@ -16,6 +46,11 @@ export default function DetailsList(props) {
               <table className='min-w-full'>
                 <thead className='border-b'>
                   <tr>
+                    <th
+                      scope='col'
+                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
+                      Remove exercise
+                    </th>
                     <th
                       scope='col'
                       className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
@@ -44,26 +79,9 @@ export default function DetailsList(props) {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className='border-b'>
-                    <td className='px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium'>
-                      <Link
-                        href={`/exercise/${GetExerciseById(exerciseId).id}`}>
-                        {GetExerciseById(exerciseId).name}
-                      </Link>
-                    </td>
-                    <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
-                      {GetExerciseById(exerciseId).equipment}
-                    </td>
-                    <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
-                      {GetExerciseById(exerciseId).difficulty}
-                    </td>
-                    <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
-                      {GetExerciseById(exerciseId).mechanic}
-                    </td>
-                    <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
-                      {GetExerciseById(exerciseId).force}
-                    </td>
-                  </tr>
+                  {
+                    exerciseArray.map(drawTableRow)
+                  }
                 </tbody>
               </table>
             </div>
@@ -75,7 +93,7 @@ export default function DetailsList(props) {
   
   return (
     <div>
-      <div>{drawTable(props.exerciseId)}</div>
+      <div>{drawTable(props.selectedExercises)}</div>
     </div>
   );
 }
