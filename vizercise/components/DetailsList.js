@@ -15,7 +15,7 @@ export default function DetailsList(props) {
 
       return (
         <tr className='border-b' key={currentId}>
-          <td><button onClick={removeClickEvent}>click to remove=)</button> </td>
+          <td className='items-center'><button className='items-center' onClick={removeClickEvent}>✖</button> </td>
           <td className='px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium'>
             <Link
               href={`/exercise/${GetExerciseById(exerciseId).id}`}>
@@ -49,7 +49,7 @@ export default function DetailsList(props) {
                     <th
                       scope='col'
                       className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
-                      Remove exercise
+                      Remove
                     </th>
                     <th
                       scope='col'
