@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
 import { exerciseDataByEquipment, GetExercises, GetDataOfc } from "./Functions";
 
+import { colorLegend } from './colorLegend';
+
 export default function CirclePacking(props) {
     const svgRef = useRef();
     const width = 500;
@@ -67,7 +69,11 @@ export default function CirclePacking(props) {
             .join("circle")
                 .attr("className", d => d.children ? "node" : d.data.id)
                 .attr("id", d => d.children ? "node" : "leaf")
-                .attr("fill", d => d.children ? d3.interpolateOranges(0.3) : d3.interpolateOranges(0.5))
+                .attr("fill", d => d.children ? d3.interpolateOranges(0.3) : 
+                    d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
+                    d.data.difficulty === "Intermediate" ? 'gold' :
+                    d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
+                    d3.interpolateOranges(0.5))
                 .attr("pointer-events", null)
                 .attr("transform", d => `translate(${d.x},${d.y})`)
                 .on("mouseover", function() { 
@@ -88,7 +94,8 @@ export default function CirclePacking(props) {
                 });
 
         const label = svg.append("g")
-            .style("font", "18px sans-serif")
+            .style("font", "18px montserrat")
+            .style("font-weight", "700")
             .attr("pointer-events", "none")
             .attr("text-anchor", "middle")
         .selectAll("text")
@@ -110,6 +117,31 @@ export default function CirclePacking(props) {
             });
 
         zoomTo([root.x, root.y, root.r * 2]);
+
+        const colorScale = d3.scaleOrdinal()
+        .domain(['Beginner', 'Intermediate', 'Advanced'])
+        .range(['#75c47c', '#fcd405', '#fa684c']);
+
+        d3.select("#outerSvg").append('rect')
+        .style("cursor", "default")
+        .attr('x', 10)
+        .attr('y', 10)
+        .attr('width', 100)
+        .attr('height', 60)
+        .attr('rx', 10)
+        .attr('fill', 'white')
+        .attr('opacity', 0.6);
+
+        d3.select("#outerSvg").append('g')
+        .style("font", "10px montserrat")
+        .style("cursor", "default")
+        .attr('transform', `translate(25,25)`)
+        .call(colorLegend, {
+        colorScale,
+        circleRadius: 4,
+        spacing: 14,
+        textOffset: 10
+        });
 
         function switchOffPointerEvents(nodeOrLeaf) {
             d3.selectAll(nodeOrLeaf)
