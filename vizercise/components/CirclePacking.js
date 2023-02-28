@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
 import { exerciseDataByEquipment, GetExercises, GetDataOfc } from "./Functions";
 
+import { colorLegend } from './colorLegend';
+
 export default function CirclePacking(props) {
     const svgRef = useRef();
     const width = 500;
@@ -115,6 +117,31 @@ export default function CirclePacking(props) {
             });
 
         zoomTo([root.x, root.y, root.r * 2]);
+
+        const colorScale = d3.scaleOrdinal()
+        .domain(['Beginner', 'Intermediate', 'Advanced'])
+        .range(['#75c47c', '#fcd405', '#fa684c']);
+
+        svg.append('rect')
+        .style("cursor", "default")
+        .attr('x', -275)
+        .attr('y', -255)
+        .attr('width', 145)
+        .attr('height', 75)
+        .attr('rx', 10)
+        .attr('fill', 'white')
+        .attr('opacity', 0.6);
+
+        svg.append('g')
+        .style("font", "14px montserrat")
+        .style("cursor", "default")
+        .attr('transform', `translate(-252,-235)`)
+        .call(colorLegend, {
+        colorScale,
+        circleRadius: 8,
+        spacing: 20,
+        textOffset: 20
+        });
 
         function switchOffPointerEvents(nodeOrLeaf) {
             d3.selectAll(nodeOrLeaf)
