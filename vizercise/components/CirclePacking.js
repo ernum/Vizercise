@@ -6,9 +6,10 @@ export default function CirclePacking(props) {
     const svgRef = useRef();
     const width = 500;
     const height = 500;
-    const popularityNorm = 4;
+    const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
     const [exerciseData, setExerciseData] = useState(exerciseDataByEquipment);
 
+    // Redraw chart when svgRef or exerciseData changes
     useEffect(() => {
         if (svgRef.current) {
             const svg = d3.select(svgRef.current);
@@ -16,10 +17,14 @@ export default function CirclePacking(props) {
         }   
     }, [svgRef, exerciseData]);
 
+    // setState whenever a muscle is clicked
     useEffect(() => {
-        setExerciseData(GetDataOfc(GetExercises(props.currentMuscle)));
-    }, [props.currentMuscle])
+        props.selectedMuscles.length 
+            ? setExerciseData(GetDataOfc(props.selectedMuscles.flatMap(GetExercises)))
+            : setExerciseData(exerciseDataByEquipment);
+    }, [props.selectedMuscles])
 
+    // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
         return (
             d3.pack()
@@ -31,7 +36,12 @@ export default function CirclePacking(props) {
         )
     }
 
+    /*
+        Draw a Circle Packing chart. Main functionality copied from:
+            https://observablehq.com/@d3/zoomable-circle-packing
+    */
     function drawChart() {
+        // Remove previous CP chart before redrawing
         d3.select("#circlePackContainer")
             .remove();
 
@@ -58,7 +68,7 @@ export default function CirclePacking(props) {
                 }
             )
 
-        // className and id should be switch but I can't figure out how to use 
+        // className and id should be switched but I can't figure out how to use 
         // className with d3 selection so this is a temporary solution...
         const node = svg.append("g")
             .attr("id", "realRoot")

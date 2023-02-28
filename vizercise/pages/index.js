@@ -4,10 +4,12 @@ import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/components/CirclePacking";
 
 export default function Home() {
-  const [currentMuscle, setCurrentMuscle] = useState(null);
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
+  const [selectedMuscles, setSelectedMuscles] = useState([]);
 
+  // This seems like a bad solution but for some reason I can't get it to work the same
+  // way that onMuscleClicked() works (array is not appended to, only replaces the elem)
   useEffect(() => {
     // Could maybe be changed to show some type of "error message" for better user 
     // feedback if user tries to add an exercise that is already in the list instead 
@@ -20,17 +22,25 @@ export default function Home() {
     setExerciseSelected(exerciseId);
   }
 
+  // Adding and removal of selected muscles
   function onMuscleClicked(muscle) {
-    setCurrentMuscle(muscle);
+    if (selectedMuscles.includes(muscle)) {
+      setSelectedMuscles(selectedMuscles.filter(
+        muscleName => muscleName !== muscle));
+    }
+    else {
+      setSelectedMuscles([... selectedMuscles, muscle]);
+    }
   }
 
+  // Removing from list of exercises
   function removeExercise(id) {
     setSelectedExercises(selectedExercises.filter(
       exerciseId => exerciseId != id));
   }
 
   function ExerciseVisualisation() {
-    if (exerciseSelected == null) {
+    if (!exerciseSelected) {
       return (
         <p className="absolute font-montserrat font-normal text-[32px] leading-10 left-[23.6%] top-[41.4%]">
           Please select an exercise
@@ -70,7 +80,7 @@ export default function Home() {
       >
         <CirclePacking 
           css={"absolute w-[90%] h-[86%] top-[13%] left-[5%]"}
-          currentMuscle={currentMuscle}
+          selectedMuscles={selectedMuscles}
           onClick={onExerciseClicked}
         />
       </div>
