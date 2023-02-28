@@ -122,25 +122,25 @@ export default function CirclePacking(props) {
         .domain(['Beginner', 'Intermediate', 'Advanced'])
         .range(['#75c47c', '#fcd405', '#fa684c']);
 
-        svg.append('rect')
+        d3.select("#outerSvg").append('rect')
         .style("cursor", "default")
-        .attr('x', -275)
-        .attr('y', -255)
-        .attr('width', 145)
-        .attr('height', 75)
+        .attr('x', 10)
+        .attr('y', 10)
+        .attr('width', 100)
+        .attr('height', 60)
         .attr('rx', 10)
         .attr('fill', 'white')
         .attr('opacity', 0.6);
 
-        svg.append('g')
-        .style("font", "14px montserrat")
+        d3.select("#outerSvg").append('g')
+        .style("font", "10px montserrat")
         .style("cursor", "default")
-        .attr('transform', `translate(-252,-235)`)
+        .attr('transform', `translate(25,25)`)
         .call(colorLegend, {
         colorScale,
-        circleRadius: 8,
-        spacing: 20,
-        textOffset: 20
+        circleRadius: 4,
+        spacing: 14,
+        textOffset: 10
         });
 
         function switchOffPointerEvents(nodeOrLeaf) {
