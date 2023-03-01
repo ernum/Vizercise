@@ -77,7 +77,7 @@ export default function Home() {
       <div
         className="box-border absolute w-[49.3%] h-[47.1%] left-[48.6%] top-[4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-        shadown-black/25"
+        shadown-black/25 overflow-hidden"
       >
         <CirclePacking   
           css={"z-0 rounded-[30px] absolute w-[100%] h-[100%] top-[0%] left-[0%]"}
