@@ -84,7 +84,7 @@ export default function Home() {
           selectedMuscles={selectedMuscles}
           onClick={onExerciseClicked}
         />
-        <p className="ml-5 mb-1 bottom-0 left-0 text-xs absolute z-10 font-montserrat font-semibold italic text-amber-900 opacity-60">size of circle = popularity by Google <a href='https://searchvolume.io/' target="_blank" rel="noopener noreferrer">search volume</a></p>
+        <p className="ml-5 mb-1 bottom-0 left-0 text-xs absolute z-10 font-montserrat font-semibold italic text-amber-900 opacity-60 pointer-events-none">size of circle = popularity by Google <a href='https://searchvolume.io/' target="_blank" rel="noopener noreferrer">search volume</a></p>
       </div>
 
       {/* Third Box */}

@@ -140,12 +140,14 @@ export default function CirclePacking(props) {
         .attr('height', 60)
         .attr('rx', 10)
         .attr('fill', 'white')
+        .attr("pointer-events", "none")
         .attr('opacity', 0.6);
 
         d3.select("#outerSvg").append('g')
         .style("font", "10px montserrat")
         .style("cursor", "default")
         .attr('transform', `translate(25,25)`)
+        .attr("pointer-events", "none")
         .call(colorLegend, {
         colorScale,
         circleRadius: 4,
