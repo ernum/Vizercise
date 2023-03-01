@@ -115,8 +115,8 @@ export default function CirclePacking(props) {
                 .on("mousemove", function(event, d) {
                     toolTip
                         .html(d.data.name)
-                        .style("left", (event.pageX - 925) + "px") 
-                        .style("top", (event.pageY - 60) + "px");
+                        .style("left", (event.pageX - 920) + "px") 
+                        .style("top", (event.pageY - 70) + "px");
                 });
 
         const label = svg.append("g")
