@@ -4,10 +4,12 @@ import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/components/CirclePacking";
 
 export default function Home() {
-  const [currentMuscle, setCurrentMuscle] = useState(null);
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
+  const [selectedMuscles, setSelectedMuscles] = useState([]);
 
+  // This seems like a bad solution but for some reason I can't get it to work the same
+  // way that onMuscleClicked() works (array is not appended to, only replaces the elem)
   useEffect(() => {
     // Could maybe be changed to show some type of "error message" for better user 
     // feedback if user tries to add an exercise that is already in the list instead 
@@ -20,17 +22,25 @@ export default function Home() {
     setExerciseSelected(exerciseId);
   }
 
+  // Adding and removal of selected muscles
   function onMuscleClicked(muscle) {
-    setCurrentMuscle(muscle);
+    if (selectedMuscles.includes(muscle)) {
+      setSelectedMuscles(selectedMuscles.filter(
+        muscleName => muscleName !== muscle));
+    }
+    else {
+      setSelectedMuscles([... selectedMuscles, muscle]);
+    }
   }
 
+  // Removing from list of exercises
   function removeExercise(id) {
     setSelectedExercises(selectedExercises.filter(
       exerciseId => exerciseId != id));
   }
 
   function ExerciseVisualisation() {
-    if (exerciseSelected == null) {
+    if (!exerciseSelected) {
       return (
         <p className="absolute font-montserrat font-normal text-[32px] leading-10 left-[23.6%] top-[41.4%]">
           Please select an exercise
@@ -58,6 +68,7 @@ export default function Home() {
           <BodyMap
             css={"absolute w-[50%] h-[86%] top-[13%] left-[22%]"}
             onClick={onMuscleClicked}
+            selectedMuscles={selectedMuscles}
           />
         </div>
       </div>
@@ -68,9 +79,9 @@ export default function Home() {
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
-        <CirclePacking 
+        <CirclePacking   
           css={"z-0 rounded-[30px] absolute w-[100%] h-[100%] top-[0%] left-[0%]"}
-          currentMuscle={currentMuscle}
+          selectedMuscles={selectedMuscles}
           onClick={onExerciseClicked}
         />
         <p className="ml-5 mb-1 bottom-0 left-0 text-xs absolute z-10 font-montserrat font-semibold italic text-amber-900 opacity-60">size of circle = popularity by Google <a href='https://searchvolume.io/' target="_blank" rel="noopener noreferrer">search volume</a></p>
