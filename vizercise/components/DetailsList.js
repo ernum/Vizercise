@@ -47,8 +47,8 @@ export default function DetailsList(props) {
                   <tr>
                     <th
                       scope='col'
-                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
-                      Remove
+                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left font-montserrat'>
+                      
                     </th>
                     <th
                       scope='col'
