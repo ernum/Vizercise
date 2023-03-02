@@ -69,7 +69,7 @@ export default function Home() {
       >
         <CirclePacking
           css={
-            "z-0 rounded-[30px] absolute w-[100%] h-[100%] top-[0%] left-[0%]"
+            "absolute w-[90%] h-[100%] top-[0%] left-[10%]"
           }
           selectedMuscles={selectedMuscles}
           onClick={onExerciseClicked}

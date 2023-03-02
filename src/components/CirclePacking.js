@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
-import { exerciseDataByEquipment, GetExercises, getNestedData } from "./Functions";
-
+import { exerciseDataByEquipment, GetExercises, getNestedData, dataReq } from "./Functions";
 import { colorLegend } from './colorLegend';
+
 
 export default function CirclePacking(props) {
     const svgRef = useRef();
@@ -10,6 +10,7 @@ export default function CirclePacking(props) {
     const height = 500;
     const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
     const [exerciseData, setExerciseData] = useState(exerciseDataByEquipment);
+    const [sortingScheme, setSortingScheme] = useState(["equipment"]);
 
     // Redraw chart when svgRef or exerciseData changes
     useEffect(() => {
@@ -22,9 +23,9 @@ export default function CirclePacking(props) {
     // setState whenever a muscle is clicked
     useEffect(() => {
         props.selectedMuscles.length 
-            ? setExerciseData(getNestedData(props.selectedMuscles.flatMap(GetExercises)))
-            : setExerciseData(exerciseDataByEquipment);
-    }, [props.selectedMuscles])
+            ? setExerciseData(getNestedData(props.selectedMuscles.flatMap(GetExercises), sortingScheme))
+            : setExerciseData(getNestedData(dataReq, sortingScheme));
+    }, [props.selectedMuscles, sortingScheme])
 
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
@@ -60,6 +61,25 @@ export default function CirclePacking(props) {
                 .style("margin", "0 -14px")
                 .style("cursor", "pointer");
         
+        d3.select("#buttonSvg")
+            .style("background", d3.interpolateOranges(0.1))
+
+        createButton()
+            .attr("y", 10)
+            .on("click", function(event) {
+                setSortingScheme(["equipment"]);
+            })
+        createButton()
+            .attr("y", 45)
+            .on("click", function(event) {
+                setSortingScheme(["force"]);
+            })
+        createButton()
+            .attr("y", 80)
+            .on("click", function(event) {
+                setSortingScheme(["mechanic"]);
+            })
+
         d3.select("#outerSvg")
             .on("click", function(event) {
                     if (focus !== root) {
@@ -173,6 +193,20 @@ export default function CirclePacking(props) {
         textOffset: 10
         });
 
+        function createButton() {
+            return (
+                d3.select("#buttonSvg").append('rect')
+                    .style("cursor", "pointer")
+                    .attr('x', 10)
+                    .attr('width', 50)
+                    .attr('height', 30)
+                    .attr('rx', 10)
+                    .attr('fill', 'white')
+                    .attr("pointer-events", null)
+                    .attr('opacity', 0.6)
+            )
+        }
+
         function createTooltip() {
             return (
                 d3.select("#toolTipAppender")
@@ -221,6 +255,10 @@ export default function CirclePacking(props) {
 
     return (
         <div id="toolTipAppender">
+            <svg 
+                id="buttonSvg"
+                className="absolute w-[10%] h-[100%] top-[0%] left-[0%]">
+            </svg>
             <svg
                 id="outerSvg"
                 className={props.css} 

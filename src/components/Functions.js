@@ -53,18 +53,24 @@ function nestByAttributes(attributesArr) {
 }
 
 const attributeTestArr = ["equipment"];
+const nestedEquipment = nestByAttributes(["equipment"]);
+const nestedForce = nestByAttributes(["force"]);
+const nestedMechanic = nestByAttributes(["mechanic"]);
 
-// Nice little helper to find the object depth
+// Nice little helper to find the object depth, to be used for deeper nesting
 const objectDepth = (o) =>
   Object (o) === o ? 1 + Math.max(-1, ...Object.values(o).map(objectDepth)) : 0
 
-function getNestedData(exerciseArray) {
-  const nestedStructure = nestByAttributes(["equipment"]);
+function getNestedData(exerciseArray, attArray) {
+  const nestedStructure = nestByAttributes(attArray);
   const depth = objectDepth(nestedStructure) / 3;
 
   if (depth === 1) {
     nestedStructure.children.forEach((elem) => {
-      const exercises = getExercisesByEquipment(exerciseArray, elem.name);
+      const exercises = 
+      (attArray[0] === "equipment" && getExercisesByEquipment(exerciseArray, elem.name)) ||
+      (attArray[0] === "force" && getExercisesByForce(exerciseArray, elem.name)) ||
+      (attArray[0] === "mechanic" && getExercisesByMechanic(exerciseArray, elem.name));
       elem.children = exercises;
     })
   }
@@ -81,7 +87,7 @@ function getNestedData(exerciseArray) {
   return nestedStructure;
 }
 
-const exerciseDataByEquipment = getNestedData(dataReq);
+const exerciseDataByEquipment = getNestedData(dataReq, ["equipment"]);
 
 function GetUniqueValuesByAttribute(attribute) {
   var lookup = {};
@@ -146,4 +152,4 @@ function getExercisesByForce(exerciseArray, forceValue) {
 }
 
 export {  GetExercises, GetExerciseById, GetUniqueValuesByAttribute, 
-          getNestedData, GetArrayByEquipment, exerciseDataByEquipment };
+          getNestedData, GetArrayByEquipment, exerciseDataByEquipment, dataReq };
