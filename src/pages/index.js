@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import BodyMap from "../components/BodyMap";
+import BodySection from "../components/BodySection";
 import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/src/components/CirclePacking";
 
@@ -53,7 +53,7 @@ export default function Home() {
                  shadown-black/25 overflow-hidden"
       >
         <div>
-          <BodyMap
+          <BodySection
             css={"absolute w-[50%] h-[86%] top-[13%] left-[22%]"}
             onClick={onMuscleClicked}
             selectedMuscles={selectedMuscles}

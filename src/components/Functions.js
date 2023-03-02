@@ -1,5 +1,9 @@
 const dataReq = require("../../public/scraped-data.json");
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 function GetExercises(currentMuscle) {
   return currentMuscle == null
     ? dataReq
@@ -146,6 +150,7 @@ function GetExercisesByEquipment(equipmentArg) {
 }
 
 export {
+  classNames,
   GetExercises,
   GetExerciseById,
   GetUniqueAttributes,

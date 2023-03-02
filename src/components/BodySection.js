@@ -1,17 +1,18 @@
 import * as d3 from "d3";
 import Script from "next/script";
+import BodyButton from "./Buttons";
 import { useEffect, useState } from "react";
 import musclesConst from "@/public/musclesConst";
 
-export default function BodyMap(props) {
+export default function BodySection(props) {
   const frontMaleEmpty = "/front_male_empty.svg";
   const backMaleEmpty = "/back_male_empty.svg";
   const frontFemaleEmpty = "/front_female_empty.svg";
   const backFemaleEmpty = "/back_female_empty.svg";
-  const frontString = "Show back";
-  const backString = "Show front";
-  const maleString = "Show female";
-  const femaleString = "Show male";
+  const frontString = "Front";
+  const backString = "Back";
+  const maleString = "Male";
+  const femaleString = "Female";
   const mirror = "translate(330, 0) scale(-1, 1)";
 
   // musclesConst holds all the different muscle svg paths
@@ -22,35 +23,37 @@ export default function BodyMap(props) {
 
   // the value of body decides what is rendered
   const [body, setBody] = useState(frontMaleEmpty);
-  const isMale = (body === frontMaleEmpty || body === backMaleEmpty) ? true : false;
-  const isForwardFacing = (body === frontMaleEmpty || body === frontFemaleEmpty) ? true : false;
-  const orientationString = (isForwardFacing) ? frontString : backString;
-  const genderString = (isMale) ? maleString : femaleString;
-  const frontMuscles = (isMale) ? frontMusclesMale : frontMusclesFemale;
-  const backMuscles = (isMale) ? backMusclesMale : backMusclesFemale;
+  const isMale =
+    body === frontMaleEmpty || body === backMaleEmpty ? true : false;
+  const isForwardFacing =
+    body === frontMaleEmpty || body === frontFemaleEmpty ? true : false;
+  const orientationString = isForwardFacing ? frontString : backString;
+  const genderString = isMale ? maleString : femaleString;
+  const frontMuscles = isMale ? frontMusclesMale : frontMusclesFemale;
+  const backMuscles = isMale ? backMusclesMale : backMusclesFemale;
 
   useEffect(() => {
-    props.selectedMuscles.forEach(element => {
+    props.selectedMuscles.forEach((element) => {
       fillMuscleOpacityTransition(element, "0.5");
     });
-  }, [props.selectedMuscles])
+  }, [props.selectedMuscles]);
 
   useEffect(() => {
     d3.select("div#body_div").selectAll("g").attr("fill", "black");
     d3.select("div#body_div").selectAll("g").attr("fill-opacity", "0");
     d3.select("div#body_div").selectAll("g").attr("isselected", "false");
-    props.selectedMuscles.forEach(element => {
+    props.selectedMuscles.forEach((element) => {
       fillMuscleOpacity(element, "0.5");
-      (element === "Lower back" && 
+      (element === "Lower back" &&
         d3.selectAll("g.lower_back").attr("isselected", "true")) ||
-      (element === "Traps (mid-back)" &&
-        d3.selectAll("g.mid_back").attr("isselected", "true")) ||
-      d3.selectAll("g#" + element).attr("isselected", "true");
+        (element === "Traps (mid-back)" &&
+          d3.selectAll("g.mid_back").attr("isselected", "true")) ||
+        d3.selectAll("g#" + element).attr("isselected", "true");
     });
-  }, [body])
- 
+  }, [body]);
+
   function drawBody(bodyArg) {
-    return (isForwardFacing) ? drawFront(bodyArg) : drawBack(bodyArg);
+    return isForwardFacing ? drawFront(bodyArg) : drawBack(bodyArg);
   }
 
   function drawFront(bodyArg) {
@@ -357,7 +360,6 @@ export default function BodyMap(props) {
   }
 
   function fillMuscle(inputId, inputClass) {
-    
     d3.selectAll(inputClass)
       .transition()
       .ease(d3.easeLinear)
@@ -365,11 +367,9 @@ export default function BodyMap(props) {
       .attr("fill-opacity", "1")
       .style("cursor", "pointer");
   }
-  
+
   function fillMuscleColor(inputStr, color) {
-    selectHelper(inputStr)
-      .attr("fill", color)
-      .style("cursor", "pointer");
+    selectHelper(inputStr).attr("fill", color).style("cursor", "pointer");
   }
 
   function fillMuscleOpacity(inputStr, opacity) {
@@ -388,17 +388,19 @@ export default function BodyMap(props) {
   }
 
   function unfillMuscle(inputId, inputClass) {
-    (!(props.selectedMuscles.includes(inputId)) &&
-    d3.selectAll(inputClass)
-      .transition()
-      .ease(d3.easeLinear)
-      .duration(300)
-      .attr("fill-opacity", "0")) ||
-    d3.selectAll(inputClass)
-      .transition()
-      .ease(d3.easeLinear)
-      .duration(300)
-      .attr("fill-opacity", "0.5");
+    (!props.selectedMuscles.includes(inputId) &&
+      d3
+        .selectAll(inputClass)
+        .transition()
+        .ease(d3.easeLinear)
+        .duration(300)
+        .attr("fill-opacity", "0")) ||
+      d3
+        .selectAll(inputClass)
+        .transition()
+        .ease(d3.easeLinear)
+        .duration(300)
+        .attr("fill-opacity", "0.5");
   }
 
   // If's due to d3 selections not too keen on whitespace
@@ -406,29 +408,27 @@ export default function BodyMap(props) {
     let selectString;
     if (gMuscleId === "Lower back") {
       selectString = d3.selectAll("g.lower_back");
-    }
-    else if (gMuscleId === "Traps (mid-back)") {
+    } else if (gMuscleId === "Traps (mid-back)") {
       selectString = d3.selectAll("g.mid_back");
-    }
-    else {
+    } else {
       selectString = d3.selectAll("g#" + gMuscleId);
     }
     return selectString;
   }
-  
+
   // Set to true if currently false or if there is currently no "isselected" attribute
   function switchIsSelected(inputClass) {
-    d3.selectAll(inputClass).attr("isselected") === "false" || 
-    !(d3.selectAll(inputClass).attr("isselected")) 
-      ? d3.selectAll(inputClass).attr("isselected", "true")        
+    d3.selectAll(inputClass).attr("isselected") === "false" ||
+    !d3.selectAll(inputClass).attr("isselected")
+      ? d3.selectAll(inputClass).attr("isselected", "true")
       : d3.selectAll(inputClass).attr("isselected", "false");
   }
 
-  
   function handleMuscleClick(inputId, inputClass) {
     switchIsSelected(inputClass);
     d3.selectAll(inputClass).attr("isselected") === "false" &&
-      d3.selectAll(inputClass)
+      d3
+        .selectAll(inputClass)
         .transition()
         .ease(d3.easeLinear)
         .duration(400)
@@ -436,12 +436,11 @@ export default function BodyMap(props) {
     props.onClick(inputId);
   }
 
-  // handles clicks on orientation (show front/back) button 
+  // handles clicks on orientation (show front/back) button
   function handleOrientationClick() {
     if (isMale) {
       isForwardFacing ? setBody(backMaleEmpty) : setBody(frontMaleEmpty);
-    }
-    else {
+    } else {
       isForwardFacing ? setBody(backFemaleEmpty) : setBody(frontFemaleEmpty);
     }
   }
@@ -450,8 +449,7 @@ export default function BodyMap(props) {
   function handleGenderClick() {
     if (isForwardFacing) {
       isMale ? setBody(frontFemaleEmpty) : setBody(frontMaleEmpty);
-    }
-    else {
+    } else {
       isMale ? setBody(backFemaleEmpty) : setBody(backMaleEmpty);
     }
   }
@@ -464,12 +462,25 @@ export default function BodyMap(props) {
     drawFront(frontMaleEmpty);
   }, [])
   */
- 
+
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      { <button onClick={handleOrientationClick}>{orientationString}</button> }
-      { <button onClick={handleGenderClick}>{genderString}</button> }
+      <div className="relative grid grid-cols-2 top-8 px-8 gap-x-16">
+        <BodyButton
+          menuOrientation="right"
+          action={handleOrientationClick}
+          buttonText={orientationString}
+          optionText={isForwardFacing ? backString : frontString}
+        />
+
+        <BodyButton
+          menuOrientation="left"
+          action={handleGenderClick}
+          buttonText={genderString}
+          optionText={isMale ? femaleString : maleString}
+        />
+      </div>
       {drawBody(body)}
     </div>
   );
