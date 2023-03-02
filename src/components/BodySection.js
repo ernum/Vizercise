@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import Script from "next/script";
+import BodyButton from "./Buttons";
 import { useEffect, useState } from "react";
 import musclesConst from "@/public/musclesConst";
 
@@ -8,10 +9,10 @@ export default function BodySection(props) {
   const backMaleEmpty = "/back_male_empty.svg";
   const frontFemaleEmpty = "/front_female_empty.svg";
   const backFemaleEmpty = "/back_female_empty.svg";
-  const frontString = "Show back";
-  const backString = "Show front";
-  const maleString = "Show female";
-  const femaleString = "Show male";
+  const frontString = "Front";
+  const backString = "Back";
+  const maleString = "Male";
+  const femaleString = "Female";
   const mirror = "translate(330, 0) scale(-1, 1)";
 
   // musclesConst holds all the different muscle svg paths
@@ -466,16 +467,19 @@ export default function BodySection(props) {
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
       <div className="relative grid grid-cols-2 top-8 px-8 gap-x-16">
-        <button
-          className="bg-black text-white"
-          onClick={handleOrientationClick}
-        >
-          {orientationString}
-        </button>
+        <BodyButton
+          menuOrientation="right"
+          action={handleOrientationClick}
+          buttonText={orientationString}
+          optionText={isForwardFacing ? backString : frontString}
+        />
 
-        <button className="bg-black text-white" onClick={handleGenderClick}>
-          {genderString}
-        </button>
+        <BodyButton
+          menuOrientation="left"
+          action={handleGenderClick}
+          buttonText={genderString}
+          optionText={isMale ? femaleString : maleString}
+        />
       </div>
       {drawBody(body)}
     </div>
