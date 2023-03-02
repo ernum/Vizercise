@@ -39,23 +39,6 @@ export default function Home() {
       exerciseId => exerciseId != id));
   }
 
-  function ExerciseVisualisation() {
-    if (!exerciseSelected) {
-      return (
-        <p className="absolute font-montserrat font-normal text-[32px] leading-10 left-[23.6%] top-[41.4%]">
-          Please select an exercise
-        </p>
-      );
-    } else {
-      return (
-        <DetailsList 
-          selectedExercises={selectedExercises}
-          onExerciseRemoval={removeExercise}
-        />
-      )
-    }
-  }
-
   return (
     <div>
       {/* Biggest Box */}
@@ -93,7 +76,10 @@ export default function Home() {
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
-        {ExerciseVisualisation()}
+        <DetailsList 
+          selectedExercises={selectedExercises}
+          onExerciseRemoval={removeExercise}
+        />
       </div>
     </div>
   );
