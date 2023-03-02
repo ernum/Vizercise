@@ -70,6 +70,13 @@ export default function CirclePacking(props) {
                 }
             )
 
+        d3.select(".tooltip")
+            .remove();
+
+        const toolTip = createTooltip();
+        const toolTipOffsetX = 80;
+        const toolTipOffsetY = 20;
+
         // className and id should be switched but I can't figure out how to use 
         // className with d3 selection so this is a temporary solution...
         const node = svg.append("g")
@@ -90,17 +97,28 @@ export default function CirclePacking(props) {
                     if (focus === root) {
                         switchOffPointerEvents("#leaf");
                         d3.select(this).attr("id") === "node" &&  
-                        d3.select(this).attr("stroke", "#000");
+                            d3.select(this).attr("stroke", "#000");
                     }
                     else {
                         switchOnPointerEvents("#leaf");
                         d3.select(this).attr("id") === "leaf" && 
-                        d3.select(this).attr("stroke", "#000"); 
+                            d3.select(this).attr("stroke", "#000");
+                        toolTip
+                        .style("visibility", "visible")
                     }
                 })
                 .on("mouseout", function() { 
                     switchOnPointerEvents("#leaf");
                     d3.select(this).attr("stroke", null);
+                    toolTip
+                        .style("visibility", "hidden")
+                })
+                .on("mousemove", function(event, d) {
+                    const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
+                    toolTip
+                        .html(d.data.name)
+                        .style("left", (event.clientX - svgRect.left - toolTipOffsetX) + "px") 
+                        .style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
                 });
 
         const label = svg.append("g")
@@ -155,6 +173,23 @@ export default function CirclePacking(props) {
         textOffset: 10
         });
 
+        function createTooltip() {
+            return (
+                d3.select("#toolTipAppender")
+                    .append("div")
+                    .attr("class", "tooltip")
+                    .attr("pointer-events", "none")
+                    .style("visibility", "hidden")
+                    .style("background-color", "white")
+                    .style("position", "absolute")
+                    .style("border", "solid")
+                    .style("border-width", "2px")
+                    .style("border-radius", "5px")
+                    .style("padding", "5px")
+                    .style("font", "12px montserrat")
+            );
+        }
+
         function switchOffPointerEvents(nodeOrLeaf) {
             d3.selectAll(nodeOrLeaf)
                 .attr("pointer-events", "none");
@@ -185,12 +220,14 @@ export default function CirclePacking(props) {
     };
 
     return (
-        <svg
-            id="outerSvg"
-            className={props.css} 
-            ref={svgRef}
-            width={width+10}
-            height={height+10}
-        />
+        <div id="toolTipAppender">
+            <svg
+                id="outerSvg"
+                className={props.css} 
+                ref={svgRef}
+                width={width+10}
+                height={height+10}
+            />
+        </div>
     );
 }
