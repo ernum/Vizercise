@@ -26,7 +26,6 @@ export default function CirclePacking(props) {
             : setExerciseData(exerciseDataByEquipment);
     }, [props.selectedMuscles])
 
-
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
         return (
@@ -73,7 +72,10 @@ export default function CirclePacking(props) {
 
         d3.select(".tooltip")
             .remove();
+
         const toolTip = createTooltip();
+        const toolTipOffsetX = 80;
+        const toolTipOffsetY = 20;
 
         // className and id should be switched but I can't figure out how to use 
         // className with d3 selection so this is a temporary solution...
@@ -101,11 +103,9 @@ export default function CirclePacking(props) {
                         switchOnPointerEvents("#leaf");
                         d3.select(this).attr("id") === "leaf" && 
                             d3.select(this).attr("stroke", "#000");
-                        
-                    }
-                    // Could also be moved into the else scope above if we don't want tooltips for outer circles
-                    toolTip
+                        toolTip
                         .style("visibility", "visible")
+                    }
                 })
                 .on("mouseout", function() { 
                     switchOnPointerEvents("#leaf");
@@ -114,10 +114,11 @@ export default function CirclePacking(props) {
                         .style("visibility", "hidden")
                 })
                 .on("mousemove", function(event, d) {
+                    const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
                     toolTip
                         .html(d.data.name)
-                        .style("left", (event.pageX - 925) + "px") 
-                        .style("top", (event.pageY - 60) + "px");
+                        .style("left", (event.clientX - svgRect.left - toolTipOffsetX) + "px") 
+                        .style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
                 });
 
         const label = svg.append("g")
@@ -185,6 +186,7 @@ export default function CirclePacking(props) {
                     .style("border-width", "2px")
                     .style("border-radius", "5px")
                     .style("padding", "5px")
+                    .style("font", "12px montserrat")
             );
         }
 
