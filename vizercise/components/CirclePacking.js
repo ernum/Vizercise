@@ -186,6 +186,7 @@ export default function CirclePacking(props) {
                     .style("border-width", "2px")
                     .style("border-radius", "5px")
                     .style("padding", "5px")
+                    .style("font", "12px montserrat")
             );
         }
 
