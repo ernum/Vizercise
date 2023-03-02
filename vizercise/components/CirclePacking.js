@@ -103,11 +103,9 @@ export default function CirclePacking(props) {
                         switchOnPointerEvents("#leaf");
                         d3.select(this).attr("id") === "leaf" && 
                             d3.select(this).attr("stroke", "#000");
-                        
-                    }
-                    // Could also be moved into the else scope above if we don't want tooltips for outer circles
-                    toolTip
+                        toolTip
                         .style("visibility", "visible")
+                    }
                 })
                 .on("mouseout", function() { 
                     switchOnPointerEvents("#leaf");
