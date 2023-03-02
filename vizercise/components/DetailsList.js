@@ -42,8 +42,8 @@ export default function DetailsList(props) {
       <div className='overflow-x-auto flex flex-col'>
         <div className='overflow-x-auto sm:-mx-6 lg:-mx-8'>
           <div className='py-2 inline-block min-w-full sm:px-6 lg:px-8'>
-              <table className='min-w-full'>
-                <thead className='border-b'>
+              <table className='min-w-full absolute top-0'>
+                <thead className='border-b bg-gray-300'>
                   <tr>
                     <th
                       scope='col'
