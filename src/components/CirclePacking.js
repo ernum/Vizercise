@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
-import { exerciseDataByEquipment, GetExercises, GetDataOfc } from "./Functions";
+import { exerciseDataByEquipment, GetExercises, getNestedData } from "./Functions";
 
 import { colorLegend } from './colorLegend';
 
@@ -22,9 +22,10 @@ export default function CirclePacking(props) {
     // setState whenever a muscle is clicked
     useEffect(() => {
         props.selectedMuscles.length 
-            ? setExerciseData(GetDataOfc(props.selectedMuscles.flatMap(GetExercises)))
+            ? setExerciseData(getNestedData(props.selectedMuscles.flatMap(GetExercises)))
             : setExerciseData(exerciseDataByEquipment);
     }, [props.selectedMuscles])
+
 
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
@@ -72,10 +73,7 @@ export default function CirclePacking(props) {
 
         d3.select(".tooltip")
             .remove();
-
         const toolTip = createTooltip();
-        const toolTipOffsetX = 80;
-        const toolTipOffsetY = 20;
 
         // className and id should be switched but I can't figure out how to use 
         // className with d3 selection so this is a temporary solution...
@@ -103,9 +101,11 @@ export default function CirclePacking(props) {
                         switchOnPointerEvents("#leaf");
                         d3.select(this).attr("id") === "leaf" && 
                             d3.select(this).attr("stroke", "#000");
-                        toolTip
-                        .style("visibility", "visible")
+                        
                     }
+                    // Could also be moved into the else scope above if we don't want tooltips for outer circles
+                    toolTip
+                        .style("visibility", "visible")
                 })
                 .on("mouseout", function() { 
                     switchOnPointerEvents("#leaf");
@@ -114,11 +114,10 @@ export default function CirclePacking(props) {
                         .style("visibility", "hidden")
                 })
                 .on("mousemove", function(event, d) {
-                    const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
                     toolTip
                         .html(d.data.name)
-                        .style("left", (event.clientX - svgRect.left - toolTipOffsetX) + "px") 
-                        .style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
+                        .style("left", (event.pageX - 925) + "px") 
+                        .style("top", (event.pageY - 60) + "px");
                 });
 
         const label = svg.append("g")
@@ -186,7 +185,6 @@ export default function CirclePacking(props) {
                     .style("border-width", "2px")
                     .style("border-radius", "5px")
                     .style("padding", "5px")
-                    .style("font", "12px montserrat")
             );
         }
 
