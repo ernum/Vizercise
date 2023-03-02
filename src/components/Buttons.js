@@ -1,11 +1,8 @@
 import { Menu, Transition, Fragment } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
+import { classNames } from "./Functions";
 
 export default function BodyButton(props) {
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(" ");
-  }
-
   return (
     <Menu as="div" className="relative inline-block text-left z-50">
       <div>
