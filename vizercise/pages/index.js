@@ -37,6 +37,9 @@ export default function Home() {
   function removeExercise(id) {
     setSelectedExercises(selectedExercises.filter(
       exerciseId => exerciseId != id));
+    if (exerciseSelected == id) {
+      setExerciseSelected(null);
+    }
   }
 
   function ExerciseVisualisation() {
