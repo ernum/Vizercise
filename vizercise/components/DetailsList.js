@@ -16,22 +16,22 @@ export default function DetailsList(props) {
       return (
         <tr className='border-b' key={currentId}>
           <td className='text-center'><button className='text-center' onClick={removeClickEvent}>✖</button> </td>
-          <td className='px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium'>
+          <td className='px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium font-montserrat'>
             <Link
               href={`/exercise/${GetExerciseById(exerciseId).id}`}>
               {GetExerciseById(exerciseId).name}
             </Link>
           </td>
-          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap font-montserrat'>
             {GetExerciseById(exerciseId).equipment}
           </td>
-          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap font-montserrat'>
             {GetExerciseById(exerciseId).difficulty}
           </td>
-          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap font-montserrat'>
             {GetExerciseById(exerciseId).mechanic}
           </td>
-          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap'>
+          <td className='text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap font-montserrat'>
             {GetExerciseById(exerciseId).force}
           </td>
         </tr>
@@ -52,27 +52,27 @@ export default function DetailsList(props) {
                     </th>
                     <th
                       scope='col'
-                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
+                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left font-semibold font-montserrat'>
                       Exercise name
                     </th>
                     <th
                       scope='col'
-                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
+                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left font-semibold font-montserrat'>
                       Equipment
                     </th>
                     <th
                       scope='col'
-                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
+                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left font-semibold font-montserrat'>
                       Difficulty
                     </th>
                     <th
                       scope='col'
-                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
+                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left font-semibold font-montserrat'>
                       Mechanic
                     </th>
                     <th
                       scope='col'
-                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left'>
+                      className='text-sm font-medium text-gray-900 px-6 py-4 text-left font-semibold font-montserrat'>
                       Force
                     </th>
                   </tr>
