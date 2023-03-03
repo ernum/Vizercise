@@ -63,6 +63,8 @@ export default function CirclePacking(props) {
         
         d3.select("#buttonSvg")
             .style("background", d3.interpolateOranges(0.1))
+            .selectAll(".sortButton")
+                .remove();
 
         createButton()
             .attr("y", 10)
@@ -170,8 +172,13 @@ export default function CirclePacking(props) {
         .domain(['Beginner', 'Intermediate', 'Advanced'])
         .range(['#75c47c', '#fcd405', '#fa684c']);
 
+        d3.select("#outerSvg")
+            .selectAll(".legendContainer")
+                .remove();
+
         d3.select("#outerSvg").append('rect')
         .style("cursor", "default")
+        .attr("class", "legendContainer")
         .attr('x', 10)
         .attr('y', 10)
         .attr('width', 100)
@@ -181,9 +188,14 @@ export default function CirclePacking(props) {
         .attr("pointer-events", "none")
         .attr('opacity', 0.6);
 
+        d3.select("#outerSvg")
+            .selectAll(".legend")
+                .remove();
+
         d3.select("#outerSvg").append('g')
         .style("font", "10px montserrat")
         .style("cursor", "default")
+        .attr("class", "legend")
         .attr('transform', `translate(25,25)`)
         .attr("pointer-events", "none")
         .call(colorLegend, {
@@ -197,6 +209,7 @@ export default function CirclePacking(props) {
             return (
                 d3.select("#buttonSvg").append('rect')
                     .style("cursor", "pointer")
+                    .attr("class", "sortButton")
                     .attr('x', 10)
                     .attr('width', 50)
                     .attr('height', 30)
