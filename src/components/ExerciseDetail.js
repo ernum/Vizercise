@@ -16,9 +16,17 @@ export default function Detail(props) {
           return (
             <div
               key={exercise.id}
-              className='absolute inset-0 flex justify-center items-center bg-opacity-50 z-20 bg-slate-400'>
+              onClick={() => props.onSetBoolValue(false)}
+              className='absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800'>
               <div className='flex shadow-2xl bg-white rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20'>
-                <div className='overflow-auto p-10 '>
+                <div className='overflow-auto p-5 '>
+                  <div className='flex flex-col items-center my-5 '>
+                    <button
+                      onClick={() => props.onSetBoolValue(false)}
+                      className='transition  bg-gray-400 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full items-center'>
+                      ✖
+                    </button>
+                  </div>
                   <iframe
                     className='m-auto rounded-xl'
                     src={exercise.video}
@@ -53,13 +61,6 @@ export default function Detail(props) {
                       <b>Instructions:</b> {exercise.howTo}
                     </p>
                     <hr />
-                    <div className='flex flex-col items-center my-5'>
-                      <button
-                        onClick={() => props.onSetBoolValue(false)}
-                        className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full items-center'>
-                        Close
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
