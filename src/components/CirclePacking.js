@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState} from "react";
 import * as d3 from "d3";
-import { exerciseDataByEquipment, GetExercises, getNestedData, dataReq } from "./Functions";
+import { GetExercises, getNestedData, dataReq } from "./Functions";
 import { colorLegend } from './colorLegend';
 
 
@@ -9,8 +9,8 @@ export default function CirclePacking(props) {
     const width = 500;
     const height = 500;
     const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
-    const [exerciseData, setExerciseData] = useState(exerciseDataByEquipment);
-    const [sortingScheme, setSortingScheme] = useState(["equipment"]);
+    const [sortingScheme, setSortingScheme] = useState([]);
+    const [exerciseData, setExerciseData] = useState(getNestedData(dataReq, sortingScheme));
 
     // Redraw chart when svgRef or exerciseData changes
     useEffect(() => {
@@ -60,7 +60,7 @@ export default function CirclePacking(props) {
                 .style("display", "block")
                 .style("margin", "0 -14px")
                 .style("cursor", "pointer");
-        
+                
         d3.select("#buttonSvg")
             .style("background", d3.interpolateOranges(0.1))
             .selectAll(".sortButton")
@@ -69,17 +69,29 @@ export default function CirclePacking(props) {
         createButton()
             .attr("y", 10)
             .on("click", function(event) {
-                setSortingScheme(["equipment"]);
+                if (sortingScheme.includes("equipment")) {
+                    setSortingScheme(sortingScheme.filter(elem => elem !== "equipment"))
+                } else {
+                    setSortingScheme([...sortingScheme, "equipment"]);
+                }
             })
         createButton()
             .attr("y", 45)
             .on("click", function(event) {
-                setSortingScheme(["force"]);
+                if (sortingScheme.includes("force")) {
+                    setSortingScheme(sortingScheme.filter(elem => elem !== "force"))
+                } else {
+                    setSortingScheme([...sortingScheme, "force"]);
+                }
             })
         createButton()
             .attr("y", 80)
             .on("click", function(event) {
-                setSortingScheme(["mechanic"]);
+                if (sortingScheme.includes("mechanic")) {
+                    setSortingScheme(sortingScheme.filter(elem => elem !== "mechanic"))
+                } else {
+                    setSortingScheme([...sortingScheme, "mechanic"]);
+                }
             })
 
         d3.select("#outerSvg")
@@ -116,7 +128,7 @@ export default function CirclePacking(props) {
                 .attr("pointer-events", null)
                 .attr("transform", d => `translate(${d.x},${d.y})`)
                 .on("mouseover", function() { 
-                    if (focus === root) {
+                    if (focus.depth !== sortingScheme.length && sortingScheme.length !== 0) {
                         switchOffPointerEvents("#leaf");
                         d3.select(this).attr("id") === "node" &&  
                             d3.select(this).attr("stroke", "#000");
@@ -163,7 +175,8 @@ export default function CirclePacking(props) {
 
         d3.selectAll("#leaf")
             .on("click", function(event, d) {
-                    (focus !== root && props.onClick(d3.select(this).attr("className")), event.stopPropagation());
+                    ((focus !== root || sortingScheme.length === 0) && 
+                    props.onClick(d3.select(this).attr("className")), event.stopPropagation());
             });
 
         zoomTo([root.x, root.y, root.r * 2]);
@@ -263,6 +276,16 @@ export default function CirclePacking(props) {
                 const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
                 return t => zoomTo(i(t));
                 });
+
+            label
+                .filter(function(d) { 
+                    return d.parent === focus || this.style.display === "inline"; })
+                .transition(transition)
+                  .style("fill-opacity", d => d.parent === focus ? d.descendants().length > 1 ? 1 : 0 : 0)
+                  .on("start", function(d) { 
+                    if (d.parent === focus) this.style.display = "inline"; })
+                  .on("end", function(d) { 
+                    if (d.parent !== focus) this.style.display = "none"; });
         }
     };
 

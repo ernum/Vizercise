@@ -69,6 +69,13 @@ function nestByAttributes(attributeArray) {
   like to allow for a bigger depth.
 */
 function getNestedData(exerciseArray, attributeArray) {
+  if (attributeArray.length === 0) {
+    const rootObject = {
+      "name": "root",
+      "children": exerciseArray
+    }
+    return rootObject;
+  }
   const rootObject = nestByAttributes(attributeArray)[0];
   const depth = attributeArray.length;
   const firstLevel = getArrayByAttribute(attributeArray[0], exerciseArray);
