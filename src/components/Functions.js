@@ -12,6 +12,7 @@ function GetExerciseById(id) {
   return dataReq[id];
 }
 
+/* -- Currently not being used but keeping them here in case need arises later --
 function groupBy(objectArray, attribute) {
   return objectArray.reduce((acc, obj) => {
     const key = obj[attribute];
@@ -25,6 +26,7 @@ function getGroupedData(exercisesArray, attribute) {
   grouped = {"name": "exercises", "children":[grouped]};
   return grouped;
 }
+*/
 
 function transformElementToObject(elementToTransform) {
   elementToTransform = {
@@ -34,59 +36,73 @@ function transformElementToObject(elementToTransform) {
   return elementToTransform;
 }
 
-function nestByAttributes(exerciseArray, attributesArr) {
-  let nodeArr = [];
-  attributesArr.forEach((elem) => {
-    nodeArr = 
-      [...nodeArr,
+function nestByAttributes(attributeArray) {
+  let nodeArray = [];
+  attributeArray.forEach((elem) => {
+    nodeArray = 
+      [...nodeArray,
         {
           "name": elem,
           "children": GetUniqueValuesByAttribute(elem).map(transformElementToObject)
         }
       ]
     })
-
-  if (attributesArr.length > 1) {
-    if (attributesArr.length === 3) {
-      nodeArr[1].children.forEach((elem) => {
-        elem.children = nodeArr[2].children;
+  if (attributeArray.length > 1) {
+    if (attributeArray.length === 3) {
+      nodeArray[1].children.forEach((elem) => {
+        elem.children = JSON.parse(JSON.stringify(nodeArray[2].children));
       })
     }
-    nodeArr[0].children.forEach((elem) => {
+    nodeArray[0].children.forEach((elem) => {
       // Deep copies (stringify -> parse) to allow value changes
-      elem.children = JSON.parse(JSON.stringify(nodeArr[1].children));
+      elem.children = JSON.parse(JSON.stringify(nodeArray[1].children));
     })
   }
-
-  return nodeArr;
+  return nodeArray;
 }
 
-const testAttrArray = ["equipment", "force"];
+/*  
+  Gets the data nested according to order of elements in attributeArray so that
+  attributeArray[0] = root and attributeArray[length-1] = leaf.
+  Returns the root object.
+  Maximum depth is 3 with current implementation but can be modified if we would
+  like to allow for a bigger depth.
+*/
+function getNestedData(exerciseArray, attributeArray) {
+  const rootObject = nestByAttributes(attributeArray)[0];
+  const depth = attributeArray.length;
+  const firstLevel = getArrayByAttribute(attributeArray[0], exerciseArray);
 
-function getNestedData(exerciseArray, attArray) {
+  if (depth > 1) {
+    const secondLevel = firstLevel.map((elem) => 
+      getArrayByAttribute(attributeArray[1], elem));
+    
+    if (depth === 2) {
+      for (let i = 0; i < rootObject.children.length; i++) {
+        for (let j = 0; j < rootObject.children[i].children.length; j++) {
+          rootObject.children[i].children[j].children = secondLevel[i][j];
+        }
+      }
+    }
 
-  const nestedStructure = nestByAttributes(exerciseArray, attArray);
-  const firstSort = nestedStructure[0];
-  //const nestCheck = nestByAttributes(dataReq, testAttrArray);
-  const nodeArr = nestByAttributes(exerciseArray, attArray);
-
-  const depth = attArray.length;
-  const firstLevel = getArrayByAttribute(attArray[0], exerciseArray);
-
-  if (depth === 2) {
-    const secondLevel = firstLevel.map((elem) => getArrayByAttribute(attArray[1], elem));
-    console.log(nodeArr[0]);
-    for (let i = 0; i < nodeArr[0].children.length; i++) {
-      for (let j = 0; j < nodeArr[0].children[i].children.length; j++) {
-        nodeArr[0].children[i].children[j].children = secondLevel[i][j];
+    else if (depth === 3) {
+      for (let i = 0; i < rootObject.children.length; i++) {
+        for (let j = 0; j < rootObject.children[i].children.length; j++) {
+          let exercises = getArrayByAttribute(attributeArray[2], secondLevel[i][j])
+          for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
+            rootObject.children[i].children[j].children[k].children = exercises[k];
+          }
+        }
       }
     }
   }
 
-  firstSort.children.forEach((elem) => {
-    elem.children = getExercisesByAttribute(attArray[0], exerciseArray, elem.name);
-  })
-  return firstSort;
+  else {
+    rootObject.children.forEach((elem) => {
+      elem.children = getExercisesByAttribute(attributeArray[0], exerciseArray, elem.name);
+    })
+  }
+  return rootObject;
 }
 
 const exerciseDataByEquipment = getNestedData(dataReq, ["equipment"]);
@@ -137,18 +153,18 @@ function GetArrayByEquipment(exerciseArray) {
 }
 
 function GetArrayByMechanic(exerciseArray) {
-  const equipmentArray = GetUniqueValuesByAttribute("mechanic");
+  const mechanicArray = GetUniqueValuesByAttribute("mechanic");
   var newArray = [];
-  equipmentArray.forEach((elem) => {
+  mechanicArray.forEach((elem) => {
     newArray = [...newArray, getExercisesByMechanic(exerciseArray, elem)]
   });
   return newArray;
 }
 
 function GetArrayByForce(exerciseArray) {
-  const equipmentArray = GetUniqueValuesByAttribute("force");
+  const forceArray = GetUniqueValuesByAttribute("force");
   var newArray = [];
-  equipmentArray.forEach((elem) => {
+  forceArray.forEach((elem) => {
     newArray = [...newArray, getExercisesByForce(exerciseArray, elem)]
   });
   return newArray;
