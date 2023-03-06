@@ -109,7 +109,7 @@ export default function BodySection(props) {
           className="pecs"
           id="Chest"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.pecs")}
@@ -123,7 +123,7 @@ export default function BodySection(props) {
           className="shoulder"
           id="Shoulders"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.shoulder")}
@@ -137,7 +137,7 @@ export default function BodySection(props) {
           className="bicep"
           id="Biceps"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.bicep")}
@@ -151,7 +151,7 @@ export default function BodySection(props) {
           className="forearm"
           id="Forearms"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.forearm")}
@@ -169,7 +169,7 @@ export default function BodySection(props) {
           className="obliques"
           id="Obliques"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.obliques")}
@@ -183,7 +183,7 @@ export default function BodySection(props) {
           className="abs"
           id="Abdominals"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.abs")}
@@ -203,7 +203,7 @@ export default function BodySection(props) {
           className="quads"
           id="Quads"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.quads")}
@@ -221,7 +221,7 @@ export default function BodySection(props) {
           className="calves"
           id="Calves"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.calves")}
@@ -245,7 +245,7 @@ export default function BodySection(props) {
           className="traps"
           id="Traps"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.traps")}
@@ -258,7 +258,7 @@ export default function BodySection(props) {
           className="shoulder"
           id="Shoulders"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.shoulder")}
@@ -272,7 +272,7 @@ export default function BodySection(props) {
           className="tricep"
           id="Triceps"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.tricep")}
@@ -286,7 +286,7 @@ export default function BodySection(props) {
           className="mid_back"
           id="Traps (mid-back)"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.mid_back")}
@@ -299,7 +299,7 @@ export default function BodySection(props) {
           className="forearm"
           id="Forearms"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.forearm")}
@@ -317,7 +317,7 @@ export default function BodySection(props) {
           className="lats"
           id="Lats"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.lats")}
@@ -331,7 +331,7 @@ export default function BodySection(props) {
           className="lower_back"
           id="Lower back"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.lower_back")}
@@ -344,7 +344,7 @@ export default function BodySection(props) {
           className="glute"
           id="Glutes"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.glute")}
@@ -358,7 +358,7 @@ export default function BodySection(props) {
           className="hamstrings"
           id="Hamstrings"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.hamstrings")}
@@ -374,7 +374,7 @@ export default function BodySection(props) {
           className="calves"
           id="Calves"
           stroke="black"
-          fill="transparent"
+          fill="white"
           fillOpacity="1"
           isselected="false"
           onMouseEnter={() => fillMuscle("g.calves")}
