@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { GetExercises, getNestedData, dataReq } from "./Functions";
 import { colorLegend } from './colorLegend';
-
 
 export default function CirclePacking(props) {
     const svgRef = useRef();
@@ -43,7 +42,8 @@ export default function CirclePacking(props) {
         Draw a Circle Packing chart. Main functionality copied from:
             https://observablehq.com/@d3/zoomable-circle-packing
     */
-    function drawChart() {
+    function drawChart() {     
+
         // Remove previous CP chart before redrawing
         d3.select("#circlePackContainer")
             .remove();
@@ -57,11 +57,12 @@ export default function CirclePacking(props) {
             .append("svg")
                 .attr("id", "circlePackContainer")
                 .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
+                .attr("class", "absolute h-[100%]")
                 .style("display", "block")
                 .style("margin", "0 -14px")
                 .style("cursor", "pointer");
-                
-        d3.select("#buttonSvg")
+
+        d3.select("#outerSvg")
             .style("background", d3.interpolateOranges(0.1))
             .selectAll(".sortButton")
                 .remove();
@@ -71,8 +72,12 @@ export default function CirclePacking(props) {
             remove it from the sorting scheme. Else, append the attribute to the end of the
             sortingScheme array (making it the current most deeply nested attribute)
         */
-        createButton()
-            .attr("y", 10)
+        let buttons_x_offset = 10
+
+        /* BUTTON 1 */
+        let button1_offset = 80
+        createButton("Equipment")
+            .attr("y", button1_offset)
             .on("click", function() {
                 if (sortingScheme.includes("equipment")) {
                     setSortingScheme(sortingScheme.filter(elem => elem !== "equipment"))
@@ -80,8 +85,20 @@ export default function CirclePacking(props) {
                     setSortingScheme([...sortingScheme, "equipment"]);
                 }
             })
-        createButton()
-            .attr("y", 45)
+
+        d3.select("#outerSvg")
+            .append("image")
+            .attr("class", "btn_img")
+            .attr("xlink:href", "/icons/dumbbell.svg")
+            .attr("x", buttons_x_offset + 5.5)
+            .attr("y", button1_offset + 5.5)
+            .attr('class', 'h-[5%]')
+            .attr('pointer-events', 'none')
+
+        /* BUTTON 2 */
+        let button2_offset = 115
+        createButton("Force")
+            .attr("y", button2_offset)
             .on("click", function() {
                 if (sortingScheme.includes("force")) {
                     setSortingScheme(sortingScheme.filter(elem => elem !== "force"))
@@ -89,8 +106,20 @@ export default function CirclePacking(props) {
                     setSortingScheme([...sortingScheme, "force"]);
                 }
             })
-        createButton()
-            .attr("y", 80)
+
+        d3.select("#outerSvg")
+            .append("image")
+            .attr("class", "btn_img")
+            .attr("xlink:href", "/icons/force.svg")
+            .attr("x", buttons_x_offset + 5.5)
+            .attr("y", button2_offset + 5.5)
+            .attr('class', 'h-[5%]')
+            .attr('pointer-events', 'none')
+
+        /* BUTTON 3 */
+        let button3_offset = 150
+        createButton("Mechanic")
+            .attr("y", button3_offset)
             .on("click", function() {
                 if (sortingScheme.includes("mechanic")) {
                     setSortingScheme(sortingScheme.filter(elem => elem !== "mechanic"))
@@ -98,6 +127,17 @@ export default function CirclePacking(props) {
                     setSortingScheme([...sortingScheme, "mechanic"]);
                 }
             })
+
+        d3.select("#outerSvg")
+            .append("image")
+            .attr("class", "btn_img")
+            .attr("xlink:href", "/icons/gear.svg")
+            .attr("x", buttons_x_offset + 5.5)
+            .attr("y", button3_offset + 5.5)
+            .attr('class', 'h-[5%]')
+            .attr('pointer-events', 'none')
+
+        /* END BUTTONS */
 
         d3.select("#outerSvg")
             .on("click", function(event) {
@@ -113,7 +153,7 @@ export default function CirclePacking(props) {
             .remove();
 
         const toolTip = createTooltip();
-        const toolTipOffsetX = 80;
+        const toolTipOffsetX = 40;
         const toolTipOffsetY = 20;
 
         // className and id should be switched but I can't figure out how to use 
@@ -142,9 +182,9 @@ export default function CirclePacking(props) {
                         switchOnPointerEvents("#leaf");
                         d3.select(this).attr("id") === "leaf" && 
                             d3.select(this).attr("stroke", "#000");
-                        toolTip
-                        .style("visibility", "visible")
                     }
+                    toolTip
+                        .style("visibility", "visible")
                 })
                 .on("mouseout", function() { 
                     switchOnPointerEvents("#leaf");
@@ -231,11 +271,11 @@ export default function CirclePacking(props) {
 
         function createButton() {
             return (
-                d3.select("#buttonSvg").append('rect')
+                d3.select("#outerSvg").append('rect')
                     .style("cursor", "pointer")
                     .attr("class", "sortButton")
-                    .attr('x', 3)
-                    .attr('width', 50)
+                    .attr('x', 10)
+                    .attr('width', 30)
                     .attr('height', 30)
                     .attr('rx', 10)
                     .attr('fill', 'white')
@@ -302,10 +342,6 @@ export default function CirclePacking(props) {
 
     return (
         <div id="toolTipAppender">
-            <svg 
-                id="buttonSvg"
-                className="absolute w-[10%] h-[100%] top-[0%] left-[0%]">
-            </svg>
             <svg
                 id="outerSvg"
                 className={props.css} 
