@@ -24,7 +24,7 @@ export default function CirclePacking(props) {
         props.selectedMuscles.length 
             ? setExerciseData(getNestedData(props.selectedMuscles.flatMap(GetExercises), sortingScheme))
             : setExerciseData(getNestedData(dataReq, sortingScheme));
-    }, [props.selectedMuscles, sortingScheme])
+    }, [props.selectedMuscles, sortingScheme]);
 
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
@@ -36,26 +36,7 @@ export default function CirclePacking(props) {
             .sum(d => d.hasOwnProperty("popularity") ? d.popularity + popularityNorm : 0)
             .sort((a,b) => b.value - a.value))
         )
-
-
-  // setState whenever a muscle is clicked
-  useEffect(() => {
-    props.selectedMuscles.length
-      ? setExerciseData(GetDataOfc(props.selectedMuscles.flatMap(GetExercises)))
-      : setExerciseData(exerciseDataByEquipment);
-  }, [props.selectedMuscles]);
-
-  // Necessary "preprocessing" of data to be able to use it in CP chart
-  function pack(data) {
-    return d3.pack().size([width, height]).padding(3)(
-      d3
-        .hierarchy(data)
-        .sum((d) =>
-          d.hasOwnProperty("popularity") ? d.popularity + popularityNorm : 0
-        )
-        .sort((a, b) => b.value - a.value)
-    );
-  }
+    }
 
   /*
         Draw a Circle Packing chart. Main functionality copied from:
