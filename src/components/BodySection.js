@@ -77,6 +77,7 @@ export default function BodySection(props) {
   }, [props.selectedExercises]);
 
   useEffect(() => {
+    d3.select("div#body_div").selectAll("g").style("stroke-width", "1");
     d3.select("div#body_div").selectAll("g").attr("isselected", "false");
     props.selectedMuscles.forEach((element) => {
       fillMuscleStroke(element, "3");
@@ -397,7 +398,7 @@ export default function BodySection(props) {
 
   function fillMuscleStroke(inputStr, width) {
     selectHelper(inputStr)
-      .attr("stroke-width", width)
+      .style("stroke-width", width)
       .style("cursor", "pointer");
   }
 
