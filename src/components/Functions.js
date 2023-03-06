@@ -206,7 +206,6 @@ export {
   GetExerciseById,
   GetUniqueValuesByAttribute,
   getNestedData,
-  GetArrayByAttribute,
   exerciseDataByEquipment,
   dataReq,
 };
