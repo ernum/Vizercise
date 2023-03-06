@@ -2,17 +2,20 @@ import * as d3 from "d3";
 import Script from "next/script";
 import BodyButton from "./Buttons";
 import { useEffect, useState } from "react";
-import musclesConst from "@/public/musclesConst";
+import { musclesConst, allMuscles, colourPalette } from "@/public/musclesConst";
+import { GetExerciseById } from "./Functions";
 
 export default function BodySection(props) {
   const frontMaleEmpty = "/front_male_empty.svg";
   const backMaleEmpty = "/back_male_empty.svg";
   const frontFemaleEmpty = "/front_female_empty.svg";
   const backFemaleEmpty = "/back_female_empty.svg";
+
   const frontString = "Front";
   const backString = "Back";
   const maleString = "Male";
   const femaleString = "Female";
+
   const mirror = "translate(330, 0) scale(-1, 1)";
 
   // musclesConst holds all the different muscle svg paths
@@ -34,16 +37,44 @@ export default function BodySection(props) {
 
   useEffect(() => {
     props.selectedMuscles.forEach((element) => {
-      fillMuscleOpacityTransition(element, "0.5");
+      fillMuscle(element);
     });
   }, [props.selectedMuscles]);
 
+  // Heat Map
   useEffect(() => {
-    d3.select("div#body_div").selectAll("g").attr("fill", "black");
-    d3.select("div#body_div").selectAll("g").attr("fill-opacity", "0");
+    let musclesToHighlight = {};
+
+    for (const exercise of props.selectedExercises) {
+      const muscles = GetExerciseById(exercise).primaryMuscles;
+      for (const muscle of muscles) {
+        if (!musclesToHighlight[muscle]) musclesToHighlight[muscle] = 1;
+        else if (musclesToHighlight[muscle] < 4) musclesToHighlight[muscle]++;
+      }
+    }
+
+    for (const muscle of allMuscles) {
+      if (musclesToHighlight[muscle]) {
+        const colour = musclesToHighlight[muscle];
+        selectHelper(muscle)
+          .transition()
+          .ease(d3.easeLinear)
+          .duration(300)
+          .attr("fill", colourPalette[colour]);
+      } else {
+        selectHelper(muscle)
+          .transition()
+          .ease(d3.easeLinear)
+          .duration(300)
+          .attr("fill", "white");
+      }
+    }
+  }, [props.selectedExercises]);
+
+  useEffect(() => {
     d3.select("div#body_div").selectAll("g").attr("isselected", "false");
     props.selectedMuscles.forEach((element) => {
-      fillMuscleOpacity(element, "0.5");
+      fillMuscleStroke(element, "3");
       (element === "Lower back" &&
         d3.selectAll("g.lower_back").attr("isselected", "true")) ||
         (element === "Traps (mid-back)" &&
@@ -64,12 +95,12 @@ export default function BodySection(props) {
           className="traps"
           id="Traps"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Traps", "g.traps")}
+          onMouseEnter={() => fillMuscle("g.traps")}
           onMouseLeave={() => unfillMuscle("Traps", "g.traps")}
-          onClick={() => handleMuscleClick("Traps", "g.traps")}
+          onClick={() => handleMuscleClick("Traps")}
         >
           <path d={frontMuscles.traps} />
           <path d={frontMuscles.traps} transform={mirror} />
@@ -78,12 +109,12 @@ export default function BodySection(props) {
           className="pecs"
           id="Chest"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Chest", "g.pecs")}
+          onMouseEnter={() => fillMuscle("g.pecs")}
           onMouseLeave={() => unfillMuscle("Chest", "g.pecs")}
-          onClick={() => handleMuscleClick("Chest", "g.pecs")}
+          onClick={() => handleMuscleClick("Chest")}
         >
           <path d={frontMuscles.pecs} />
           <path d={frontMuscles.pecs} transform={mirror} />
@@ -92,12 +123,12 @@ export default function BodySection(props) {
           className="shoulder"
           id="Shoulders"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Shoulders", "g.shoulder")}
+          onMouseEnter={() => fillMuscle("g.shoulder")}
           onMouseLeave={() => unfillMuscle("Shoulders", "g.shoulder")}
-          onClick={() => handleMuscleClick("Shoulders", "g.shoulder")}
+          onClick={() => handleMuscleClick("Shoulders")}
         >
           <path d={frontMuscles.shoulder} />
           <path d={frontMuscles.shoulder} transform={mirror} />
@@ -106,12 +137,12 @@ export default function BodySection(props) {
           className="bicep"
           id="Biceps"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Biceps", "g.bicep")}
+          onMouseEnter={() => fillMuscle("g.bicep")}
           onMouseLeave={() => unfillMuscle("Biceps", "g.bicep")}
-          onClick={() => handleMuscleClick("Biceps", "g.bicep")}
+          onClick={() => handleMuscleClick("Biceps")}
         >
           <path d={frontMuscles.bicep} />
           <path d={frontMuscles.bicep} transform={mirror} />
@@ -120,12 +151,12 @@ export default function BodySection(props) {
           className="forearm"
           id="Forearms"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Forearms", "g.forearm")}
+          onMouseEnter={() => fillMuscle("g.forearm")}
           onMouseLeave={() => unfillMuscle("Forearms", "g.forearm")}
-          onClick={() => handleMuscleClick("Forearms", "g.forearm")}
+          onClick={() => handleMuscleClick("Forearms")}
         >
           <path d={frontMuscles.forearm_outer} />
           <path d={frontMuscles.forearm_outer} transform={mirror} />
@@ -138,12 +169,12 @@ export default function BodySection(props) {
           className="obliques"
           id="Obliques"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Obliques", "g.obliques")}
+          onMouseEnter={() => fillMuscle("g.obliques")}
           onMouseLeave={() => unfillMuscle("Obliques", "g.obliques")}
-          onClick={() => handleMuscleClick("Obliques", "g.obliques")}
+          onClick={() => handleMuscleClick("Obliques")}
         >
           <path d={frontMuscles.obliques} />
           <path d={frontMuscles.obliques} transform={mirror} />
@@ -152,12 +183,12 @@ export default function BodySection(props) {
           className="abs"
           id="Abdominals"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Abdominals", "g.abs")}
+          onMouseEnter={() => fillMuscle("g.abs")}
           onMouseLeave={() => unfillMuscle("Abdominals", "g.abs")}
-          onClick={() => handleMuscleClick("Abdominals", "g.abs")}
+          onClick={() => handleMuscleClick("Abdominals")}
         >
           <path d={frontMuscles.abs_1} />
           <path d={frontMuscles.abs_1} transform={mirror} />
@@ -172,12 +203,12 @@ export default function BodySection(props) {
           className="quads"
           id="Quads"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Quads", "g.quads")}
+          onMouseEnter={() => fillMuscle("g.quads")}
           onMouseLeave={() => unfillMuscle("Quads", "g.quads")}
-          onClick={() => handleMuscleClick("Quads", "g.quads")}
+          onClick={() => handleMuscleClick("Quads")}
         >
           <path d={frontMuscles.quad_mid} />
           <path d={frontMuscles.quad_mid} transform={mirror} />
@@ -190,12 +221,12 @@ export default function BodySection(props) {
           className="calves"
           id="Calves"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Calves", "g.calves")}
+          onMouseEnter={() => fillMuscle("g.calves")}
           onMouseLeave={() => unfillMuscle("Calves", "g.calves")}
-          onClick={() => handleMuscleClick("Calves", "g.calves")}
+          onClick={() => handleMuscleClick("Calves")}
         >
           <path d={frontMuscles.calves_outer} />
           <path d={frontMuscles.calves_outer} transform={mirror} />
@@ -214,12 +245,12 @@ export default function BodySection(props) {
           className="traps"
           id="Traps"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Traps", "g.traps")}
+          onMouseEnter={() => fillMuscle("g.traps")}
           onMouseLeave={() => unfillMuscle("Traps", "g.traps")}
-          onClick={() => handleMuscleClick("Traps", "g.traps")}
+          onClick={() => handleMuscleClick("Traps")}
         >
           <path d={backMuscles.traps} />
         </g>
@@ -227,12 +258,12 @@ export default function BodySection(props) {
           className="shoulder"
           id="Shoulders"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Shoulders", "g.shoulder")}
+          onMouseEnter={() => fillMuscle("g.shoulder")}
           onMouseLeave={() => unfillMuscle("Shoulders", "g.shoulder")}
-          onClick={() => handleMuscleClick("Shoulders", "g.shoulder")}
+          onClick={() => handleMuscleClick("Shoulders")}
         >
           <path d={backMuscles.shoulder} />
           <path d={backMuscles.shoulder} transform={mirror} />
@@ -241,12 +272,12 @@ export default function BodySection(props) {
           className="tricep"
           id="Triceps"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Triceps", "g.tricep")}
+          onMouseEnter={() => fillMuscle("g.tricep")}
           onMouseLeave={() => unfillMuscle("Triceps", "g.tricep")}
-          onClick={() => handleMuscleClick("Triceps", "g.tricep")}
+          onClick={() => handleMuscleClick("Triceps")}
         >
           <path d={backMuscles.tricep} />
           <path d={backMuscles.tricep} transform={mirror} />
@@ -255,12 +286,12 @@ export default function BodySection(props) {
           className="mid_back"
           id="Traps (mid-back)"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Traps (mid-back)", "g.mid_back")}
+          onMouseEnter={() => fillMuscle("g.mid_back")}
           onMouseLeave={() => unfillMuscle("Traps (mid-back)", "g.mid_back")}
-          onClick={() => handleMuscleClick("Traps (mid-back)", "g.mid_back")}
+          onClick={() => handleMuscleClick("Traps (mid-back)")}
         >
           <path d={backMuscles.mid_back} />
         </g>
@@ -268,12 +299,12 @@ export default function BodySection(props) {
           className="forearm"
           id="Forearms"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Forearms", "g.forearm")}
+          onMouseEnter={() => fillMuscle("g.forearm")}
           onMouseLeave={() => unfillMuscle("Forearms", "g.forearm")}
-          onClick={() => handleMuscleClick("Forearms", "g.forearm")}
+          onClick={() => handleMuscleClick("Forearms")}
         >
           <path d={backMuscles.forearm_inner} />
           <path d={backMuscles.forearm_inner} transform={mirror} />
@@ -286,12 +317,12 @@ export default function BodySection(props) {
           className="lats"
           id="Lats"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Lats", "g.lats")}
+          onMouseEnter={() => fillMuscle("g.lats")}
           onMouseLeave={() => unfillMuscle("Lats", "g.lats")}
-          onClick={() => handleMuscleClick("Lats", "g.lats")}
+          onClick={() => handleMuscleClick("Lats")}
         >
           <path d={backMuscles.lats} />
           <path d={backMuscles.lats} transform={mirror} />
@@ -300,12 +331,12 @@ export default function BodySection(props) {
           className="lower_back"
           id="Lower back"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Lower back", "g.lower_back")}
+          onMouseEnter={() => fillMuscle("g.lower_back")}
           onMouseLeave={() => unfillMuscle("Lower back", "g.lower_back")}
-          onClick={() => handleMuscleClick("Lower back", "g.lower_back")}
+          onClick={() => handleMuscleClick("Lower back")}
         >
           <path d={backMuscles.lower_back} />
         </g>
@@ -313,12 +344,12 @@ export default function BodySection(props) {
           className="glute"
           id="Glutes"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Glutes", "g.glute")}
+          onMouseEnter={() => fillMuscle("g.glute")}
           onMouseLeave={() => unfillMuscle("Glutes", "g.glute")}
-          onClick={() => handleMuscleClick("Glutes", "g.glute")}
+          onClick={() => handleMuscleClick("Glutes")}
         >
           <path d={backMuscles.glute} />
           <path d={backMuscles.glute} transform={mirror} />
@@ -327,12 +358,12 @@ export default function BodySection(props) {
           className="hamstrings"
           id="Hamstrings"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Hamstrings", "g.hamstrings")}
+          onMouseEnter={() => fillMuscle("g.hamstrings")}
           onMouseLeave={() => unfillMuscle("Hamstrings", "g.hamstrings")}
-          onClick={() => handleMuscleClick("Hamstrings", "g.hamstrings")}
+          onClick={() => handleMuscleClick("Hamstrings")}
         >
           <path d={backMuscles.hamstrings_inner} />
           <path d={backMuscles.hamstrings_inner} transform={mirror} />
@@ -343,12 +374,12 @@ export default function BodySection(props) {
           className="calves"
           id="Calves"
           stroke="black"
-          fill="black"
-          fillOpacity="0"
+          fill="white"
+          fillOpacity="1"
           isselected="false"
-          onMouseEnter={() => fillMuscle("Calves", "g.calves")}
+          onMouseEnter={() => fillMuscle("g.calves")}
           onMouseLeave={() => unfillMuscle("Calves", "g.calves")}
-          onClick={() => handleMuscleClick("Calves", "g.calves")}
+          onClick={() => handleMuscleClick("Calves")}
         >
           <path d={backMuscles.calves_inner} />
           <path d={backMuscles.calves_inner} transform={mirror} />
@@ -359,31 +390,18 @@ export default function BodySection(props) {
     );
   }
 
-  function fillMuscle(inputId, inputClass) {
+  function fillMuscleStroke(inputStr, width) {
+    selectHelper(inputStr)
+      .attr("stroke-width", width)
+      .style("cursor", "pointer");
+  }
+
+  function fillMuscle(inputClass) {
     d3.selectAll(inputClass)
       .transition()
       .ease(d3.easeLinear)
-      .duration(300)
-      .attr("fill-opacity", "1")
-      .style("cursor", "pointer");
-  }
-
-  function fillMuscleColor(inputStr, color) {
-    selectHelper(inputStr).attr("fill", color).style("cursor", "pointer");
-  }
-
-  function fillMuscleOpacity(inputStr, opacity) {
-    selectHelper(inputStr)
-      .attr("fill-opacity", opacity)
-      .style("cursor", "pointer");
-  }
-
-  function fillMuscleOpacityTransition(inputStr, opacity) {
-    selectHelper(inputStr)
-      .transition()
-      .ease(d3.easeLinear)
-      .duration(400)
-      .attr("fill-opacity", opacity)
+      .duration(200)
+      .style("stroke-width", "3")
       .style("cursor", "pointer");
   }
 
@@ -393,14 +411,14 @@ export default function BodySection(props) {
         .selectAll(inputClass)
         .transition()
         .ease(d3.easeLinear)
-        .duration(300)
-        .attr("fill-opacity", "0")) ||
+        .duration(200)
+        .style("stroke-width", "1")) ||
       d3
         .selectAll(inputClass)
         .transition()
         .ease(d3.easeLinear)
-        .duration(300)
-        .attr("fill-opacity", "0.5");
+        .duration(200)
+        .style("stroke-width", "3");
   }
 
   // If's due to d3 selections not too keen on whitespace
@@ -416,23 +434,7 @@ export default function BodySection(props) {
     return selectString;
   }
 
-  // Set to true if currently false or if there is currently no "isselected" attribute
-  function switchIsSelected(inputClass) {
-    d3.selectAll(inputClass).attr("isselected") === "false" ||
-    !d3.selectAll(inputClass).attr("isselected")
-      ? d3.selectAll(inputClass).attr("isselected", "true")
-      : d3.selectAll(inputClass).attr("isselected", "false");
-  }
-
-  function handleMuscleClick(inputId, inputClass) {
-    switchIsSelected(inputClass);
-    d3.selectAll(inputClass).attr("isselected") === "false" &&
-      d3
-        .selectAll(inputClass)
-        .transition()
-        .ease(d3.easeLinear)
-        .duration(400)
-        .attr("fill-opacity", "0");
+  function handleMuscleClick(inputId) {
     props.onClick(inputId);
   }
 
@@ -453,15 +455,6 @@ export default function BodySection(props) {
       isMale ? setBody(backFemaleEmpty) : setBody(backMaleEmpty);
     }
   }
-
-  /*  Tried this as a feeble attempt at solving first switch lag (to no avail)
-  useEffect(() => {
-    drawBack(backFemaleEmpty);
-    drawBack(backMaleEmpty);
-    drawFront(frontFemaleEmpty);
-    drawFront(frontMaleEmpty);
-  }, [])
-  */
 
   return (
     <div id="body_div">
