@@ -65,6 +65,8 @@ export default function CirclePacking(props) {
         d3.select("#outerSvg")
             .style("background", d3.interpolateOranges(0.1))
             .selectAll(".sortButton")
+                .remove()
+            .selectAll(".btn_img")
                 .remove();
 
         /*
@@ -106,6 +108,16 @@ export default function CirclePacking(props) {
                     setSortingScheme([...sortingScheme, "force"]);
                 }
             })
+            .on("mouseover", function() {
+                    /* when mouse is over the button, expand its width to 100 */
+                    d3.select(this)
+                        .attr("width", 100)
+                })
+            .on("mouseout", function() {
+                    /* when mouse is over the button, expand its width to 100 */
+                    d3.select(this)
+                        .attr("width", 50)
+                });
 
         d3.select("#outerSvg")
             .append("image")
