@@ -68,6 +68,7 @@ export default function Home() {
             css={"absolute w-[50%] h-[86%] top-[13%] left-[22%]"}
             onClick={onMuscleClicked}
             selectedMuscles={selectedMuscles}
+            selectedExercises={selectedExercises}
           />
         </div>
       </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { GetExercises, getNestedData, dataReq } from "./Functions";
-import { colorLegend } from './colorLegend';
+import { ColorLegend } from './ColorLegend';
 
 export default function CirclePacking(props) {
     const svgRef = useRef();
@@ -36,12 +36,31 @@ export default function CirclePacking(props) {
             .sum(d => d.hasOwnProperty("popularity") ? d.popularity + popularityNorm : 0)
             .sort((a,b) => b.value - a.value))
         )
-    }
 
-    /*
+
+  // setState whenever a muscle is clicked
+  useEffect(() => {
+    props.selectedMuscles.length
+      ? setExerciseData(GetDataOfc(props.selectedMuscles.flatMap(GetExercises)))
+      : setExerciseData(exerciseDataByEquipment);
+  }, [props.selectedMuscles]);
+
+  // Necessary "preprocessing" of data to be able to use it in CP chart
+  function pack(data) {
+    return d3.pack().size([width, height]).padding(3)(
+      d3
+        .hierarchy(data)
+        .sum((d) =>
+          d.hasOwnProperty("popularity") ? d.popularity + popularityNorm : 0
+        )
+        .sort((a, b) => b.value - a.value)
+    );
+  }
+
+  /*
         Draw a Circle Packing chart. Main functionality copied from:
             https://observablehq.com/@d3/zoomable-circle-packing
-    */
+  */
     function drawChart() {     
 
         // Remove previous CP chart before redrawing
@@ -267,12 +286,28 @@ export default function CirclePacking(props) {
         .attr("class", "legend")
         .attr('transform', `translate(25,25)`)
         .attr("pointer-events", "none")
-        .call(colorLegend, {
+        .call(ColorLegend, {
         colorScale,
         circleRadius: 4,
         spacing: 14,
-        textOffset: 10
-        });
+        textOffset: 10,
+      });
+
+    function createTooltip() {
+      return d3
+        .select("#toolTipAppender")
+        .append("div")
+        .attr("class", "tooltip")
+        .attr("pointer-events", "none")
+        .style("visibility", "hidden")
+        .style("background-color", "white")
+        .style("position", "absolute")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+        .style("font", "12px montserrat");
+    }
 
         function createButton(sortName, yOffset) {
             return (
@@ -332,16 +367,14 @@ export default function CirclePacking(props) {
                     .style("font", "12px montserrat")
             );
         }
+        
+    function switchOffPointerEvents(nodeOrLeaf) {
+      d3.selectAll(nodeOrLeaf).attr("pointer-events", "none");
+    }
 
-        function switchOffPointerEvents(nodeOrLeaf) {
-            d3.selectAll(nodeOrLeaf)
-                .attr("pointer-events", "none");
-        }
-
-        function switchOnPointerEvents(nodeOrLeaf) {
-            d3.selectAll(nodeOrLeaf)
-                .attr("pointer-events", null);
-        }
+    function switchOnPointerEvents(nodeOrLeaf) {
+      d3.selectAll(nodeOrLeaf).attr("pointer-events", null);
+    }
 
         function zoomTo(v) {
             const k = width / v[2];       
