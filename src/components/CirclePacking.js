@@ -66,8 +66,10 @@ export default function CirclePacking(props) {
             .style("background", d3.interpolateOranges(0.1))
             .selectAll(".sortButton")
                 .remove()
+
+        d3.select("#outerSvg")
             .selectAll(".btn_img")
-                .remove();
+                .remove()
 
         /*
             For all the sorting buttons: If the attribute is already part of the sorting scheme,
@@ -94,7 +96,8 @@ export default function CirclePacking(props) {
             .attr("xlink:href", "/icons/dumbbell.svg")
             .attr("x", buttons_x_offset + 5.5)
             .attr("y", button1_offset + 5.5)
-            .attr('class', 'h-[5%]')
+            .attr('class', 'btn_img')
+            .attr('height', '5%')
             .attr('pointer-events', 'none')
 
         /* BUTTON 2 */
@@ -108,24 +111,14 @@ export default function CirclePacking(props) {
                     setSortingScheme([...sortingScheme, "force"]);
                 }
             })
-            .on("mouseover", function() {
-                    /* when mouse is over the button, expand its width to 100 */
-                    d3.select(this)
-                        .attr("width", 100)
-                })
-            .on("mouseout", function() {
-                    /* when mouse is over the button, expand its width to 100 */
-                    d3.select(this)
-                        .attr("width", 50)
-                });
 
         d3.select("#outerSvg")
             .append("image")
-            .attr("class", "btn_img")
             .attr("xlink:href", "/icons/force.svg")
             .attr("x", buttons_x_offset + 5.5)
             .attr("y", button2_offset + 5.5)
-            .attr('class', 'h-[5%]')
+            .attr('class', 'btn_img')
+            .attr('height', '5%')
             .attr('pointer-events', 'none')
 
         /* BUTTON 3 */
@@ -142,11 +135,11 @@ export default function CirclePacking(props) {
 
         d3.select("#outerSvg")
             .append("image")
-            .attr("class", "btn_img")
             .attr("xlink:href", "/icons/gear.svg")
             .attr("x", buttons_x_offset + 5.5)
             .attr("y", button3_offset + 5.5)
-            .attr('class', 'h-[5%]')
+            .attr('class', 'btn_img')
+            .attr('height', '5%')
             .attr('pointer-events', 'none')
 
         /* END BUTTONS */
@@ -281,7 +274,7 @@ export default function CirclePacking(props) {
         textOffset: 10
         });
 
-        function createButton() {
+        function createButton(sortName) {
             return (
                 d3.select("#outerSvg").append('rect')
                     .style("cursor", "pointer")
@@ -293,6 +286,23 @@ export default function CirclePacking(props) {
                     .attr('fill', 'white')
                     .attr("pointer-events", null)
                     .attr('opacity', 0.6)
+                    .on("mouseover", function() {
+                        /* when mouse is over the button, expand its width to 100 */
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("width", 100)
+
+                        d3.select(this).append("text").text(sortName)
+                    })
+                    .on("mouseout", function() {
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("width", 30)
+
+                        
+                    })
             )
         }
 
