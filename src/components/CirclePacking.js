@@ -66,9 +66,14 @@ export default function CirclePacking(props) {
             .selectAll(".sortButton")
                 .remove();
 
+        /*
+            For all the sorting buttons: If the attribute is already part of the sorting scheme,
+            remove it from the sorting scheme. Else, append the attribute to the end of the
+            sortingScheme array (making it the current most deeply nested attribute)
+        */
         createButton()
             .attr("y", 10)
-            .on("click", function(event) {
+            .on("click", function() {
                 if (sortingScheme.includes("equipment")) {
                     setSortingScheme(sortingScheme.filter(elem => elem !== "equipment"))
                 } else {
@@ -77,7 +82,7 @@ export default function CirclePacking(props) {
             })
         createButton()
             .attr("y", 45)
-            .on("click", function(event) {
+            .on("click", function() {
                 if (sortingScheme.includes("force")) {
                     setSortingScheme(sortingScheme.filter(elem => elem !== "force"))
                 } else {
@@ -86,7 +91,7 @@ export default function CirclePacking(props) {
             })
         createButton()
             .attr("y", 80)
-            .on("click", function(event) {
+            .on("click", function() {
                 if (sortingScheme.includes("mechanic")) {
                     setSortingScheme(sortingScheme.filter(elem => elem !== "mechanic"))
                 } else {
@@ -168,15 +173,21 @@ export default function CirclePacking(props) {
             .text(d => d.data.name);
             
         d3.selectAll("#node")
-            .on("click", function(event, d) {
-                (zoom(event, d), event.stopPropagation())
-                switchOffPointerEvents("#node")
+            .on("click", function(event, d) {          
+                (zoom(event, d), event.stopPropagation())     
+                if (focus.depth > d.depth) {
+                    d3.select(this)
+                        .attr("pointer-events", "none");
+                } else {
+                    d3.select(this)
+                        .attr("pointer-events", null);
+                }        
             });
 
         d3.selectAll("#leaf")
             .on("click", function(event, d) {
-                    ((focus !== root || sortingScheme.length === 0) && 
-                    props.onClick(d3.select(this).attr("className")), event.stopPropagation());
+                ((focus !== root || sortingScheme.length === 0) && 
+                props.onClick(d3.select(this).attr("className")), event.stopPropagation());
             });
 
         zoomTo([root.x, root.y, root.r * 2]);
@@ -223,7 +234,7 @@ export default function CirclePacking(props) {
                 d3.select("#buttonSvg").append('rect')
                     .style("cursor", "pointer")
                     .attr("class", "sortButton")
-                    .attr('x', 10)
+                    .attr('x', 3)
                     .attr('width', 50)
                     .attr('height', 30)
                     .attr('rx', 10)

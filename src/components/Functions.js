@@ -109,6 +109,10 @@ function getNestedData(exerciseArray, attributeArray) {
       elem.children = getExercisesByAttribute(attributeArray[0], exerciseArray, elem.name);
     })
   }
+  /*  
+    Something like this could be used if we want to filter out empty nested categories:
+    .filter(value => Object.keys(value).length !== 0);
+  */
   return rootObject;
 }
 
@@ -147,12 +151,6 @@ function GetUniqueValuesByAttribute(attribute) {
 function GetArrayByEquipment(exerciseArray) {
   const equipmentArray = GetUniqueValuesByAttribute("equipment");
   var newArray = [];
-  /*
-  equipmentArray.forEach((elem) => {
-    newArray = [...newArray, getExercisesByEquipment(exerciseArray, elem)].filter
-      (value => Object.keys(value).length !== 0);
-  });
-  */
   equipmentArray.forEach((elem) => {
     newArray = [...newArray, getExercisesByEquipment(exerciseArray, elem)]
   });
