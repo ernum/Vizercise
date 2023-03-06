@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { exerciseDataByEquipment, GetExercises, GetDataOfc } from "./Functions";
-
 import { ColorLegend } from "./ColorLegend";
 
 export default function CirclePacking(props) {
