@@ -37,7 +37,12 @@ export default function BodySection(props) {
 
   useEffect(() => {
     props.selectedMuscles.forEach((element) => {
-      fillMuscle(element);
+      selectHelper(element)
+        .transition()
+        .ease(d3.easeLinear)
+        .duration(200)
+        .style("stroke-width", "3")
+        .style("cursor", "pointer");
     });
   }, [props.selectedMuscles]);
 
