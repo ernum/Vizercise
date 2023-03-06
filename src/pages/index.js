@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react";
-import BodyMap from "../components/BodyMap";
+import BodySection from "../components/BodySection";
 import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/src/components/CirclePacking";
+import Detail from "../components/ExerciseDetail";
 
 export default function Home() {
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
+  const [idFromSetId, setnewId] = useState();
+  const [isClosed, setBoolValue] = useState();
+
+  function detailPopup() {
+    if (isClosed == true)
+      return <Detail id={idFromSetId} onSetBoolValue={setBoolValue} />;
+    else return "";
+  }
 
   // This seems like a bad solution but for some reason I can't get it to work the same
   // way that onMuscleClicked() works (array is not appended to, only replaces the elem)
@@ -46,6 +55,8 @@ export default function Home() {
 
   return (
     <div>
+      {/*PopUp Box*/}
+      <div>{detailPopup()}</div>
       {/* Biggest Box */}
       <div
         className="box-border absolute w-[33%] h-[86.5%] left-[12.2%] top-[4%]
@@ -53,7 +64,7 @@ export default function Home() {
                  shadown-black/25 overflow-hidden"
       >
         <div>
-          <BodyMap
+          <BodySection
             css={"absolute w-[50%] h-[86%] top-[13%] left-[22%]"}
             onClick={onMuscleClicked}
             selectedMuscles={selectedMuscles}
@@ -95,6 +106,8 @@ export default function Home() {
         <DetailsList
           selectedExercises={selectedExercises}
           onExerciseRemoval={removeExercise}
+          onSetNewId={setnewId}
+          onSetBoolValue={setBoolValue}
         />
       </div>
     </div>
