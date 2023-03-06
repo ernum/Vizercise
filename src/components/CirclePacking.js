@@ -80,7 +80,7 @@ export default function CirclePacking(props) {
 
         /* BUTTON 1 */
         let button1_offset = 80
-        createButton("Equipment")
+        createButton("Equipment", button1_offset)
             .attr("y", button1_offset)
             .on("click", function() {
                 if (sortingScheme.includes("equipment")) {
@@ -102,7 +102,7 @@ export default function CirclePacking(props) {
 
         /* BUTTON 2 */
         let button2_offset = 115
-        createButton("Force")
+        createButton("Force", button2_offset)
             .attr("y", button2_offset)
             .on("click", function() {
                 if (sortingScheme.includes("force")) {
@@ -123,7 +123,7 @@ export default function CirclePacking(props) {
 
         /* BUTTON 3 */
         let button3_offset = 150
-        createButton("Mechanic")
+        createButton("Mechanic", button3_offset)
             .attr("y", button3_offset)
             .on("click", function() {
                 if (sortingScheme.includes("mechanic")) {
@@ -274,7 +274,7 @@ export default function CirclePacking(props) {
         textOffset: 10
         });
 
-        function createButton(sortName) {
+        function createButton(sortName, yOffset) {
             return (
                 d3.select("#outerSvg").append('rect')
                     .style("cursor", "pointer")
@@ -290,10 +290,18 @@ export default function CirclePacking(props) {
                         /* when mouse is over the button, expand its width to 100 */
                         d3.select(this)
                             .transition()
-                            .duration(200)
+                            .duration(100)
                             .attr("width", 100)
 
-                        d3.select(this).append("text").text(sortName)
+                        d3.select('#outerSvg')
+                            .append('text').text(sortName)
+                            .style("font", "10px montserrat")
+                            .style("cursor", "default")
+                            .attr("class", "sortButtonText")
+                            .attr('x', 43)
+                            .attr('y', yOffset + 19)
+                            .attr("pointer-events", "none")
+                            .style("animation", "fadein 0.5s")
                     })
                     .on("mouseout", function() {
                         d3.select(this)
@@ -301,7 +309,9 @@ export default function CirclePacking(props) {
                             .duration(200)
                             .attr("width", 30)
 
-                        
+                        d3.select('#outerSvg')
+                            .selectAll(".sortButtonText")
+                                .remove()
                     })
             )
         }
