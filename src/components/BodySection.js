@@ -11,8 +11,6 @@ export default function BodySection(props) {
   const frontFemaleEmpty = "/front_female_empty.svg";
   const backFemaleEmpty = "/back_female_empty.svg";
 
-  const frontString = "Front";
-  const backString = "Back";
   const maleString = "Male";
   const femaleString = "Female";
 
@@ -25,12 +23,7 @@ export default function BodySection(props) {
   const backMusclesFemale = musclesConst[3];
 
   // the value of body decides what is rendered
-  const [body, setBody] = useState(frontMaleEmpty);
-  const isMale =
-    body === frontMaleEmpty || body === backMaleEmpty ? true : false;
-  const isForwardFacing =
-    body === frontMaleEmpty || body === frontFemaleEmpty ? true : false;
-  const orientationString = isForwardFacing ? frontString : backString;
+  const [isMale, setIsMale] = useState(true);
   const genderString = isMale ? maleString : femaleString;
   const frontMuscles = isMale ? frontMusclesMale : frontMusclesFemale;
   const backMuscles = isMale ? backMusclesMale : backMusclesFemale;
@@ -84,19 +77,6 @@ export default function BodySection(props) {
         .style("fill", colour);
     }
   }, [props.selectedExercises]);
-
-  useEffect(() => {
-    d3.select("div#body_div").selectAll("g").style("stroke-width", "1");
-    d3.select("div#body_div").selectAll("g").attr("isselected", "false");
-    props.selectedMuscles.forEach((element) => {
-      fillMuscleStroke(element, "3");
-      (element === "Lower back" &&
-        d3.selectAll("g.lower_back").attr("isselected", "true")) ||
-        (element === "Traps (mid-back)" &&
-          d3.selectAll("g.mid_back").attr("isselected", "true")) ||
-        d3.selectAll("g#" + element).attr("isselected", "true");
-    });
-  }, [body]);
 
   function drawFront(bodyArg) {
     return (
@@ -401,18 +381,12 @@ export default function BodySection(props) {
     );
   }
 
-  function fillMuscleStroke(inputStr, width) {
-    selectHelper(inputStr)
-      .style("stroke-width", width)
-      .style("cursor", "pointer");
-  }
-
   function fillMuscle(inputClass) {
     d3.selectAll(inputClass)
       .transition()
       .ease(d3.easeLinear)
       .duration(200)
-      .style("stroke-width", "5")
+      .style("stroke-width", "4")
       .style("cursor", "pointer");
   }
 
@@ -429,7 +403,7 @@ export default function BodySection(props) {
         .transition()
         .ease(d3.easeLinear)
         .duration(200)
-        .style("stroke-width", "5");
+        .style("stroke-width", "4");
   }
 
   // If's due to d3 selections not too keen on whitespace
@@ -449,38 +423,26 @@ export default function BodySection(props) {
     props.onClick(inputId);
   }
 
-  // handles clicks on orientation (show front/back) button
-  function handleOrientationClick() {
-    if (isMale) {
-      isForwardFacing ? setBody(backMaleEmpty) : setBody(frontMaleEmpty);
-    } else {
-      isForwardFacing ? setBody(backFemaleEmpty) : setBody(frontFemaleEmpty);
-    }
-  }
-
-  // handles clicks on gender button
-  function handleGenderClick() {
-    if (isForwardFacing) {
-      isMale ? setBody(frontFemaleEmpty) : setBody(frontMaleEmpty);
-    } else {
-      isMale ? setBody(backFemaleEmpty) : setBody(backMaleEmpty);
-    }
-  }
-
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
       <div className="relative grid grid-cols-1 top-8 px-60 gap-x-16">
         <BodyButton
           menuOrientation="left"
-          action={handleGenderClick}
+          action={() => {
+            setIsMale(!isMale);
+          }}
           buttonText={genderString}
           optionText={isMale ? femaleString : maleString}
         />
       </div>
-      <div className="grid grid-cols-2 grid-rows-5 md:px-6 lg:px-24 pt-20 m-auto">
-        <div className="col-span-1">{drawFront(body)}</div>
-        <div className="col-span-1">{drawBack(body)}</div>
+      <div className="grid grid-cols-2 pt-20 m-auto h-0">
+        <div className="col-span-1">
+          {drawFront(isMale ? frontMaleEmpty : frontFemaleEmpty)}
+        </div>
+        <div className="col-span-1">
+          {drawBack(isMale ? backMaleEmpty : backFemaleEmpty)}
+        </div>
       </div>
     </div>
   );

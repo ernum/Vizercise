@@ -164,4 +164,5 @@ const colourPalette = [
   "#9D0000",
   "#870000",
 ];
+
 export { musclesConst, allMuscles, colourPalette };
