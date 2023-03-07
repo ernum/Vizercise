@@ -50,29 +50,38 @@ export default function BodySection(props) {
   useEffect(() => {
     let musclesToHighlight = {};
 
-    for (const exercise of props.selectedExercises) {
-      const muscles = GetExerciseById(exercise).primaryMuscles;
-      for (const muscle of muscles) {
-        if (!musclesToHighlight[muscle]) musclesToHighlight[muscle] = 1;
-        else if (musclesToHighlight[muscle] < 4) musclesToHighlight[muscle]++;
+    for (let exercise of props.selectedExercises) {
+      exercise = GetExerciseById(exercise);
+      const incValues = [2, 1, 0.5];
+      const muscles = [
+        exercise.primaryMuscles,
+        exercise.secondaryMuscles,
+        exercise.tertiaryMuscles,
+      ];
+
+      for (let i = 0; i < 3; i++) {
+        if (muscles[i]) {
+          for (const muscle of muscles[i]) {
+            if (!musclesToHighlight[muscle])
+              musclesToHighlight[muscle] = incValues[i];
+            else if (musclesToHighlight[muscle] < 9)
+              musclesToHighlight[muscle] += incValues[i];
+          }
+        }
       }
     }
 
     for (const muscle of allMuscles) {
-      if (musclesToHighlight[muscle]) {
-        const colour = musclesToHighlight[muscle];
-        selectHelper(muscle)
-          .transition()
-          .ease(d3.easeLinear)
-          .duration(300)
-          .attr("fill", colourPalette[colour]);
-      } else {
-        selectHelper(muscle)
-          .transition()
-          .ease(d3.easeLinear)
-          .duration(300)
-          .attr("fill", "white");
-      }
+      const sum = musclesToHighlight[muscle] ? musclesToHighlight[muscle] : -1;
+      const colour =
+        musclesToHighlight[muscle] == -1
+          ? "white"
+          : colourPalette[Math.floor(sum)];
+      selectHelper(muscle)
+        .transition()
+        .ease(d3.easeLinear)
+        .duration(300)
+        .style("fill", colour);
     }
   }, [props.selectedExercises]);
 
@@ -403,7 +412,7 @@ export default function BodySection(props) {
       .transition()
       .ease(d3.easeLinear)
       .duration(200)
-      .style("stroke-width", "3")
+      .style("stroke-width", "5")
       .style("cursor", "pointer");
   }
 
@@ -420,7 +429,7 @@ export default function BodySection(props) {
         .transition()
         .ease(d3.easeLinear)
         .duration(200)
-        .style("stroke-width", "3");
+        .style("stroke-width", "5");
   }
 
   // If's due to d3 selections not too keen on whitespace

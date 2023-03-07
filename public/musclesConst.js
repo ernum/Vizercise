@@ -151,6 +151,17 @@ const allMuscles = [
   "Hamstrings",
 ];
 
-const colourPalette = ["#FFCDD2", "#EF9A9A", "#E57373", "#F44336", "#D32F2F"];
-
+const colourPalette = [
+  "#FFCDD2",
+  "#F8B1B1",
+  "#ED9696",
+  "#E27B7B",
+  "#D86060",
+  "#CE4545",
+  "#C42A2A",
+  "#BB0F0F",
+  "#B40000",
+  "#9D0000",
+  "#870000",
+];
 export { musclesConst, allMuscles, colourPalette };
