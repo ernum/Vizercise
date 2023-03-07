@@ -89,13 +89,9 @@ export default function BodySection(props) {
     });
   }, [body]);
 
-  function drawBody(bodyArg) {
-    return isForwardFacing ? drawFront(bodyArg) : drawBack(bodyArg);
-  }
-
   function drawFront(bodyArg) {
     return (
-      <svg className={props.css} viewBox="0 0 330 860">
+      <svg viewBox="0 0 330 860">
         <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
@@ -245,7 +241,7 @@ export default function BodySection(props) {
 
   function drawBack(bodyArg) {
     return (
-      <svg className={props.css} viewBox="0 0 330 860">
+      <svg viewBox="0 0 330 860">
         <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
@@ -465,14 +461,7 @@ export default function BodySection(props) {
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      <div className="relative grid grid-cols-2 top-8 px-8 gap-x-16">
-        <BodyButton
-          menuOrientation="right"
-          action={handleOrientationClick}
-          buttonText={orientationString}
-          optionText={isForwardFacing ? backString : frontString}
-        />
-
+      <div className="relative grid grid-cols-1 top-8 px-60 gap-x-16">
         <BodyButton
           menuOrientation="left"
           action={handleGenderClick}
@@ -480,7 +469,10 @@ export default function BodySection(props) {
           optionText={isMale ? femaleString : maleString}
         />
       </div>
-      {drawBody(body)}
+      <div className="grid grid-cols-2 grid-rows-5 md:px-6 lg:px-24 pt-20 m-auto">
+        <div className="col-span-1">{drawFront(body)}</div>
+        <div className="col-span-1">{drawBack(body)}</div>
+      </div>
     </div>
   );
 }
