@@ -70,6 +70,14 @@ export default function CirclePacking(props) {
         d3.select("#outerSvg")
             .selectAll(".btn_img")
                 .remove()
+        
+        d3.select("#outerSvg")
+            .selectAll(".btn_order")
+                .remove()
+        
+        d3.select("#outerSvg")
+            .selectAll(".btn_order_text")
+                .remove()
 
         /*
             For all the sorting buttons: If the attribute is already part of the sorting scheme,
@@ -336,8 +344,29 @@ export default function CirclePacking(props) {
                 .attr('height', '5%')
                 .attr('pointer-events', 'none')
 
-
             if (sortingScheme.includes(sortName.toLowerCase())) {
+                // Append a circle to the top left of the button,
+                // showing the order of the filter in the sorting scheme
+                let button_order = d3.select('#outerSvg')
+                    .append('circle')
+                    .attr('class', 'btn_order')
+                    .attr('cx', buttons_x_offset + 3)
+                    .attr('cy', yOffset + 3)
+                    .attr('r', 5)
+                    .attr('fill', 'darkSlateBlue')
+                    .attr('pointer-events', 'none')
+            
+                let button_order_text = d3.select('#outerSvg')
+                    .append('text').text(sortingScheme.indexOf(sortName.toLowerCase()) + 1)
+                    .style('font', 'montserrat')
+                    .attr('class', 'btn_order_text')
+                    .attr('x', buttons_x_offset + 3)
+                    .attr('y', yOffset + 3.5)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'middle')
+                    .attr('fill', 'white')
+                    .attr('font-size', 8)
+                
                 button_img.classed("filter-white", true);
             }
 
