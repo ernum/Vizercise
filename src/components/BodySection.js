@@ -80,7 +80,10 @@ export default function BodySection(props) {
 
   function drawFront(bodyArg) {
     return (
-      <svg viewBox="0 0 330 860">
+      <svg
+        className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
+        viewBox="0 0 330 860"
+      >
         <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
@@ -230,7 +233,10 @@ export default function BodySection(props) {
 
   function drawBack(bodyArg) {
     return (
-      <svg viewBox="0 0 330 860">
+      <svg
+        className="absolute w-[50%] h-[86%] top[13%] left-[45%]"
+        viewBox="0 0 330 860"
+      >
         <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
@@ -426,7 +432,7 @@ export default function BodySection(props) {
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      <div className="relative grid grid-cols-1 top-8 px-60 gap-x-16">
+      <div className="relative grid grid-cols-1 top-8 px-60 gap-x-16 pb-16">
         <BodyButton
           menuOrientation="left"
           action={() => {
@@ -436,14 +442,8 @@ export default function BodySection(props) {
           optionText={isMale ? femaleString : maleString}
         />
       </div>
-      <div className="grid grid-cols-2 pt-20 m-auto h-0">
-        <div className="col-span-1">
-          {drawFront(isMale ? frontMaleEmpty : frontFemaleEmpty)}
-        </div>
-        <div className="col-span-1">
-          {drawBack(isMale ? backMaleEmpty : backFemaleEmpty)}
-        </div>
-      </div>
+      {drawFront(isMale ? frontMaleEmpty : frontFemaleEmpty)}
+      {drawBack(isMale ? backMaleEmpty : backFemaleEmpty)}
     </div>
   );
 }
