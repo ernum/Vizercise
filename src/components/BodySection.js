@@ -66,6 +66,14 @@ export default function BodySection(props) {
           .ease(d3.easeLinear)
           .duration(300)
           .attr("fill", colourPalette[colour]);
+        
+        if (musclesToHighlight[muscle] === 4) {
+          selectHelper(muscle)
+            .classed("pulsing", true)
+        } else {
+          selectHelper(muscle)
+            .classed("pulsing", false)
+        }
       } else {
         selectHelper(muscle)
           .transition()

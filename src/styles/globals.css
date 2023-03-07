@@ -22,3 +22,12 @@ body {
     font-weight: 700;
     src: url('/fonts/montserrat/Montserrat-Bold.ttf') format('truetype');
 }
+
+.pulsing {
+    animation: pulses 0.5s 0s linear infinite alternate;
+}
+  
+@keyframes pulses {
+    from   {fill:#D32F2F;}
+    to     {fill:#8b0000;}
+}
