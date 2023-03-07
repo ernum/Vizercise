@@ -52,8 +52,6 @@ export default function CirclePacking(props) {
             }
             return "selectedleaf";
         });
-
-        d3.selectAll("#leaf").attr("stroke", null);
         d3.selectAll("#selectedleaf").attr("stroke", "#000");
     }, [props.selectedExercises, exerciseData]);
     
@@ -268,7 +266,7 @@ export default function CirclePacking(props) {
         d3.selectAll("#leaf")
             .on("click", function(event, d) {
                 ((focus !== root || sortingScheme.length === 0) && 
-                props.onClick(d3.select(this).attr("className")), event.stopPropagation());
+                props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation());
             });
 
         zoomTo([root.x, root.y, root.r * 2]);
@@ -311,19 +309,19 @@ export default function CirclePacking(props) {
         });
 
         function createTooltip() {
-        return d3
-            .select("#toolTipAppender")
-            .append("div")
-            .attr("class", "tooltip")
-            .attr("pointer-events", "none")
-            .style("visibility", "hidden")
-            .style("background-color", "white")
-            .style("position", "absolute")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
-            .style("padding", "5px")
-            .style("font", "12px montserrat");
+            return d3
+                .select("#toolTipAppender")
+                .append("div")
+                .attr("class", "tooltip")
+                .attr("pointer-events", "none")
+                .style("visibility", "hidden")
+                .style("background-color", "white")
+                .style("position", "absolute")
+                .style("border", "solid")
+                .style("border-width", "2px")
+                .style("border-radius", "5px")
+                .style("padding", "5px")
+                .style("font", "12px montserrat");
         }
 
         function createButton(sortName, yOffset) {
@@ -386,11 +384,11 @@ export default function CirclePacking(props) {
         }
             
         function switchOffPointerEvents(nodeOrLeaf) {
-        d3.selectAll(nodeOrLeaf).attr("pointer-events", "none");
+            d3.selectAll(nodeOrLeaf).attr("pointer-events", "none");
         }
 
         function switchOnPointerEvents(nodeOrLeaf) {
-        d3.selectAll(nodeOrLeaf).attr("pointer-events", null);
+            d3.selectAll(nodeOrLeaf).attr("pointer-events", null);
         }
 
         function zoomTo(v) {
