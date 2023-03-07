@@ -22,7 +22,7 @@ export default function DetailsList(props) {
               ✖
             </button>{" "}
           </td>
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium">
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-montserrat font-bold">
             <button onClick={() => setId(currentId)}>{exercise.name}</button>
           </td>
           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap font-montserrat">

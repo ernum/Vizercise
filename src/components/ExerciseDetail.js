@@ -17,7 +17,7 @@ export default function Detail(props) {
             <div
               key={exercise.id}
               onClick={() => props.onSetBoolValue(false)}
-              className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
+              className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800 font-bold font-montserrat"
             >
               <div className="hover:cursor-default flex shadow-2xl bg-white rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20">
                 <div className="overflow-auto p-5 ">
@@ -39,7 +39,7 @@ export default function Detail(props) {
                     title="video"
                   ></iframe>
                   <div className="p-10">
-                    <h1 className="text-center p-2 text-3xl text-neutral-600 font-medium">
+                    <h1 className="text-center p-2 text-3xl font-bold">
                       {exercise.name}
                     </h1>
                     <p className="py-2 font-normal">
