@@ -83,6 +83,7 @@ export default function Home() {
           css={
             "absolute w-[100%] h-[100%] top-[0%]"
           }
+          selectedExercises={selectedExercises}
           selectedMuscles={selectedMuscles}
           onClick={onExerciseClicked}
         />

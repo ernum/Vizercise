@@ -25,7 +25,38 @@ export default function CirclePacking(props) {
             ? setExerciseData(getNestedData(props.selectedMuscles.flatMap(GetExercises), sortingScheme))
             : setExerciseData(getNestedData(dataReq, sortingScheme));
     }, [props.selectedMuscles, sortingScheme]);
+     
+    /*
+    Change id attribute to indicate the exercise has been selected/deselected
+    whenever props.selectedExercises or exerciseData changes. Would probably 
+    be better to use a foreach loop on props.selectedExercises instead of checking 
+    all leafs I realise as I'm writing this comment butuh... Leaving as is for now.
+    Naming convention is confusing due to how I first wrote this whole thing
+    when I couldn't figure out how to use the id attribute ("." instead of "#").
+    */
+    useEffect(() => {
+       d3.selectAll("#leaf")
+        .attr("id", function() {
+            let exerciseId = d3.select(this).attr("className");
+            if (props.selectedExercises.includes(exerciseId)) {
+                return "selectedleaf";
+            }
+            return "leaf";
+        });
+        
+       d3.selectAll("#selectedleaf")
+        .attr("id", function() {
+            let exerciseId = d3.select(this).attr("className");
+            if (!props.selectedExercises.includes(exerciseId)) {
+                return "leaf";
+            }
+            return "selectedleaf";
+        });
 
+        d3.selectAll("#leaf").attr("stroke", null);
+        d3.selectAll("#selectedleaf").attr("stroke", "#000");
+    }, [props.selectedExercises, exerciseData]);
+    
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
         return (
@@ -39,7 +70,7 @@ export default function CirclePacking(props) {
     }
 
   /*
-        Draw a Circle Packing chart. Main functionality copied from:
+        Draw a Circle Packing chart. Core functionality copied from:
             https://observablehq.com/@d3/zoomable-circle-packing
   */
     function drawChart() {     
@@ -149,6 +180,7 @@ export default function CirclePacking(props) {
                     if (focus !== root) {
                         (zoom(event, root), event.stopPropagation());
                         switchOffPointerEvents("#leaf");
+                        switchOffPointerEvents("#selectedleaf");
                         switchOnPointerEvents("#node");
                     }
                 }
@@ -180,11 +212,13 @@ export default function CirclePacking(props) {
                 .on("mouseover", function() { 
                     if (focus.depth !== sortingScheme.length && sortingScheme.length !== 0) {
                         switchOffPointerEvents("#leaf");
+                        switchOffPointerEvents("#selectedleaf");
                         d3.select(this).attr("id") === "node" &&  
                             d3.select(this).attr("stroke", "#000");
                     }
                     else {
                         switchOnPointerEvents("#leaf");
+                        switchOnPointerEvents("#selectedleaf");
                         d3.select(this).attr("id") === "leaf" && 
                             d3.select(this).attr("stroke", "#000");
                     }
@@ -193,7 +227,9 @@ export default function CirclePacking(props) {
                 })
                 .on("mouseout", function() { 
                     switchOnPointerEvents("#leaf");
-                    d3.select(this).attr("stroke", null);
+                    switchOnPointerEvents("#selectedleaf");
+                    d3.select(this).attr("id") !== "selectedleaf" &&
+                        d3.select(this).attr("stroke", null);
                     toolTip
                         .style("visibility", "hidden")
                 })
@@ -272,23 +308,23 @@ export default function CirclePacking(props) {
         circleRadius: 4,
         spacing: 14,
         textOffset: 10,
-      });
+        });
 
-    function createTooltip() {
-      return d3
-        .select("#toolTipAppender")
-        .append("div")
-        .attr("class", "tooltip")
-        .attr("pointer-events", "none")
-        .style("visibility", "hidden")
-        .style("background-color", "white")
-        .style("position", "absolute")
-        .style("border", "solid")
-        .style("border-width", "2px")
-        .style("border-radius", "5px")
-        .style("padding", "5px")
-        .style("font", "12px montserrat");
-    }
+        function createTooltip() {
+        return d3
+            .select("#toolTipAppender")
+            .append("div")
+            .attr("class", "tooltip")
+            .attr("pointer-events", "none")
+            .style("visibility", "hidden")
+            .style("background-color", "white")
+            .style("position", "absolute")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("font", "12px montserrat");
+        }
 
         function createButton(sortName, yOffset) {
             return (
@@ -348,14 +384,14 @@ export default function CirclePacking(props) {
                     .style("font", "12px montserrat")
             );
         }
-        
-    function switchOffPointerEvents(nodeOrLeaf) {
-      d3.selectAll(nodeOrLeaf).attr("pointer-events", "none");
-    }
+            
+        function switchOffPointerEvents(nodeOrLeaf) {
+        d3.selectAll(nodeOrLeaf).attr("pointer-events", "none");
+        }
 
-    function switchOnPointerEvents(nodeOrLeaf) {
-      d3.selectAll(nodeOrLeaf).attr("pointer-events", null);
-    }
+        function switchOnPointerEvents(nodeOrLeaf) {
+        d3.selectAll(nodeOrLeaf).attr("pointer-events", null);
+        }
 
         function zoomTo(v) {
             const k = width / v[2];       
