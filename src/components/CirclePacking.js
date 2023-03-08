@@ -21,8 +21,8 @@ export default function CirclePacking(props) {
 
     // setState whenever a muscle is clicked
     useEffect(() => {
-        props.selectedMuscles.length 
-            ? setExerciseData(getNestedData(props.selectedMuscles.flatMap(GetExercises), sortingScheme))
+        props.selectedMuscles.length
+            ? setExerciseData(getNestedData([...new Set(props.selectedMuscles.flatMap(GetExercises))], sortingScheme))
             : setExerciseData(getNestedData(dataReq, sortingScheme));
     }, [props.selectedMuscles, sortingScheme]);
 
