@@ -100,16 +100,33 @@ export default function CirclePacking(props) {
             .selectAll(".btn_img")
                 .remove()
 
+        d3.select("#outerSvg")
+            .selectAll(".sortButtonText")
+                .remove()
+        
+        d3.select("#outerSvg")
+            .selectAll(".btn_order")
+                .remove()
+        
+        d3.select("#outerSvg")
+            .selectAll(".btn_order_text")
+                .remove()
+
         /*
             For all the sorting buttons: If the attribute is already part of the sorting scheme,
             remove it from the sorting scheme. Else, append the attribute to the end of the
             sortingScheme array (making it the current most deeply nested attribute)
         */
-        let buttons_x_offset = 10
 
         /* BUTTON 1 */
         let button1_offset = 80
-        createButton("Equipment", button1_offset)
+        let b1_font_color = "black";
+        if (sortingScheme.includes("equipment")) {
+            b1_font_color = "white";
+        }
+        let b1_img_path = "/icons/dumbbell.svg"
+
+        let b1 = createButton("Equipment", button1_offset, b1_font_color, b1_img_path)
             .attr("y", button1_offset)
             .on("click", function() {
                 if (sortingScheme.includes("equipment")) {
@@ -119,25 +136,15 @@ export default function CirclePacking(props) {
                 }
             })
 
-        d3.select("#outerSvg")
-            .append("image")
-            .attr("class", "btn_img")
-            .attr("xlink:href", "/icons/dumbbell.svg")
-            .attr("x", buttons_x_offset + 5.5)
-            .attr("y", button1_offset + 5.5)
-            .attr('class', 'btn_img')
-            .attr('height', '5%')
-            .attr('pointer-events', 'none')
-            .attr("opacity", function() {
-                // Reduce icon opacity if depth === max depth
-                if (sortingScheme.includes("equipment") || sortingScheme.length < 3) 
-                { return 1; }
-                return 0.5;
-            })
-
         /* BUTTON 2 */
         let button2_offset = 115
-        createButton("Force", button2_offset)
+        let b2_font_color = "black";
+        if (sortingScheme.includes("force")) {
+            b2_font_color = "white";
+        }
+        let b2_img_path = "/icons/force.svg"
+
+        let b2 = createButton("Force", button2_offset, b2_font_color, b2_img_path)
             .attr("y", button2_offset)
             .on("click", function() {
                 if (sortingScheme.includes("force")) {
@@ -146,24 +153,16 @@ export default function CirclePacking(props) {
                     setSortingScheme([...sortingScheme, "force"]);
                 }
             })
-
-        d3.select("#outerSvg")
-            .append("image")
-            .attr("xlink:href", "/icons/force.svg")
-            .attr("x", buttons_x_offset + 5.5)
-            .attr("y", button2_offset + 5.5)
-            .attr('class', 'btn_img')
-            .attr('height', '5%')
-            .attr('pointer-events', 'none')
-            .attr("opacity", function() {   
-                if (sortingScheme.includes("force") || sortingScheme.length < 3) 
-                { return 1; }
-                return 0.5;
-            })
-
+        
         /* BUTTON 3 */
         let button3_offset = 150
-        createButton("Mechanic", button3_offset)
+        let b3_font_color = "black";
+        if (sortingScheme.includes("mechanic")) {
+            b3_font_color = "white";
+        }
+        let b3_img_path = "/icons/gear.svg"
+
+        let b3 = createButton("Mechanic", button3_offset, b3_font_color, b3_img_path)
             .attr("y", button3_offset)
             .on("click", function() {
                 if (sortingScheme.includes("mechanic")) {
@@ -350,51 +349,91 @@ export default function CirclePacking(props) {
                 .style("font", "12px montserrat");
         }
 
-        function createButton(sortName, yOffset) {
-            return (
-                d3.select("#outerSvg").append('rect')
-                    .style("cursor", "pointer")
-                    .attr("class", "sortButton")
-                    .attr('x', 10)
-                    .attr('width', 30)
-                    .attr('height', 30)
-                    .attr('rx', 10)
+        function createButton(sortName, yOffset, font_color, icon_path) {
+            let buttons_x_offset = 10
+
+            let button_fill = "white";
+            if (sortingScheme.includes(sortName.toLowerCase())) {
+                button_fill = "DarkSlateGray"
+            }
+
+            let button = d3.select("#outerSvg").append('rect')
+            .style("cursor", "pointer")
+            .attr("class", "sortButton")
+            .attr('x', 10)
+            .attr('width', 30)
+            .attr('height', 30)
+            .attr('rx', 10)
+            .attr('fill', button_fill)
+            .attr("pointer-events", null)
+            .attr('opacity', 0.6)
+            .on("mouseover", function() {
+                /* when mouse is over the button, expand its width to 100 */
+                d3.select(this)
+                    .transition()
+                    .duration(100)
+                    .attr("width", 100)
+
+                d3.select('#outerSvg')
+                    .append('text').text(sortName)
+                    .style("fill", font_color)
+                    .style("font", "10px montserrat")
+                    .style("cursor", "default")
+                    .attr("class", "sortButtonText")
+                    .attr('x', 43)
+                    .attr('y', yOffset + 19)
+                    .attr("pointer-events", "none")
+                    .style("animation", "fadein 0.5s")
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                    .transition()
+                    .duration(200)
+                    .attr("width", 30)
+
+                d3.select('#outerSvg')
+                    .selectAll(".sortButtonText")
+                        .remove()
+            })
+
+            let button_img = d3.select("#outerSvg")
+                .append("image")
+                .attr("class", "btn_img")
+                .attr("xlink:href", icon_path)
+                .attr("x", buttons_x_offset + 5.5)
+                .attr("y", yOffset + 5.5)
+                .attr('class', 'btn_img')
+                .attr('height', '5%')
+                .attr('pointer-events', 'none')
+
+            if (sortingScheme.includes(sortName.toLowerCase())) {
+                // Append a circle to the top left of the button,
+                // showing the order of the filter in the sorting scheme
+                let button_order = d3.select('#outerSvg')
+                    .append('circle')
+                    .attr('class', 'btn_order')
+                    .attr('cx', buttons_x_offset + 3)
+                    .attr('cy', yOffset + 3)
+                    .attr('r', 5)
+                    .attr('fill', 'darkSlateBlue')
+                    .attr('pointer-events', 'none')
+            
+                let button_order_text = d3.select('#outerSvg')
+                    .append('text').text(sortingScheme.indexOf(sortName.toLowerCase()) + 1)
+                    .style('font', 'montserrat')
+                    .attr('class', 'btn_order_text')
+                    .attr('x', buttons_x_offset + 3)
+                    .attr('y', yOffset + 3.5)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'middle')
                     .attr('fill', 'white')
-                    .attr("pointer-events", function () {
-                        // enable if depth !== max depth || attributeKey is in sortingScheme (allow deselection)
-                        if (sortingScheme.includes(sortName.toLowerCase()) || sortingScheme.length < 3) 
-                        { return null; }    
-                        // disable if depth === max depth && attributeKey is not in sortingScheme
-                        return "none";
-                    })
-                    .attr('opacity', 0.6)
-                    .on("mouseover", function() {
-                        /* when mouse is over the button, expand its width to 100 */
-                        d3.select(this)
-                            .transition()
-                            .duration(100)
-                            .attr("width", 100)
+                    .attr('font-size', 8)
+                
+                button_img.classed("filter-white", true);
+            }
 
-                        d3.select('#outerSvg')
-                            .append('text').text(sortName)
-                            .style("font", "10px montserrat")
-                            .style("cursor", "default")
-                            .attr("class", "sortButtonText")
-                            .attr('x', 43)
-                            .attr('y', yOffset + 19)
-                            .attr("pointer-events", "none")
-                            .style("animation", "fadein 0.5s")
-                    })
-                    .on("mouseout", function() {
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr("width", 30)
-
-                        d3.select('#outerSvg')
-                            .selectAll(".sortButtonText")
-                                .remove()
-                    })
+            return (
+                button
             )
         }
             

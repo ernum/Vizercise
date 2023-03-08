@@ -55,13 +55,12 @@ export default function Home() {
       <div>{detailPopup()}</div>
       {/* Biggest Box */}
       <div
-        className="box-border absolute w-[33%] h-[86.5%] left-[12.2%] top-[4%]
+        className="box-border absolute w-[45%] h-[90%] left-[2%] top-[4%]
                  bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
                  shadown-black/25 overflow-hidden"
       >
         <div>
           <BodySection
-            css={"absolute w-[50%] h-[86%] top-[13%] left-[22%]"}
             onClick={onMuscleClicked}
             selectedMuscles={selectedMuscles}
             selectedExercises={selectedExercises}
@@ -71,14 +70,12 @@ export default function Home() {
 
       {/* Second Box */}
       <div
-        className="box-border absolute w-[49.3%] h-[47.1%] left-[48.6%] top-[4%]
+        className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25 overflow-hidden"
       >
         <CirclePacking
-          css={
-            "absolute w-[100%] h-[100%] top-[0%]"
-          }
+          css={"absolute w-[100%] h-[100%] top-[0%]"}
           selectedExercises={selectedExercises}
           selectedMuscles={selectedMuscles}
           onExerciseClick={setExerciseSelected}
@@ -97,7 +94,7 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[55.4%]
+        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[58.9%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25"
       >
