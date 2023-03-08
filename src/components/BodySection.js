@@ -11,8 +11,6 @@ export default function BodySection(props) {
   const frontFemaleEmpty = "/front_female_empty.svg";
   const backFemaleEmpty = "/back_female_empty.svg";
 
-  const frontString = "Front";
-  const backString = "Back";
   const maleString = "Male";
   const femaleString = "Female";
 
@@ -25,12 +23,7 @@ export default function BodySection(props) {
   const backMusclesFemale = musclesConst[3];
 
   // the value of body decides what is rendered
-  const [body, setBody] = useState(frontMaleEmpty);
-  const isMale =
-    body === frontMaleEmpty || body === backMaleEmpty ? true : false;
-  const isForwardFacing =
-    body === frontMaleEmpty || body === frontFemaleEmpty ? true : false;
-  const orientationString = isForwardFacing ? frontString : backString;
+  const [isMale, setIsMale] = useState(true);
   const genderString = isMale ? maleString : femaleString;
   const frontMuscles = isMale ? frontMusclesMale : frontMusclesFemale;
   const backMuscles = isMale ? backMusclesMale : backMusclesFemale;
@@ -50,52 +43,46 @@ export default function BodySection(props) {
   useEffect(() => {
     let musclesToHighlight = {};
 
-    for (const exercise of props.selectedExercises) {
-      const muscles = GetExerciseById(exercise).primaryMuscles;
-      for (const muscle of muscles) {
-        if (!musclesToHighlight[muscle]) musclesToHighlight[muscle] = 1;
-        else if (musclesToHighlight[muscle] < 4) musclesToHighlight[muscle]++;
+    for (let exercise of props.selectedExercises) {
+      exercise = GetExerciseById(exercise);
+      const incValues = [2, 1, 0.5];
+      const muscles = [
+        exercise.primaryMuscles,
+        exercise.secondaryMuscles,
+        exercise.tertiaryMuscles,
+      ];
+
+      for (let i = 0; i < 3; i++) {
+        if (muscles[i]) {
+          for (const muscle of muscles[i]) {
+            if (!musclesToHighlight[muscle])
+              musclesToHighlight[muscle] = incValues[i];
+            else if (musclesToHighlight[muscle] < 9)
+              musclesToHighlight[muscle] += incValues[i];
+          }
+        }
       }
     }
 
     for (const muscle of allMuscles) {
-      if (musclesToHighlight[muscle]) {
-        const colour = musclesToHighlight[muscle];
-        selectHelper(muscle)
-          .transition()
-          .ease(d3.easeLinear)
-          .duration(300)
-          .attr("fill", colourPalette[colour]);
-      } else {
-        selectHelper(muscle)
-          .transition()
-          .ease(d3.easeLinear)
-          .duration(300)
-          .attr("fill", "white");
-      }
+      const sum = musclesToHighlight[muscle] ? musclesToHighlight[muscle] : -1;
+      const colour = sum == -1 ? "white" : colourPalette[Math.floor(sum)];
+
+      selectHelper(muscle)
+        .classed("pulsing", sum >= 9 ? true : false)
+        .transition()
+        .ease(d3.easeLinear)
+        .duration(300)
+        .style("fill", colour);
     }
   }, [props.selectedExercises]);
 
-  useEffect(() => {
-    d3.select("div#body_div").selectAll("g").style("stroke-width", "1");
-    d3.select("div#body_div").selectAll("g").attr("isselected", "false");
-    props.selectedMuscles.forEach((element) => {
-      fillMuscleStroke(element, "3");
-      (element === "Lower back" &&
-        d3.selectAll("g.lower_back").attr("isselected", "true")) ||
-        (element === "Traps (mid-back)" &&
-          d3.selectAll("g.mid_back").attr("isselected", "true")) ||
-        d3.selectAll("g#" + element).attr("isselected", "true");
-    });
-  }, [body]);
-
-  function drawBody(bodyArg) {
-    return isForwardFacing ? drawFront(bodyArg) : drawBack(bodyArg);
-  }
-
   function drawFront(bodyArg) {
     return (
-      <svg className={props.css} viewBox="0 0 330 860">
+      <svg
+        className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
+        viewBox="0 0 330 860"
+      >
         <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
@@ -245,7 +232,10 @@ export default function BodySection(props) {
 
   function drawBack(bodyArg) {
     return (
-      <svg className={props.css} viewBox="0 0 330 860">
+      <svg
+        className="absolute w-[50%] h-[86%] top[13%] left-[45%]"
+        viewBox="0 0 330 860"
+      >
         <image href={bodyArg} width="330" height="860" />
         <g
           className="traps"
@@ -396,18 +386,12 @@ export default function BodySection(props) {
     );
   }
 
-  function fillMuscleStroke(inputStr, width) {
-    selectHelper(inputStr)
-      .style("stroke-width", width)
-      .style("cursor", "pointer");
-  }
-
   function fillMuscle(inputClass) {
     d3.selectAll(inputClass)
       .transition()
       .ease(d3.easeLinear)
       .duration(200)
-      .style("stroke-width", "3")
+      .style("stroke-width", "4")
       .style("cursor", "pointer");
   }
 
@@ -424,7 +408,7 @@ export default function BodySection(props) {
         .transition()
         .ease(d3.easeLinear)
         .duration(200)
-        .style("stroke-width", "3");
+        .style("stroke-width", "4");
   }
 
   // If's due to d3 selections not too keen on whitespace
@@ -444,43 +428,21 @@ export default function BodySection(props) {
     props.onClick(inputId);
   }
 
-  // handles clicks on orientation (show front/back) button
-  function handleOrientationClick() {
-    if (isMale) {
-      isForwardFacing ? setBody(backMaleEmpty) : setBody(frontMaleEmpty);
-    } else {
-      isForwardFacing ? setBody(backFemaleEmpty) : setBody(frontFemaleEmpty);
-    }
-  }
-
-  // handles clicks on gender button
-  function handleGenderClick() {
-    if (isForwardFacing) {
-      isMale ? setBody(frontFemaleEmpty) : setBody(frontMaleEmpty);
-    } else {
-      isMale ? setBody(backFemaleEmpty) : setBody(backMaleEmpty);
-    }
-  }
-
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      <div className="relative grid grid-cols-2 top-8 px-8 gap-x-16">
-        <BodyButton
-          menuOrientation="right"
-          action={handleOrientationClick}
-          buttonText={orientationString}
-          optionText={isForwardFacing ? backString : frontString}
-        />
-
+      <div className="relative grid grid-cols-1 top-8 px-60 gap-x-16 pb-16">
         <BodyButton
           menuOrientation="left"
-          action={handleGenderClick}
+          action={() => {
+            setIsMale(!isMale);
+          }}
           buttonText={genderString}
           optionText={isMale ? femaleString : maleString}
         />
       </div>
-      {drawBody(body)}
+      {drawFront(isMale ? frontMaleEmpty : frontFemaleEmpty)}
+      {drawBack(isMale ? backMaleEmpty : backFemaleEmpty)}
     </div>
   );
 }
