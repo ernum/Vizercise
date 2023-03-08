@@ -253,10 +253,11 @@ export default function CirclePacking(props) {
                         switchOnPointerEvents("#leaf");
                         switchOnPointerEvents("#selectedleaf");
                         d3.select(this).attr("id") === "leaf" && 
-                            d3.select(this).attr("stroke", "#000");
+                            d3.select(this).attr("stroke", "#000") &&
+                            toolTip
+                                .style("visibility", "visible");
                     }
-                    toolTip
-                        .style("visibility", "visible")
+                    
                 })
                 .on("mouseout", function() { 
                     switchOnPointerEvents("#leaf");
@@ -405,23 +406,6 @@ export default function CirclePacking(props) {
                                 .remove()
                     })
             )
-        }
-
-        function createTooltip() {
-            return (
-                d3.select("#toolTipAppender")
-                    .append("div")
-                    .attr("class", "tooltip")
-                    .attr("pointer-events", "none")
-                    .style("visibility", "hidden")
-                    .style("background-color", "white")
-                    .style("position", "absolute")
-                    .style("border", "solid")
-                    .style("border-width", "2px")
-                    .style("border-radius", "5px")
-                    .style("padding", "5px")
-                    .style("font", "12px montserrat")
-            );
         }
             
         function switchOffPointerEvents(nodeOrLeaf) {
