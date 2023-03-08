@@ -3,7 +3,7 @@ import BodySection from "../components/BodySection";
 //import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
-import Presenter from "./Presenter";
+import Presenter from "../components/Presenter";
 
 
 export default function Home() {
