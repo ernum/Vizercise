@@ -172,24 +172,15 @@ export default function CirclePacking(props) {
                 }
             })
 
-        d3.select("#outerSvg")
-            .append("image")
-            .attr("xlink:href", "/icons/gear.svg")
-            .attr("x", buttons_x_offset + 5.5)
-            .attr("y", button3_offset + 5.5)
-            .attr('class', 'btn_img')
-            .attr('height', '5%')
-            .attr('pointer-events', 'none')
-            .attr("opacity", function() {
-                if (sortingScheme.includes("mechanic") || sortingScheme.length < 3) 
-                { return 1; }
-                return 0.5;
-            })
-
-
         /* BUTTON 4 */
         let button4_offset = 185
-        createButton("Difficulty", button4_offset)
+        let b4_font_color = "black";
+        if (sortingScheme.includes("difficulty")) {
+            b4_font_color = "white";
+        }
+        let b4_img_path = "/icons/difficulty.svg"
+
+        let b4 = createButton("Difficulty", button4_offset, b4_font_color, b4_img_path)
             .attr("y", button4_offset)
             .on("click", function() {
                 if (sortingScheme.includes("difficulty")) {
@@ -197,20 +188,6 @@ export default function CirclePacking(props) {
                 } else {
                     setSortingScheme([...sortingScheme, "difficulty"]);
                 }
-            })
-
-        d3.select("#outerSvg")
-            .append("image")
-            .attr("xlink:href", "/icons/difficulty.svg")
-            .attr("x", buttons_x_offset + 5.5)
-            .attr("y", button4_offset + 5.5)
-            .attr('class', 'btn_img')
-            .attr('height', '5%')
-            .attr('pointer-events', 'none')
-            .attr("opacity", function() {
-                if (sortingScheme.includes("difficulty") || sortingScheme.length < 3) 
-                { return 1; }
-                return 0.5;
             })
 
         /* END BUTTONS */
@@ -365,7 +342,13 @@ export default function CirclePacking(props) {
             .attr('height', 30)
             .attr('rx', 10)
             .attr('fill', button_fill)
-            .attr("pointer-events", null)
+            .attr("pointer-events", function () {
+                // enable if depth !== max depth || attributeKey is in sortingScheme (allow deselection)
+                if (sortingScheme.includes(sortName.toLowerCase()) || sortingScheme.length < 3) 
+                { return null; }    
+                // disable if depth === max depth && attributeKey is not in sortingScheme
+                return "none";
+            })
             .attr('opacity', 0.6)
             .on("mouseover", function() {
                 /* when mouse is over the button, expand its width to 100 */
@@ -405,6 +388,12 @@ export default function CirclePacking(props) {
                 .attr('class', 'btn_img')
                 .attr('height', '5%')
                 .attr('pointer-events', 'none')
+                .attr("opacity", function() {
+                    if (sortingScheme.includes(sortName.toLowerCase()) || 
+                        sortingScheme.length < 3) 
+                    { return 1; }
+                    return 0.5;
+                })
 
             if (sortingScheme.includes(sortName.toLowerCase())) {
                 // Append a circle to the top left of the button,
@@ -435,14 +424,6 @@ export default function CirclePacking(props) {
             return (
                 button
             )
-        }
-            
-        function switchOffPointerEvents(nodeOrLeaf) {
-            d3.selectAll(nodeOrLeaf).attr("pointer-events", "none");
-        }
-
-        function switchOnPointerEvents(nodeOrLeaf) {
-            d3.selectAll(nodeOrLeaf).attr("pointer-events", null);
         }
 
         function zoomTo(v) {
