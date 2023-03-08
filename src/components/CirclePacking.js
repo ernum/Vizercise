@@ -70,6 +70,10 @@ export default function CirclePacking(props) {
         d3.select("#outerSvg")
             .selectAll(".btn_img")
                 .remove()
+
+        d3.select("#outerSvg")
+            .selectAll(".sortButtonText")
+                .remove()
         
         d3.select("#outerSvg")
             .selectAll(".btn_order")
