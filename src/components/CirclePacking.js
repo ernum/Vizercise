@@ -226,7 +226,8 @@ export default function CirclePacking(props) {
                 .on("mouseover", function(event, d) { 
                     if (d.parent === focus) {
                         d3.select(this).attr("stroke", "#000");
-                        d3.select(this).attr("id") === "leaf" && 
+                        (d3.select(this).attr("id") === "leaf" || 
+                        d3.select(this).attr("id") === "selectedleaf") && 
                         toolTip.style("visibility", "visible");
                     }
                 })
