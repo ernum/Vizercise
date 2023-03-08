@@ -128,6 +128,13 @@ export default function CirclePacking(props) {
             .attr('class', 'btn_img')
             .attr('height', '5%')
             .attr('pointer-events', 'none')
+            .attr("opacity", function() {
+                if (sortingScheme.includes("equipment") || 
+                    sortingScheme.length < 3) {
+                    return 1;
+                }
+                return 0.5;
+            })
 
         /* BUTTON 2 */
         let button2_offset = 115
@@ -149,6 +156,14 @@ export default function CirclePacking(props) {
             .attr('class', 'btn_img')
             .attr('height', '5%')
             .attr('pointer-events', 'none')
+            .attr("opacity", function() {
+                if (sortingScheme.includes("force") || 
+                    sortingScheme.length < 3) {
+                    return 1;
+                }
+                return 0.5;
+            })
+
 
         /* BUTTON 3 */
         let button3_offset = 150
@@ -170,6 +185,26 @@ export default function CirclePacking(props) {
             .attr('class', 'btn_img')
             .attr('height', '5%')
             .attr('pointer-events', 'none')
+            .attr("opacity", function() {
+                if (sortingScheme.includes("mechanic") || 
+                    sortingScheme.length < 3) {
+                    return 1;
+                }
+                return 0.5;
+            })
+
+
+        /* BUTTON 4 */
+        let button4_offset = 185
+        createButton("Difficulty", button4_offset)
+            .attr("y", button4_offset)
+            .on("click", function() {
+                if (sortingScheme.includes("difficulty")) {
+                    setSortingScheme(sortingScheme.filter(elem => elem !== "difficulty"))
+                } else {
+                    setSortingScheme([...sortingScheme, "difficulty"]);
+                }
+            })
 
         /* END BUTTONS */
 
@@ -334,7 +369,13 @@ export default function CirclePacking(props) {
                     .attr('height', 30)
                     .attr('rx', 10)
                     .attr('fill', 'white')
-                    .attr("pointer-events", null)
+                    .attr("pointer-events", function () {
+                        if (sortingScheme.includes(sortName.toLowerCase()) || 
+                            sortingScheme.length < 3) {
+                            return null;
+                        }
+                        return "none";
+                    })
                     .attr('opacity', 0.6)
                     .on("mouseover", function() {
                         /* when mouse is over the button, expand its width to 100 */
