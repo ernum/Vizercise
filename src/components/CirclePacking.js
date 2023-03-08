@@ -48,6 +48,7 @@ export default function CirclePacking(props) {
         .attr("id", function() {
             let exerciseId = d3.select(this).attr("className");
             if (!props.selectedExercises.includes(exerciseId)) {
+                d3.select(this).attr("stroke", "none");
                 return "leaf";
             }
             return "selectedleaf";
