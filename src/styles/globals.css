@@ -23,6 +23,15 @@ body {
     src: url('/fonts/montserrat/Montserrat-Bold.ttf') format('truetype');
 }
 
+.pulsing {
+    animation: pulses 0.5s 0s linear infinite alternate;
+}
+
+@keyframes pulses {
+    from   {fill:#E27B7B;}
+    to     {fill:#8b0000;}
+}
+
 .filter-white {
     filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
 }

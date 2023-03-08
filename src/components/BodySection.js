@@ -66,11 +66,10 @@ export default function BodySection(props) {
 
     for (const muscle of allMuscles) {
       const sum = musclesToHighlight[muscle] ? musclesToHighlight[muscle] : -1;
-      const colour =
-        musclesToHighlight[muscle] == -1
-          ? "white"
-          : colourPalette[Math.floor(sum)];
+      const colour = sum == -1 ? "white" : colourPalette[Math.floor(sum)];
+
       selectHelper(muscle)
+        .classed("pulsing", sum >= 9 ? true : false)
         .transition()
         .ease(d3.easeLinear)
         .duration(300)
