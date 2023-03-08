@@ -20,17 +20,15 @@ export default function Home() {
   // This seems like a bad solution but for some reason I can't get it to work the same
   // way that onMuscleClicked() works (array is not appended to, only replaces the elem)
   useEffect(() => {
-    // Could maybe be changed to show some type of "error message" for better user
-    // feedback if user tries to add an exercise that is already in the list instead
-    // of just disallowing it (current implementation).
-    exerciseSelected &&
-      !selectedExercises.includes(exerciseSelected) &&
-      setSelectedExercises([exerciseSelected, ...selectedExercises]);
+    if (exerciseSelected) {
+      if (selectedExercises.includes(exerciseSelected)) {
+        removeExercise(exerciseSelected);
+      } else {
+        setSelectedExercises([exerciseSelected, ...selectedExercises]);
+      }
+      setExerciseSelected(null);
+    }
   }, [exerciseSelected]);
-
-  function onExerciseClicked(exerciseId) {
-    setExerciseSelected(exerciseId);
-  }
 
   // Adding and removal of selected muscles
   function onMuscleClicked(muscle) {
@@ -48,9 +46,7 @@ export default function Home() {
     setSelectedExercises(
       selectedExercises.filter((exerciseId) => exerciseId != id)
     );
-    if (exerciseSelected == id) {
-      setExerciseSelected(null);
-    }
+    setExerciseSelected(null);
   }
 
   return (
@@ -80,8 +76,9 @@ export default function Home() {
       >
         <CirclePacking
           css={"absolute w-[100%] h-[100%] top-[0%]"}
+          selectedExercises={selectedExercises}
           selectedMuscles={selectedMuscles}
-          onClick={onExerciseClicked}
+          onExerciseClick={setExerciseSelected}
         />
         <p className="ml-5 mb-1 bottom-0 left-0 text-xs absolute z-10 font-montserrat font-semibold italic text-amber-900 opacity-60 pointer-events-none">
           size of circle = popularity by Google{" "}

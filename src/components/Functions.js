@@ -124,17 +124,19 @@ const exerciseDataByEquipment = getNestedData(dataReq, ["equipment"]);
 
 function getArrayByAttribute(attributeKey, exerciseArray) {
   return (
-    (attributeKey === "equipment" && GetArrayByEquipment(exerciseArray)) ||
-    (attributeKey === "force" && GetArrayByForce(exerciseArray)) ||
-    (attributeKey === "mechanic" && GetArrayByMechanic(exerciseArray))
-  )
+    (attributeKey === "equipment" && getArrayByEquipment(exerciseArray)) ||
+    (attributeKey === "force" && getArrayByForce(exerciseArray)) ||
+    (attributeKey === "mechanic" && getArrayByMechanic(exerciseArray)) ||
+    (attributeKey === "difficulty" && getArrayByDifficulty(exerciseArray))
+  );
 }
 
 function getExercisesByAttribute(attributeKey, exerciseArray, attributeVal) {
   return (
     (attributeKey === "equipment" && getExercisesByEquipment(exerciseArray, attributeVal)) ||
     (attributeKey === "force" && getExercisesByForce(exerciseArray, attributeVal)) ||
-    (attributeKey === "mechanic" && getExercisesByMechanic(exerciseArray, attributeVal))
+    (attributeKey === "mechanic" && getExercisesByMechanic(exerciseArray, attributeVal)) ||
+    (attributeKey === "difficulty" && getExercisesByDifficulty(exerciseArray, attributeVal))
   );
 }
 
@@ -152,7 +154,7 @@ function GetUniqueValuesByAttribute(attribute) {
   return ([... new Set(result.flat())]);
 }
 
-function GetArrayByEquipment(exerciseArray) {
+function getArrayByEquipment(exerciseArray) {
   const equipmentArray = GetUniqueValuesByAttribute("equipment");
   var newArray = [];
   equipmentArray.forEach((elem) => {
@@ -161,7 +163,7 @@ function GetArrayByEquipment(exerciseArray) {
   return newArray;
 }
 
-function GetArrayByMechanic(exerciseArray) {
+function getArrayByMechanic(exerciseArray) {
   const mechanicArray = GetUniqueValuesByAttribute("mechanic");
   var newArray = [];
   mechanicArray.forEach((elem) => {
@@ -170,11 +172,20 @@ function GetArrayByMechanic(exerciseArray) {
   return newArray;
 }
 
-function GetArrayByForce(exerciseArray) {
+function getArrayByForce(exerciseArray) {
   const forceArray = GetUniqueValuesByAttribute("force");
   var newArray = [];
   forceArray.forEach((elem) => {
     newArray = [...newArray, getExercisesByForce(exerciseArray, elem)]
+  });
+  return newArray;
+}
+
+function getArrayByDifficulty(exerciseArray) {
+  const difficultyArray = GetUniqueValuesByAttribute("difficulty");
+  var newArray = [];
+  difficultyArray.forEach((elem) => {
+    newArray = [...newArray, getExercisesByDifficulty(exerciseArray, elem)]
   });
   return newArray;
 }
@@ -197,6 +208,13 @@ function getExercisesByForce(exerciseArray, forceValue) {
   return (
     exerciseArray.filter((exercise) =>
       exercise.force === forceValue)
+  );
+}
+
+function getExercisesByDifficulty(exerciseArray, difficultyValue) {
+  return (
+    exerciseArray.filter((exercise) =>
+      exercise.difficulty === difficultyValue)
   );
 }
 
