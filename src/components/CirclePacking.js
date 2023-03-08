@@ -161,7 +161,6 @@ export default function CirclePacking(props) {
                 return 0.5;
             })
 
-
         /* BUTTON 3 */
         let button3_offset = 150
         createButton("Mechanic", button3_offset)
@@ -199,6 +198,20 @@ export default function CirclePacking(props) {
                 } else {
                     setSortingScheme([...sortingScheme, "difficulty"]);
                 }
+            })
+
+        d3.select("#outerSvg")
+            .append("image")
+            .attr("xlink:href", "/icons/difficulty.svg")
+            .attr("x", buttons_x_offset + 5.5)
+            .attr("y", button4_offset + 5.5)
+            .attr('class', 'btn_img')
+            .attr('height', '5%')
+            .attr('pointer-events', 'none')
+            .attr("opacity", function() {
+                if (sortingScheme.includes("difficulty") || sortingScheme.length < 3) 
+                { return 1; }
+                return 0.5;
             })
 
         /* END BUTTONS */
