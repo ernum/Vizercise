@@ -172,23 +172,46 @@ export default function CirclePacking(props) {
                 }
             })
 
+        d3.select("#outerSvg")
+            .append("image")
+            .attr("xlink:href", "/icons/gear.svg")
+            .attr("x", buttons_x_offset + 5.5)
+            .attr("y", button3_offset + 5.5)
+            .attr('class', 'btn_img')
+            .attr('height', '5%')
+            .attr('pointer-events', 'none')
+            .attr("opacity", function() {
+                if (sortingScheme.includes("mechanic") || sortingScheme.length < 3) 
+                { return 1; }
+                return 0.5;
+            })
+
+
         /* BUTTON 4 */
         let button4_offset = 185
-        let b4_font_color = "black";
-        if (sortingScheme.includes("difficulty")) {
-            b4_font_color = "white";
-        }
-        let b4_img_path = "/icons/difficulty.svg"
+        createButton("Difficulty", button4_offset)
+            .attr("y", button4_offset)
+            .on("click", function() {
+                if (sortingScheme.includes("difficulty")) {
+                    setSortingScheme(sortingScheme.filter(elem => elem !== "difficulty"))
+                } else {
+                    setSortingScheme([...sortingScheme, "difficulty"]);
+                }
+            })
 
-        let b4 = createButton("Difficulty", button4_offset, b4_font_color, b4_img_path)
-        .attr("y", button4_offset)
-        .on("click", function() {
-            if (sortingScheme.includes("difficulty")) {
-                setSortingScheme(sortingScheme.filter(elem => elem !== "difficulty"))
-            } else {
-                setSortingScheme([...sortingScheme, "difficulty"]);
-            }
-        })
+        d3.select("#outerSvg")
+            .append("image")
+            .attr("xlink:href", "/icons/difficulty.svg")
+            .attr("x", buttons_x_offset + 5.5)
+            .attr("y", button4_offset + 5.5)
+            .attr('class', 'btn_img')
+            .attr('height', '5%')
+            .attr('pointer-events', 'none')
+            .attr("opacity", function() {
+                if (sortingScheme.includes("difficulty") || sortingScheme.length < 3) 
+                { return 1; }
+                return 0.5;
+            })
 
         /* END BUTTONS */
 
