@@ -71,7 +71,7 @@ export default function CirclePacking(props) {
         Draw a Circle Packing chart. Core functionality copied from:
             https://observablehq.com/@d3/zoomable-circle-packing
   */
-    function drawChart() {     
+    function drawChart() {
 
         // Remove previous CP chart before redrawing
         d3.select("#circlePackContainer")
@@ -129,10 +129,9 @@ export default function CirclePacking(props) {
             .attr('height', '5%')
             .attr('pointer-events', 'none')
             .attr("opacity", function() {
-                if (sortingScheme.includes("equipment") || 
-                    sortingScheme.length < 3) {
-                    return 1;
-                }
+                // Reduce icon opacity if depth === max depth
+                if (sortingScheme.includes("equipment") || sortingScheme.length < 3) 
+                { return 1; }
                 return 0.5;
             })
 
@@ -156,11 +155,9 @@ export default function CirclePacking(props) {
             .attr('class', 'btn_img')
             .attr('height', '5%')
             .attr('pointer-events', 'none')
-            .attr("opacity", function() {
-                if (sortingScheme.includes("force") || 
-                    sortingScheme.length < 3) {
-                    return 1;
-                }
+            .attr("opacity", function() {   
+                if (sortingScheme.includes("force") || sortingScheme.length < 3) 
+                { return 1; }
                 return 0.5;
             })
 
@@ -186,10 +183,8 @@ export default function CirclePacking(props) {
             .attr('height', '5%')
             .attr('pointer-events', 'none')
             .attr("opacity", function() {
-                if (sortingScheme.includes("mechanic") || 
-                    sortingScheme.length < 3) {
-                    return 1;
-                }
+                if (sortingScheme.includes("mechanic") || sortingScheme.length < 3) 
+                { return 1; }
                 return 0.5;
             })
 
@@ -210,12 +205,8 @@ export default function CirclePacking(props) {
 
         d3.select("#outerSvg")
             .on("click", function(event) {
-                    if (focus !== root) {
-                        (zoom(event, root), event.stopPropagation());
-                        switchOffPointerEvents("#leaf");
-                        switchOffPointerEvents("#selectedleaf");
-                        switchOnPointerEvents("#node");
-                    }
+                if (focus === root) { return; }
+                (zoom(event, focus.parent), event.stopPropagation());
                 }
             )
 
@@ -240,32 +231,19 @@ export default function CirclePacking(props) {
                     d.data.difficulty === "Intermediate" ? 'gold' :
                     d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
                     d3.interpolateOranges(0.5))
-                .attr("pointer-events", null)
+                .attr("pointer-events", d => d.depth === 1 ? null : "none")
                 .attr("transform", d => `translate(${d.x},${d.y})`)
-                .on("mouseover", function() { 
-                    if (focus.depth !== sortingScheme.length && sortingScheme.length !== 0) {
-                        switchOffPointerEvents("#leaf");
-                        switchOffPointerEvents("#selectedleaf");
-                        d3.select(this).attr("id") === "node" &&  
-                            d3.select(this).attr("stroke", "#000");
-                    }
-                    else {
-                        switchOnPointerEvents("#leaf");
-                        switchOnPointerEvents("#selectedleaf");
+                .on("mouseover", function(event, d) { 
+                    if (d.parent === focus) {
+                        d3.select(this).attr("stroke", "#000");
                         d3.select(this).attr("id") === "leaf" && 
-                            d3.select(this).attr("stroke", "#000") &&
-                            toolTip
-                                .style("visibility", "visible");
+                        toolTip.style("visibility", "visible");
                     }
-                    
                 })
-                .on("mouseout", function() { 
-                    switchOnPointerEvents("#leaf");
-                    switchOnPointerEvents("#selectedleaf");
+                .on("mouseout", function() {
                     d3.select(this).attr("id") !== "selectedleaf" &&
-                        d3.select(this).attr("stroke", null);
-                    toolTip
-                        .style("visibility", "hidden")
+                    d3.select(this).attr("stroke", null);
+                    toolTip.style("visibility", "hidden")
                 })
                 .on("mousemove", function(event, d) {
                     const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
@@ -289,17 +267,16 @@ export default function CirclePacking(props) {
             
         d3.selectAll("#node")
             .on("click", function(event, d) {          
-                (zoom(event, d), event.stopPropagation())     
-                if (focus.depth > d.depth) {
-                    d3.select(this)
-                        .attr("pointer-events", "none");
-                } else {
-                    d3.select(this)
-                        .attr("pointer-events", null);
-                }        
+                (zoom(event, d), event.stopPropagation()) 
             });
 
         d3.selectAll("#leaf")
+            .on("click", function(event, d) {
+                ((focus !== root || sortingScheme.length === 0) && 
+                props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation());
+            });
+
+        d3.selectAll("#selectedleaf")
             .on("click", function(event, d) {
                 ((focus !== root || sortingScheme.length === 0) && 
                 props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation());
@@ -371,10 +348,10 @@ export default function CirclePacking(props) {
                     .attr('rx', 10)
                     .attr('fill', 'white')
                     .attr("pointer-events", function () {
-                        if (sortingScheme.includes(sortName.toLowerCase()) || 
-                            sortingScheme.length < 3) {
-                            return null;
-                        }
+                        // enable if depth !== max depth || attributeKey is in sortingScheme (allow deselection)
+                        if (sortingScheme.includes(sortName.toLowerCase()) || sortingScheme.length < 3) 
+                        { return null; }    
+                        // disable if depth === max depth && attributeKey is not in sortingScheme
                         return "none";
                     })
                     .attr('opacity', 0.6)
@@ -422,10 +399,39 @@ export default function CirclePacking(props) {
             label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
             node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
             node.attr("r", d => d.r * k);
-        }   
+        }
 
         function zoom(event, d) {
+            // Only allow a depth change of 1
+            if (Math.abs(d.depth - focus.depth) !== 1) { return; }
             focus = d;
+
+            // Turn on node pointer events if they are the children of current focus
+            d3.selectAll("#node")
+                .attr("pointer-events", function(d) {
+                    if (d.parent === focus) { return null; }
+                    return "none";
+                })
+
+            // Turn on leaf pointer-events if they are next in line
+            d3.selectAll("#leaf")
+                .attr("pointer-events", function(d) {
+                    if (root.height === focus.depth + 1 && d.parent === focus) { return null; } 
+                    return "none";
+                })
+            d3.selectAll("#selectedleaf")
+                .attr("pointer-events", function(d) {
+                    if (root.height === focus.depth + 1 && d.parent === focus) { return null; } 
+                    return "none";
+                })
+
+            // Switch cursor of background to pointer when zoomed in
+            d3.select("#outerSvg")
+                .style("cursor", function() {
+                    if (focus === root) { return "default"; }
+                    return "pointer";
+                })
+
             const transition = svg.transition()
                 .duration(event.altKey ? 7500 : 750)
                 .tween("zoom", d => {
