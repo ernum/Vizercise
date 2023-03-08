@@ -28,33 +28,31 @@ export default function CirclePacking(props) {
      
     /*
     Change id attribute to indicate the exercise has been selected/deselected
-    whenever props.selectedExercises or exerciseData changes. Would probably 
-    be better to use a foreach loop on props.selectedExercises instead of checking 
-    all leafs I realise as I'm writing this comment butuh... Leaving as is for now.
+    whenever props.selectedExercises or exerciseData changes.
     Naming convention is confusing due to how I first wrote this whole thing
     when I couldn't figure out how to use the id attribute ("." instead of "#").
     */
     useEffect(() => {
-       d3.selectAll("#leaf")
-        .attr("id", function() {
-            let exerciseId = d3.select(this).attr("className");
-            if (props.selectedExercises.includes(exerciseId)) {
-                return "selectedleaf";
-            }
-            return "leaf";
-        });
-        
-       d3.selectAll("#selectedleaf")
-        .attr("id", function() {
-            let exerciseId = d3.select(this).attr("className");
-            if (!props.selectedExercises.includes(exerciseId)) {
-                d3.select(this).attr("stroke", "none");
-                return "leaf";
-            }
-            return "selectedleaf";
-        });
-        d3.selectAll("#selectedleaf").attr("stroke", "#000");
-    }, [props.selectedExercises, exerciseData]);
+        d3.selectAll("#leaf")
+         .attr("id", function() {
+             let exerciseId = d3.select(this).attr("className");
+             if (props.selectedExercises.includes(exerciseId)) {
+                 return "selectedleaf";
+             }
+             return "leaf";
+         });
+         
+        d3.selectAll("#selectedleaf")
+         .attr("id", function() {
+             let exerciseId = d3.select(this).attr("className");
+             if (!props.selectedExercises.includes(exerciseId)) {
+                 d3.select(this).attr("stroke", "none");
+                 return "leaf";
+             }
+             return "selectedleaf";
+         });
+         d3.selectAll("#selectedleaf").attr("stroke", "#000");
+     }, [props.selectedExercises, exerciseData]);
     
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
@@ -223,20 +221,33 @@ export default function CirclePacking(props) {
                     d3.interpolateOranges(0.5))
                 .attr("pointer-events", d => d.depth === 1 ? null : "none")
                 .attr("transform", d => `translate(${d.x},${d.y})`)
-                .on("mouseover", function(event, d) { 
-                    if (d.parent === focus) {
+                .on("click", function(event, d) {
+                    if (d3.select(this).attr("id") === "node") {
+                        (zoom(event, d), event.stopPropagation());
+                    } else {
+                        props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation();
+                        leafIdSwitch(d3.select(this));
+                        leafStrokeSwitch(d3.select(this));
+                    }
+                })
+                .on("mouseover", function() {
+                    if (d3.select(this).attr("id") === "node") {
                         d3.select(this).attr("stroke", "#000");
-                        (d3.select(this).attr("id") === "leaf" || 
-                        d3.select(this).attr("id") === "selectedleaf") && 
+                    } else {
                         toolTip.style("visibility", "visible");
+                        d3.select(this).classed("pulsingOpacity", true)
                     }
                 })
                 .on("mouseout", function() {
-                    d3.select(this).attr("id") !== "selectedleaf" &&
-                    d3.select(this).attr("stroke", null);
-                    toolTip.style("visibility", "hidden")
+                    if (d3.select(this).attr("id") === "node") {
+                        d3.select(this).attr("stroke", null);
+                    } else {
+                        toolTip.style("visibility", "hidden");
+                        d3.select(this).classed("pulsingOpacity", false)
+                    }
                 })
                 .on("mousemove", function(event, d) {
+                    if (d3.select(this).attr("id") === "node") { return; }
                     const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
                     toolTip
                         .html(d.data.name)
@@ -255,23 +266,14 @@ export default function CirclePacking(props) {
             .style("fill-opacity", d => d.parent === root ? d.descendants().length > 1 ? 1 : 0 : 0)
             .style("display", d => d.parent === root ? "inline" : "none")
             .text(d => d.data.name);
-            
-        d3.selectAll("#node")
-            .on("click", function(event, d) {          
-                (zoom(event, d), event.stopPropagation()) 
-            });
 
-        d3.selectAll("#leaf")
-            .on("click", function(event, d) {
-                ((focus !== root || sortingScheme.length === 0) && 
-                props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation());
-            });
+        function leafStrokeSwitch(leaf) {
+            leaf.attr("id") === "leaf" ? leaf.attr("stroke", null) : leaf.attr("stroke", "#000")
+        }
 
-        d3.selectAll("#selectedleaf")
-            .on("click", function(event, d) {
-                ((focus !== root || sortingScheme.length === 0) && 
-                props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation());
-            });
+        function leafIdSwitch(leaf) {
+            leaf.attr("id") === "leaf" ? leaf.attr("id", "selectedleaf") : leaf.attr("id", "leaf")
+        }
 
         zoomTo([root.x, root.y, root.r * 2]);
 
