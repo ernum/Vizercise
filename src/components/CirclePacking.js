@@ -19,21 +19,14 @@ export default function CirclePacking(props) {
         }   
     }, [svgRef, exerciseData]);
 
-    // setState whenever a muscle is clicked
+    // Update the data displayed in CP chart when a muscle or sorting button is clicked
     useEffect(() => {
         props.selectedMuscles.length
             ? setExerciseData(getNestedData([...new Set(props.selectedMuscles.flatMap(GetExercises))], sortingScheme))
             : setExerciseData(getNestedData(dataReq, sortingScheme));
     }, [props.selectedMuscles, sortingScheme]);
-     
-    /*
-    Change id attribute to indicate the exercise has been selected/deselected
-    whenever props.selectedExercises or exerciseData changes. Would probably 
-    be better to use a foreach loop on props.selectedExercises instead of checking 
-    all leafs I realise as I'm writing this comment butuh... Leaving as is for now.
-    Naming convention is confusing due to how I first wrote this whole thing
-    when I couldn't figure out how to use the id attribute ("." instead of "#").
-    */
+
+   // Update id of leafs if they have been selected and give selected leafs a border outline
     useEffect(() => {
        d3.selectAll("#leaf")
         .attr("id", function() {
@@ -43,7 +36,6 @@ export default function CirclePacking(props) {
             }
             return "leaf";
         });
-        
        d3.selectAll("#selectedleaf")
         .attr("id", function() {
             let exerciseId = d3.select(this).attr("className");
@@ -55,7 +47,12 @@ export default function CirclePacking(props) {
         });
         d3.selectAll("#selectedleaf").attr("stroke", "#000");
     }, [props.selectedExercises, exerciseData]);
-    
+
+    // Draw legend only on first render
+    useEffect(() => {
+        legendSetup();
+    }, []);
+
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function pack(data) {
         return (
@@ -73,11 +70,7 @@ export default function CirclePacking(props) {
             https://observablehq.com/@d3/zoomable-circle-packing
   */
     function drawChart() {
-
-        // Remove previous CP chart before redrawing
-        d3.select("#circlePackContainer")
-            .remove();
-
+        removePrevious();
         const root = pack(exerciseData)
         let focus = root;
         let view;
@@ -93,33 +86,160 @@ export default function CirclePacking(props) {
                 .style("cursor", "pointer");
 
         d3.select("#outerSvg")
-            .style("background", d3.interpolateOranges(0.1))
-            .selectAll(".sortButton")
-                .remove()
+            .on("click", function(event) {
+                if (focus === root) { return; }
+                (zoom(event, focus.parent), event.stopPropagation());
+                }
+            )
 
-        d3.select("#outerSvg")
-            .selectAll(".btn_img")
-                .remove()
+        const node = nodeSetup();
+        const label = labelSetup();
+        const toolTip = createTooltip();
+        buttonSetup(); 
+        zoomTo([root.x, root.y, root.r * 2]);
 
-        d3.select("#outerSvg")
-            .selectAll(".sortButtonText")
-                .remove()
+        function zoomTo(v) {
+            const k = width / v[2];       
+            view = v;   
+            label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+            node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+            node.attr("r", d => d.r * k);
+        }
+
+        function zoom(event, d) {
+            // Only allow a depth change of 1
+            if (Math.abs(d.depth - focus.depth) !== 1) { return; }
+            focus = d;
+
+            // Turn on node pointer events if they are the children of current focus
+            d3.selectAll("#node")
+                .attr("pointer-events", function(d) {
+                    if (d.parent === focus) { return null; }
+                    return "none";
+                })
+
+            // Turn on leaf pointer-events if they are next in line
+            d3.selectAll("#leaf")
+                .attr("pointer-events", function(d) {
+                    if (root.height === focus.depth + 1 && d.parent === focus) { return null; } 
+                    return "none";
+                })
+            d3.selectAll("#selectedleaf")
+                .attr("pointer-events", function(d) {
+                    if (root.height === focus.depth + 1 && d.parent === focus) { return null; } 
+                    return "none";
+                })
+
+            // Switch cursor of background to pointer when zoomed in
+            d3.select("#outerSvg")
+                .style("cursor", function() {
+                    if (focus === root) { return "default"; }
+                    return "pointer";
+                })
+
+            const transition = svg.transition()
+                .duration(event.altKey ? 7500 : 750)
+                .tween("zoom", d => {
+                const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+                return t => zoomTo(i(t));
+                });
+
+            label
+                .filter(function(d) { 
+                    return d.parent === focus || this.style.display === "inline"; })
+                .transition(transition)
+                  .style("fill-opacity", d => d.parent === focus ? d.descendants().length > 1 ? 1 : 0 : 0)
+                  .on("start", function(d) { 
+                    if (d.parent === focus) this.style.display = "inline"; })
+                  .on("end", function(d) { 
+                    if (d.parent !== focus) this.style.display = "none"; });
+        }
+
+        function labelSetup() {
+            return(
+                svg.append("g")
+                .style("font", "18px montserrat")
+                .style("font-weight", "700")
+                .attr("pointer-events", "none")
+                .attr("text-anchor", "middle")
+            .selectAll("text")
+            .data(root.descendants())
+            .join("text")
+                .style("fill-opacity", d => d.parent === root ? d.descendants().length > 1 ? 1 : 0 : 0)
+                .style("display", d => d.parent === root ? "inline" : "none")
+                .text(d => d.data.name)
+            );
+        }
         
-        d3.select("#outerSvg")
-            .selectAll(".btn_order")
-                .remove()
-        
-        d3.select("#outerSvg")
-            .selectAll(".btn_order_text")
-                .remove()
+        // Create nodes and define behavior in CP chart
+        function nodeSetup() {
+            const toolTipOffsetX = 40;
+            const toolTipOffsetY = 20;
+            return (
+                svg.append("g")
+                .attr("id", "realRoot")
+                .selectAll("circle")
+                .data(root.descendants().slice(1))
+                .join("circle")
+                    .attr("className", d => d.children ? "node" : d.data.id)
+                    .attr("id", d => d.children ? "node" : "leaf")
+                    .attr("fill", d => d.children ? d3.interpolateOranges(0.2 + d.depth / 10) : 
+                        d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
+                        d.data.difficulty === "Intermediate" ? 'gold' :
+                        d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
+                        d3.interpolateOranges(0.5))
+                    .attr("pointer-events", d => d.depth === 1 ? null : "none")
+                    .attr("transform", d => `translate(${d.x},${d.y})`)
+                    .on("mouseover", function(event, d) { 
+                        if (d.parent === focus) {
+                            d3.select(this).attr("stroke", "#000");
+                            (d3.select(this).attr("id") === "leaf" || 
+                            d3.select(this).attr("id") === "selectedleaf") && 
+                            toolTip.style("visibility", "visible");
+                        }
+                    })
+                    .on("mouseout", function() {
+                        d3.select(this).attr("id") !== "selectedleaf" &&
+                        d3.select(this).attr("stroke", null);
+                        toolTip.style("visibility", "hidden")
+                    })
+                    .on("mousemove", function(event, d) {
+                        const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
+                        toolTip
+                            .html(d.data.name)
+                            .style("left", (event.clientX - svgRect.left - toolTipOffsetX) + "px") 
+                            .style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
+                    })
+                    .on("click", function(event, d) {
+                        d3.select(this).attr("id") === "node"
+                            ? (zoom(event, d), event.stopPropagation()) 
+                            : props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation();
+                    })
+            );
+        }
+    };
 
-        /*
-            For all the sorting buttons: If the attribute is already part of the sorting scheme,
-            remove it from the sorting scheme. Else, append the attribute to the end of the
-            sortingScheme array (making it the current most deeply nested attribute)
-        */
+    function createTooltip() {
+        return d3
+            .select("#toolTipAppender")
+            .append("div")
+            .attr("class", "tooltip")
+            .attr("pointer-events", "none")
+            .style("visibility", "hidden")
+            .style("background-color", "white")
+            .style("position", "absolute")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+            .style("font", "12px montserrat");
+    }
 
-        /* BUTTON 1 */
+    /*
+        Everything related to sortingScheme buttons here
+    */
+    function buttonSetup() {
+        // BUTTON 1
         let button1_offset = 80
         let b1_font_color = "black";
         if (sortingScheme.includes("equipment")) {
@@ -137,7 +257,7 @@ export default function CirclePacking(props) {
                 }
             })
 
-        /* BUTTON 2 */
+        // BUTTON 2
         let button2_offset = 115
         let b2_font_color = "black";
         if (sortingScheme.includes("force")) {
@@ -155,7 +275,7 @@ export default function CirclePacking(props) {
                 }
             })
         
-        /* BUTTON 3 */
+        // BUTTON 3
         let button3_offset = 150
         let b3_font_color = "black";
         if (sortingScheme.includes("mechanic")) {
@@ -173,7 +293,7 @@ export default function CirclePacking(props) {
                 }
             })
 
-        /* BUTTON 4 */
+        // BUTTON 4
         let button4_offset = 185
         let b4_font_color = "black";
         if (sortingScheme.includes("difficulty")) {
@@ -191,142 +311,7 @@ export default function CirclePacking(props) {
                 }
             })
 
-        /* END BUTTONS */
-
-        d3.select("#outerSvg")
-            .on("click", function(event) {
-                if (focus === root) { return; }
-                (zoom(event, focus.parent), event.stopPropagation());
-                }
-            )
-
-        d3.select(".tooltip")
-            .remove();
-
-        const toolTip = createTooltip();
-        const toolTipOffsetX = 40;
-        const toolTipOffsetY = 20;
-
-        // className and id should be switched but I can't figure out how to use 
-        // className with d3 selection so this is a temporary solution...
-        const node = svg.append("g")
-            .attr("id", "realRoot")
-            .selectAll("circle")
-            .data(root.descendants().slice(1))
-            .join("circle")
-                .attr("className", d => d.children ? "node" : d.data.id)
-                .attr("id", d => d.children ? "node" : "leaf")
-                .attr("fill", d => d.children ? d3.interpolateOranges(0.2 + d.depth / 10) : 
-                    d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
-                    d.data.difficulty === "Intermediate" ? 'gold' :
-                    d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
-                    d3.interpolateOranges(0.5))
-                .attr("pointer-events", d => d.depth === 1 ? null : "none")
-                .attr("transform", d => `translate(${d.x},${d.y})`)
-                .on("mouseover", function(event, d) { 
-                    if (d.parent === focus) {
-                        d3.select(this).attr("stroke", "#000");
-                        (d3.select(this).attr("id") === "leaf" || 
-                        d3.select(this).attr("id") === "selectedleaf") && 
-                        toolTip.style("visibility", "visible");
-                    }
-                })
-                .on("mouseout", function() {
-                    d3.select(this).attr("id") !== "selectedleaf" &&
-                    d3.select(this).attr("stroke", null);
-                    toolTip.style("visibility", "hidden")
-                })
-                .on("mousemove", function(event, d) {
-                    const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
-                    toolTip
-                        .html(d.data.name)
-                        .style("left", (event.clientX - svgRect.left - toolTipOffsetX) + "px") 
-                        .style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
-                });
-
-        const label = svg.append("g")
-            .style("font", "18px montserrat")
-            .style("font-weight", "700")
-            .attr("pointer-events", "none")
-            .attr("text-anchor", "middle")
-        .selectAll("text")
-        .data(root.descendants())
-        .join("text")
-            .style("fill-opacity", d => d.parent === root ? d.descendants().length > 1 ? 1 : 0 : 0)
-            .style("display", d => d.parent === root ? "inline" : "none")
-            .text(d => d.data.name);
-            
-        d3.selectAll("#node")
-            .on("click", function(event, d) {          
-                (zoom(event, d), event.stopPropagation()) 
-            });
-
-        d3.selectAll("#leaf")
-            .on("click", function(event, d) {
-                ((focus !== root || sortingScheme.length === 0) && 
-                props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation());
-            });
-
-        d3.selectAll("#selectedleaf")
-            .on("click", function(event, d) {
-                ((focus !== root || sortingScheme.length === 0) && 
-                props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation());
-            });
-
-        zoomTo([root.x, root.y, root.r * 2]);
-
-        const colorScale = d3.scaleOrdinal()
-        .domain(['Beginner', 'Intermediate', 'Advanced'])
-        .range(['#75c47c', '#fcd405', '#fa684c']);
-
-        d3.select("#outerSvg")
-            .selectAll(".legendContainer")
-                .remove();
-
-        d3.select("#outerSvg").append('rect')
-        .style("cursor", "default")
-        .attr("class", "legendContainer")
-        .attr('x', 10)
-        .attr('y', 10)
-        .attr('width', 100)
-        .attr('height', 60)
-        .attr('rx', 10)
-        .attr('fill', 'white')
-        .attr("pointer-events", "none")
-        .attr('opacity', 0.6);
-
-        d3.select("#outerSvg")
-            .selectAll(".legend")
-                .remove();
-
-        d3.select("#outerSvg").append('g')
-        .style("font", "10px montserrat")
-        .style("cursor", "default")
-        .attr("class", "legend")
-        .attr('transform', `translate(25,25)`)
-        .attr("pointer-events", "none")
-        .call(ColorLegend, {
-        colorScale,
-        circleRadius: 4,
-        spacing: 14,
-        textOffset: 10,
-        });
-
-        function createTooltip() {
-            return d3
-                .select("#toolTipAppender")
-                .append("div")
-                .attr("class", "tooltip")
-                .attr("pointer-events", "none")
-                .style("visibility", "hidden")
-                .style("background-color", "white")
-                .style("position", "absolute")
-                .style("border", "solid")
-                .style("border-width", "2px")
-                .style("border-radius", "5px")
-                .style("padding", "5px")
-                .style("font", "12px montserrat");
-        }
+        // END BUTTONS
 
         function createButton(sortName, yOffset, font_color, icon_path) {
             let buttons_x_offset = 10
@@ -353,7 +338,7 @@ export default function CirclePacking(props) {
             })
             .attr('opacity', 0.6)
             .on("mouseover", function() {
-                /* when mouse is over the button, expand its width to 100 */
+                // when mouse is over the button, expand its width to 100 
                 d3.select(this)
                     .transition()
                     .duration(100)
@@ -422,69 +407,64 @@ export default function CirclePacking(props) {
                 
                 button_img.classed("filter-white", true);
             }
-
-            return (
-                button
-            )
+            return button;
         }
+    }
 
-        function zoomTo(v) {
-            const k = width / v[2];       
-            view = v;   
-            label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
-            node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
-            node.attr("r", d => d.r * k);
-        }
+    function legendSetup() {
+        const colorScale = d3.scaleOrdinal()
+        .domain(['Beginner', 'Intermediate', 'Advanced'])
+        .range(['#75c47c', '#fcd405', '#fa684c']);
 
-        function zoom(event, d) {
-            // Only allow a depth change of 1
-            if (Math.abs(d.depth - focus.depth) !== 1) { return; }
-            focus = d;
+        d3.select("#outerSvg").append('rect')
+        .style("cursor", "default")
+        .attr("class", "legendContainer")
+        .attr('x', 10)
+        .attr('y', 10)
+        .attr('width', 100)
+        .attr('height', 60)
+        .attr('rx', 10)
+        .attr('fill', 'white')
+        .attr("pointer-events", "none")
+        .attr('opacity', 0.6);
 
-            // Turn on node pointer events if they are the children of current focus
-            d3.selectAll("#node")
-                .attr("pointer-events", function(d) {
-                    if (d.parent === focus) { return null; }
-                    return "none";
-                })
+        d3.select("#outerSvg").append('g')
+        .style("font", "10px montserrat")
+        .style("cursor", "default")
+        .attr("class", "legend")
+        .attr('transform', `translate(25,25)`)
+        .attr("pointer-events", "none")
+        .call(ColorLegend, {
+        colorScale,
+        circleRadius: 4,
+        spacing: 14,
+        textOffset: 10,
+        });
+    }
 
-            // Turn on leaf pointer-events if they are next in line
-            d3.selectAll("#leaf")
-                .attr("pointer-events", function(d) {
-                    if (root.height === focus.depth + 1 && d.parent === focus) { return null; } 
-                    return "none";
-                })
-            d3.selectAll("#selectedleaf")
-                .attr("pointer-events", function(d) {
-                    if (root.height === focus.depth + 1 && d.parent === focus) { return null; } 
-                    return "none";
-                })
-
-            // Switch cursor of background to pointer when zoomed in
-            d3.select("#outerSvg")
-                .style("cursor", function() {
-                    if (focus === root) { return "default"; }
-                    return "pointer";
-                })
-
-            const transition = svg.transition()
-                .duration(event.altKey ? 7500 : 750)
-                .tween("zoom", d => {
-                const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-                return t => zoomTo(i(t));
-                });
-
-            label
-                .filter(function(d) { 
-                    return d.parent === focus || this.style.display === "inline"; })
-                .transition(transition)
-                  .style("fill-opacity", d => d.parent === focus ? d.descendants().length > 1 ? 1 : 0 : 0)
-                  .on("start", function(d) { 
-                    if (d.parent === focus) this.style.display = "inline"; })
-                  .on("end", function(d) { 
-                    if (d.parent !== focus) this.style.display = "none"; });
-        }
-    };
+    // Remove all previous CP chart elements before redrawing
+    function removePrevious() {
+        d3.select("#circlePackContainer")
+            .remove();
+        d3.select(".tooltip")
+            .remove();
+        d3.select("#outerSvg")
+            .style("background", d3.interpolateOranges(0.1))
+            .selectAll(".sortButton")
+                .remove();
+        d3.select("#outerSvg")
+            .selectAll(".btn_img")
+                .remove();
+        d3.select("#outerSvg")
+            .selectAll(".sortButtonText")
+                .remove();
+        d3.select("#outerSvg")
+            .selectAll(".btn_order")
+                .remove();
+        d3.select("#outerSvg")
+            .selectAll(".btn_order_text")
+                .remove();
+    }
 
     return (
         <div id="toolTipAppender">
