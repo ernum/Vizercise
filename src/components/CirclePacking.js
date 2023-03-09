@@ -14,9 +14,8 @@ export default function CirclePacking(props) {
     // Redraw chart when svgRef or exerciseData changes
     useEffect(() => {
         if (svgRef.current) {
-            const svg = d3.select(svgRef.current);
-            drawChart(svg);
-        }   
+            drawChart(d3.select(svgRef.current));
+        }
     }, [svgRef, exerciseData]);
 
     // Update the data displayed in CP chart when a muscle or sorting button is clicked
@@ -329,13 +328,7 @@ export default function CirclePacking(props) {
             .attr('height', 30)
             .attr('rx', 10)
             .attr('fill', button_fill)
-            .attr("pointer-events", function () {
-                // enable if depth !== max depth || attributeKey is in sortingScheme (allow deselection)
-                if (sortingScheme.includes(sortName.toLowerCase()) || sortingScheme.length < 3) 
-                { return null; }    
-                // disable if depth === max depth && attributeKey is not in sortingScheme
-                return "none";
-            })
+            .attr("pointer-events", null)
             .attr('opacity', 0.6)
             .on("mouseover", function() {
                 // when mouse is over the button, expand its width to 100 
@@ -375,12 +368,6 @@ export default function CirclePacking(props) {
                 .attr('class', 'btn_img')
                 .attr('height', '5%')
                 .attr('pointer-events', 'none')
-                .attr("opacity", function() {
-                    if (sortingScheme.includes(sortName.toLowerCase()) || 
-                        sortingScheme.length < 3) 
-                    { return 1; }
-                    return 0.5;
-                })
 
             if (sortingScheme.includes(sortName.toLowerCase())) {
                 // Append a circle to the top left of the button,

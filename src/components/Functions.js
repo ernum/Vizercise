@@ -51,12 +51,17 @@ function nestByAttributes(attributeArray) {
         }
       ]
     })
+  if (attributeArray.length > 3 ) {
+    nodeArray[2].children.forEach((elem) => {
+      elem.children = JSON.parse(JSON.stringify(nodeArray[3].children));
+    })
+  }
+  if (attributeArray.length > 2) {
+    nodeArray[1].children.forEach((elem) => {
+      elem.children = JSON.parse(JSON.stringify(nodeArray[2].children));
+    })
+  }
   if (attributeArray.length > 1) {
-    if (attributeArray.length === 3) {
-      nodeArray[1].children.forEach((elem) => {
-        elem.children = JSON.parse(JSON.stringify(nodeArray[2].children));
-      })
-    }
     nodeArray[0].children.forEach((elem) => {
       // Deep copies (stringify -> parse) to allow value changes
       elem.children = JSON.parse(JSON.stringify(nodeArray[1].children));
@@ -68,9 +73,7 @@ function nestByAttributes(attributeArray) {
 /*  
   Gets the data nested according to order of elements in attributeArray so that
   attributeArray[0] = root and attributeArray[length-1] = leaf.
-  Returns the root object.
-  Maximum depth is 3 with current implementation but can be modified if we would
-  like to allow for a bigger depth.
+  Returns the root object. Maximum depth is 4 with current implementation
 */
 function getNestedData(exerciseArray, attributeArray) {
   if (attributeArray.length === 0) {
@@ -87,7 +90,7 @@ function getNestedData(exerciseArray, attributeArray) {
   if (depth > 1) {
     const secondLevel = firstLevel.map((elem) => 
       getArrayByAttribute(attributeArray[1], elem));
-    
+
     if (depth === 2) {
       for (let i = 0; i < rootObject.children.length; i++) {
         for (let j = 0; j < rootObject.children[i].children.length; j++) {
@@ -95,13 +98,27 @@ function getNestedData(exerciseArray, attributeArray) {
         }
       }
     }
-
     else if (depth === 3) {
       for (let i = 0; i < rootObject.children.length; i++) {
         for (let j = 0; j < rootObject.children[i].children.length; j++) {
-          let exercises = getArrayByAttribute(attributeArray[2], secondLevel[i][j])
+          let exercises = getArrayByAttribute(attributeArray[2], secondLevel[i][j]);
           for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
             rootObject.children[i].children[j].children[k].children = exercises[k];
+          }
+        }
+      }
+    }
+    else if (depth === 4) {
+      const thirdLevel = secondLevel.map((outerElem) =>
+        outerElem.map((innerElem) =>
+          getArrayByAttribute(attributeArray[2], innerElem)));
+      for (let i = 0; i < rootObject.children.length; i++) {
+        for (let j = 0; j < rootObject.children[i].children.length; j++) {
+          for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
+            let exercises = getArrayByAttribute(attributeArray[3], thirdLevel[i][j][k]);
+            for (let l = 0; l < rootObject.children[i].children[j].children[k].children.length; l++) {
+              rootObject.children[i].children[j].children[k].children[l].children = exercises[l];
+            }
           }
         }
       }
