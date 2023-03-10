@@ -6,9 +6,6 @@ export default function DetailsList(props) {
     props.onSetNewId(id);
     props.onSetIsClosed(true);
   };
-  function changeBoolValue() {
-    props.onSetExerciseOrVideo(false);
-  }
 
   function drawTable(exerciseArray) {
     function drawTableRow(exerciseId) {
@@ -57,6 +54,7 @@ export default function DetailsList(props) {
                     className='text-sm font-medium text-gray-900 px-6 py-4 text-left font-montserrat'>
                     <TableButton
                       onSetExerciseOrVideo={props.onSetExerciseOrVideo}
+                      view={"table"}
                     />
                   </th>
                   <th

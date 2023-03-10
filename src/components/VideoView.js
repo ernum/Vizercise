@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import { TableButton } from "./Buttons";
 import { GetExerciseById } from "./Functions";
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function VideoView(props) {
   const arrLength = props.selectedExercises.length;
@@ -19,8 +24,8 @@ export default function VideoView(props) {
         <iframe
           className='m-auto rounded-xl'
           src={videoURL}
-          width='355px'
-          height='200px'
+          width='500px'
+          height='282px'
           allow='autoplay; encrypted-media'
           allowFullScreen
           title='video'></iframe>
@@ -44,26 +49,27 @@ export default function VideoView(props) {
     <div>
       <div className='  m-5'>
         <TableButton
+          view={"video"}
           onSetExerciseOrVideo={props.onSetExerciseOrVideo}
           bool={false}
         />
       </div>
 
       <div className=' flex flex-row mx-40 justify-center '>
-        <button
-          onClick={handleDecrement}
-          className=' hover:bg-gray-100 text-gray-800 font-bold text-4xl border-gray-400 rounded transition '>
-          ⪻
+        <button onClick={handleDecrement}>
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            className=' text-gray-400 text-4xl hover:text-gray-800 transition'
+          />
         </button>
-        <div className='hover:cursor-default flex shadow-2xl rounded-xl w-1/2 m-auto min-w-min '>
-          <div className='relative overflow-auto p-5 '>
-            <div>{displayVideo()}</div>
-          </div>
+        <div className='shadow-2xl rounded-xl m-auto min-w-min p-3'>
+          <div>{displayVideo()}</div>
         </div>
-        <button
-          onClick={handleIncrement}
-          className=' hover:bg-gray-100 text-gray-800 font-bold text-4xl border-gray-400 rounded transition'>
-          ⪼
+        <button onClick={handleIncrement}>
+          <FontAwesomeIcon
+            icon={faChevronRight}
+            className=' text-gray-400 text-4xl hover:text-gray-800 transition'
+          />
         </button>
       </div>
     </div>

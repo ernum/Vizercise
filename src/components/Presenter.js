@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import VideoView from "../components/VideoView";
 import DetailsList from "../components/DetailsList";
-import { useState, useEffect } from "react";
+import { useState} from "react";
+
 
 export default function Presenter(props) {
   const [exerciseOrVideo, setExerciseOrVideo] = useState(true);

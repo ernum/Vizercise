@@ -1,6 +1,8 @@
 import { Menu, Transition, Fragment } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { classNames } from "./Functions";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCirclePlay, faTableList } from "@fortawesome/free-solid-svg-icons";
 
 export default function BodyButton(props) {
   return (
@@ -49,6 +51,13 @@ export default function BodyButton(props) {
 }
 
 export function TableButton(props) {
+  console.log(props.view);
+  function changeIcon() {
+    if (props.view == "table") {
+      return <FontAwesomeIcon icon={faCirclePlay} className='text-2xl' />;
+    } else if (props.view == "video")
+      return <FontAwesomeIcon icon={faTableList} className='text-2xl' />;
+  }
   function changeBoolValue() {
     if (props.bool == false) {
       props.onSetExerciseOrVideo(true);
@@ -59,9 +68,9 @@ export function TableButton(props) {
     <div>
       <div>
         <button
-          onClick={changeBoolValue}
-          className=' bg-gray-300 hover:bg-gray-200 text-black py-1 px-2 border border-gray-400 rounded'>
-          🡠
+          onClick={changeBoolValue }
+          className='  transition hover:text-black text-gray-500 '>
+          {changeIcon()}
         </button>
       </div>
     </div>
