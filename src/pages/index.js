@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import BodySection from "../components/BodySection";
-import DetailsList from "../components/DetailsList";
+import Presenter from "../components/Presenter";
 import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
 
@@ -9,11 +9,11 @@ export default function Home() {
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
   const [idFromSetId, setnewId] = useState();
-  const [isClosed, setBoolValue] = useState();
+  const [isClosed, setIsClosed] = useState();
 
   function detailPopup() {
     if (isClosed == true)
-      return <Detail id={idFromSetId} onSetBoolValue={setBoolValue} />;
+      return <Detail id={idFromSetId} onSetBoolValue={setIsClosed} />;
     else return "";
   }
 
@@ -55,10 +55,9 @@ export default function Home() {
       <div>{detailPopup()}</div>
       {/* Biggest Box */}
       <div
-        className="box-border absolute w-[45%] h-[90%] left-[2%] top-[4%]
+        className='box-border absolute w-[45%] h-[90%] left-[2%] top-[4%]
                  bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-                 shadown-black/25 overflow-hidden"
-      >
+                 shadown-black/25 overflow-hidden'>
         <div>
           <BodySection
             onClick={onMuscleClicked}
@@ -70,23 +69,21 @@ export default function Home() {
 
       {/* Second Box */}
       <div
-        className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[4%]
+        className='box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-        shadown-black/25 overflow-hidden"
-      >
+        shadown-black/25 overflow-hidden'>
         <CirclePacking
           css={"absolute w-[100%] h-[100%] top-[0%]"}
           selectedExercises={selectedExercises}
           selectedMuscles={selectedMuscles}
           onExerciseClick={setExerciseSelected}
         />
-        <p className="ml-5 mb-1 bottom-0 left-0 text-xs absolute z-10 font-montserrat font-semibold italic text-amber-900 opacity-60 pointer-events-none">
+        <p className='ml-5 mb-1 bottom-0 left-0 text-xs absolute z-10 font-montserrat font-semibold italic text-amber-900 opacity-60 pointer-events-none'>
           size of circle = popularity by Google{" "}
           <a
-            href="https://searchvolume.io/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+            href='https://searchvolume.io/'
+            target='_blank'
+            rel='noopener noreferrer'>
             search volume
           </a>
         </p>
@@ -94,15 +91,14 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[58.9%]
+        className='overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[58.9%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-        shadown-black/25"
-      >
-        <DetailsList
+        shadown-black/25'>
+        <Presenter
           selectedExercises={selectedExercises}
           onExerciseRemoval={removeExercise}
           onSetNewId={setnewId}
-          onSetBoolValue={setBoolValue}
+          onSetIsClosed={setIsClosed}
         />
       </div>
     </div>

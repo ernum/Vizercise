@@ -1,9 +1,10 @@
 import { GetExerciseById } from "./Functions";
+import { TableButton } from "./Buttons";
 
 export default function DetailsList(props) {
   const setId = (id) => {
     props.onSetNewId(id);
-    props.onSetBoolValue(true);
+    props.onSetIsClosed(true);
   };
 
   function drawTable(exerciseArray) {
@@ -51,7 +52,10 @@ export default function DetailsList(props) {
                   <th
                     scope="col"
                     className="text-sm font-medium text-gray-900 px-6 py-4 text-left font-montserrat"
-                  ></th>
+                  > <TableButton
+                  onSetExerciseOrVideo={props.onSetExerciseOrVideo}
+                  view={"table"}
+                /></th>
                   <th
                     scope="col"
                     className="text-sm font-medium text-gray-900 px-6 py-4 text-left font-montserrat"
