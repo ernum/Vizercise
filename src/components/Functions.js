@@ -34,8 +34,8 @@ function getGroupedData(exercisesArray, attribute) {
 
 function transformElementToObject(elementToTransform) {
   elementToTransform = {
-    "name": elementToTransform,
-    "children": []
+    name: elementToTransform,
+    children: [],
   };
   return elementToTransform;
 }
@@ -43,24 +43,26 @@ function transformElementToObject(elementToTransform) {
 function nestByAttributes(attributeArray) {
   let nodeArray = [];
   attributeArray.forEach((elem) => {
-    nodeArray = 
-      [...nodeArray,
-        {
-          "name": elem,
-          "children": GetUniqueValuesByAttribute(elem).map(transformElementToObject)
-        }
-      ]
-    })
+    nodeArray = [
+      ...nodeArray,
+      {
+        name: elem,
+        children: GetUniqueValuesByAttribute(elem).map(
+          transformElementToObject
+        ),
+      },
+    ];
+  });
   if (attributeArray.length > 1) {
     if (attributeArray.length === 3) {
       nodeArray[1].children.forEach((elem) => {
         elem.children = JSON.parse(JSON.stringify(nodeArray[2].children));
-      })
+      });
     }
     nodeArray[0].children.forEach((elem) => {
       // Deep copies (stringify -> parse) to allow value changes
       elem.children = JSON.parse(JSON.stringify(nodeArray[1].children));
-    })
+    });
   }
   return nodeArray;
 }
@@ -75,9 +77,9 @@ function nestByAttributes(attributeArray) {
 function getNestedData(exerciseArray, attributeArray) {
   if (attributeArray.length === 0) {
     const rootObject = {
-      "name": "root",
-      "children": exerciseArray
-    }
+      name: "root",
+      children: exerciseArray,
+    };
     return rootObject;
   }
   const rootObject = nestByAttributes(attributeArray)[0];
@@ -85,33 +87,42 @@ function getNestedData(exerciseArray, attributeArray) {
   const firstLevel = getArrayByAttribute(attributeArray[0], exerciseArray);
 
   if (depth > 1) {
-    const secondLevel = firstLevel.map((elem) => 
-      getArrayByAttribute(attributeArray[1], elem));
-    
+    const secondLevel = firstLevel.map((elem) =>
+      getArrayByAttribute(attributeArray[1], elem)
+    );
+
     if (depth === 2) {
       for (let i = 0; i < rootObject.children.length; i++) {
         for (let j = 0; j < rootObject.children[i].children.length; j++) {
           rootObject.children[i].children[j].children = secondLevel[i][j];
         }
       }
-    }
-
-    else if (depth === 3) {
+    } else if (depth === 3) {
       for (let i = 0; i < rootObject.children.length; i++) {
         for (let j = 0; j < rootObject.children[i].children.length; j++) {
-          let exercises = getArrayByAttribute(attributeArray[2], secondLevel[i][j])
-          for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
-            rootObject.children[i].children[j].children[k].children = exercises[k];
+          let exercises = getArrayByAttribute(
+            attributeArray[2],
+            secondLevel[i][j]
+          );
+          for (
+            let k = 0;
+            k < rootObject.children[i].children[j].children.length;
+            k++
+          ) {
+            rootObject.children[i].children[j].children[k].children =
+              exercises[k];
           }
         }
       }
     }
-  }
-
-  else {
+  } else {
     rootObject.children.forEach((elem) => {
-      elem.children = getExercisesByAttribute(attributeArray[0], exerciseArray, elem.name);
-    })
+      elem.children = getExercisesByAttribute(
+        attributeArray[0],
+        exerciseArray,
+        elem.name
+      );
+    });
   }
   /*  
     Something like this could be used if we want to filter out empty nested categories:
@@ -133,10 +144,14 @@ function getArrayByAttribute(attributeKey, exerciseArray) {
 
 function getExercisesByAttribute(attributeKey, exerciseArray, attributeVal) {
   return (
-    (attributeKey === "equipment" && getExercisesByEquipment(exerciseArray, attributeVal)) ||
-    (attributeKey === "force" && getExercisesByForce(exerciseArray, attributeVal)) ||
-    (attributeKey === "mechanic" && getExercisesByMechanic(exerciseArray, attributeVal)) ||
-    (attributeKey === "difficulty" && getExercisesByDifficulty(exerciseArray, attributeVal))
+    (attributeKey === "equipment" &&
+      getExercisesByEquipment(exerciseArray, attributeVal)) ||
+    (attributeKey === "force" &&
+      getExercisesByForce(exerciseArray, attributeVal)) ||
+    (attributeKey === "mechanic" &&
+      getExercisesByMechanic(exerciseArray, attributeVal)) ||
+    (attributeKey === "difficulty" &&
+      getExercisesByDifficulty(exerciseArray, attributeVal))
   );
 }
 
@@ -144,21 +159,21 @@ function GetUniqueValuesByAttribute(attribute) {
   var lookup = {};
   var items = dataReq;
   var result = [];
-  for (var item, i = 0; item = items[i++];) {
-      var name = item[attribute];
-      if (!(name in lookup)) {
-          lookup[name] = 1;
-          result.push(name);
-      }
+  for (var item, i = 0; (item = items[i++]); ) {
+    var name = item[attribute];
+    if (!(name in lookup)) {
+      lookup[name] = 1;
+      result.push(name);
+    }
   }
-  return ([... new Set(result.flat())]);
+  return [...new Set(result.flat())];
 }
 
 function getArrayByEquipment(exerciseArray) {
   const equipmentArray = GetUniqueValuesByAttribute("equipment");
   var newArray = [];
   equipmentArray.forEach((elem) => {
-    newArray = [...newArray, getExercisesByEquipment(exerciseArray, elem)]
+    newArray = [...newArray, getExercisesByEquipment(exerciseArray, elem)];
   });
   return newArray;
 }
@@ -167,7 +182,7 @@ function getArrayByMechanic(exerciseArray) {
   const mechanicArray = GetUniqueValuesByAttribute("mechanic");
   var newArray = [];
   mechanicArray.forEach((elem) => {
-    newArray = [...newArray, getExercisesByMechanic(exerciseArray, elem)]
+    newArray = [...newArray, getExercisesByMechanic(exerciseArray, elem)];
   });
   return newArray;
 }
@@ -176,7 +191,7 @@ function getArrayByForce(exerciseArray) {
   const forceArray = GetUniqueValuesByAttribute("force");
   var newArray = [];
   forceArray.forEach((elem) => {
-    newArray = [...newArray, getExercisesByForce(exerciseArray, elem)]
+    newArray = [...newArray, getExercisesByForce(exerciseArray, elem)];
   });
   return newArray;
 }
@@ -185,37 +200,44 @@ function getArrayByDifficulty(exerciseArray) {
   const difficultyArray = GetUniqueValuesByAttribute("difficulty");
   var newArray = [];
   difficultyArray.forEach((elem) => {
-    newArray = [...newArray, getExercisesByDifficulty(exerciseArray, elem)]
+    newArray = [...newArray, getExercisesByDifficulty(exerciseArray, elem)];
   });
   return newArray;
 }
 
 function getExercisesByEquipment(exerciseArray, equipmentValue) {
-  return (
-    exerciseArray.filter((exercise) =>
-      exercise.equipment === equipmentValue)
+  return exerciseArray.filter(
+    (exercise) => exercise.equipment === equipmentValue
   );
 }
 
 function getExercisesByMechanic(exerciseArray, mechanicValue) {
-  return (
-    exerciseArray.filter((exercise) =>
-      exercise.mechanic === mechanicValue)
+  return exerciseArray.filter(
+    (exercise) => exercise.mechanic === mechanicValue
   );
 }
 
 function getExercisesByForce(exerciseArray, forceValue) {
-  return (
-    exerciseArray.filter((exercise) =>
-      exercise.force === forceValue)
-  );
+  return exerciseArray.filter((exercise) => exercise.force === forceValue);
 }
 
 function getExercisesByDifficulty(exerciseArray, difficultyValue) {
-  return (
-    exerciseArray.filter((exercise) =>
-      exercise.difficulty === difficultyValue)
+  return exerciseArray.filter(
+    (exercise) => exercise.difficulty === difficultyValue
   );
+}
+
+function calculateMusclesInvolved(id) {
+  let sum = 0;
+  const exercise = GetExerciseById(id);
+  const muscles = [
+    exercise.primaryMuscles,
+    exercise.secondaryMuscles,
+    exercise.tertiaryMuscles,
+  ];
+
+  for (const muscle of muscles) if (muscle) sum += muscle.length;
+  return sum;
 }
 
 export {
@@ -225,5 +247,6 @@ export {
   GetUniqueValuesByAttribute,
   getNestedData,
   exerciseDataByEquipment,
+  calculateMusclesInvolved,
   dataReq,
 };
