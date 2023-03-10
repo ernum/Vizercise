@@ -10,11 +10,14 @@ export default function CirclePacking(props) {
     const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
     const [sortingScheme, setSortingScheme] = useState([]);
     const [exerciseData, setExerciseData] = useState(getNestedData(dataReq, sortingScheme));
+    const [lastFocus, setLastFocus] = useState();
+    const [didInit, setDidInit] = useState(false);
 
     // Redraw chart when svgRef or exerciseData changes
     useEffect(() => {
         if (svgRef.current) {
             drawChart(d3.select(svgRef.current));
+            // if (didInit) {}      Might want to use something like this
         }
     }, [svgRef, exerciseData]);
 
@@ -49,7 +52,7 @@ export default function CirclePacking(props) {
 
     // Draw legend only on first render
     useEffect(() => {
-        legendSetup();
+        !didInit && legendSetup();
     }, []);
 
     // Necessary "preprocessing" of data to be able to use it in CP chart
@@ -82,7 +85,7 @@ export default function CirclePacking(props) {
                 .attr("class", "absolute h-[100%]")
                 .style("display", "block")
                 .style("margin", "0 -14px")
-                .style("cursor", "pointer");
+                .style("cursor", "pointer")
 
         d3.select("#outerSvg")
             .on("click", function(event) {
@@ -95,11 +98,126 @@ export default function CirclePacking(props) {
         const label = labelSetup();
         const toolTip = createTooltip();
         buttonSetup(); 
-        zoomTo([root.x, root.y, root.r * 2]);
+
+        lastFocus && adjustZoomFocus(lastFocus);
+        zoomTo([focus.x, focus.y, focus.r * 2]);
+
+        /*          
+                Might need this
+        if (!didInit) {
+            zoomTo([focus.x, focus.y, focus.r * 2]);
+        } else {
+            
+        } */
+        
+        setDidInit(true);
+
+        /*
+            Adjusts the focus of newly drawn CP chart by finding the element that 
+            was === focus before CP chart was redrawn by iterating over all of the
+            previous focus ancestors until finding the element that corresponds to
+            to previous focus in the new hierarchy.
+            Currently only works when elems are added to sortingScheme, not when removed.
+        */ 
+        function adjustZoomFocus(oldFocus) {
+            // If oldFocus was previous root or current root is not nested
+            if (oldFocus.depth === 0 || root.height === 1) { 
+                //console.log("if_1")
+                // Do nothing
+                return;
+            }
+            // If a sortingScheme element was removed (decreased circle layers)
+            if (oldFocus.depth + oldFocus.height > root.height) {
+                //console.log("if_2")
+                // Do something(?)
+                return;
+            }
+            // If its the same number of layers (dunno if this actually happens but probably can)
+            if (oldFocus.depth + oldFocus.height === root.height) {
+                //console.log("if_3")
+                // Do something(?)
+                return;
+            }
+        
+            let depthDifference = root.height - oldFocus.height - 1;
+            //console.log(depthDifference)
+
+            if (depthDifference === 1) {
+                let found = false;
+                let i = 0;
+                while (!found && i < root.children.length) {
+                    if (root.children[i].data.name === oldFocus.data.name) {
+                        focus = root.children[i];
+                        switchPointerEvents();
+                        found = true;
+                    }
+                    i++;
+                }
+            } else if (depthDifference === 2) {
+                let foundParent = false;
+                let parent;
+                let i = 0;
+                while (!foundParent && i < root.children.length) {
+                    if (root.children[i].data.name === oldFocus.parent.data.name) {
+                        parent = root.children[i];
+                        foundParent = true;
+                    }
+                    i++;
+                }
+                if (foundParent) {
+                    let found = false;
+                    i = 0;
+                    while (!found && i < parent.children.length) {
+                        if (parent.children[i].data.name === oldFocus.data.name) {
+                            focus = parent.children[i];
+                            switchPointerEvents();
+                            found = true;
+                        }
+                        i++;
+                    }
+                }
+            } else if (depthDifference === 3) {
+                let foundGrandParent = false;
+                let grandParent;
+                let i = 0;
+                while (!foundGrandParent && i < root.children.length) {
+                    if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
+                        grandParent = root.children[i];
+                        foundGrandParent = true;
+                    }
+                    i++;
+                }
+                if (foundGrandParent) {
+                    let foundParent = false;
+                    let parent;
+                    i = 0;
+                    while (!foundParent && i < grandParent.children.length) {
+                        if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
+                            parent = grandParent.children[i];
+                            foundParent = true;
+                        }
+                        i++;
+                    }
+                    if (foundParent) {
+                        let found = false;
+                        i = 0;
+                        while (!found && i < parent.children.length) {
+                            if (parent.children[i].data.name === oldFocus.data.name) {
+                                focus = parent.children[i];
+                                switchPointerEvents();
+                                found = true;
+                                console.log(focus);
+                            }
+                            i++;
+                        }
+                    }
+                }
+            }
+        } 
 
         function zoomTo(v) {
-            const k = width / v[2];       
-            view = v;   
+            const k = width / v[2];
+            view = v;
             label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
             node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
             node.attr("r", d => d.r * k);
@@ -108,15 +226,49 @@ export default function CirclePacking(props) {
         function zoom(event, d) {
             // Only allow a depth change of 1
             if (Math.abs(d.depth - focus.depth) !== 1) { return; }
-            focus = d;
+            setLastFocus(focus);
+            // If not node or outerSvg, event.target === sortButton
+            if (event.target.id !== "node" && event.target.id !== "outerSvg") {
+                return;
+            }
+            focus = d;     
+            switchPointerEvents();
+            const transition = zoomTransition(event);
+            labelTransition(transition);     
+        }
 
+        // Moved outside of zoom() for later re-use
+        function zoomTransition(e) {
+            return (
+                svg.transition()
+                    .duration(e.altKey ? 7500 : 750)
+                    .tween("zoom", d => {
+                    const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+                    return t => zoomTo(i(t));
+                    })
+            );
+        }
+
+        // Moved outside of zoom() for later re-use
+        function labelTransition(transitionArg) {
+            label
+                .filter(function(d) { 
+                    return d.parent === focus || this.style.display === "inline"; })
+                .transition(transitionArg)
+                  .style("fill-opacity", d => d.parent === focus ? d.descendants().length > 1 ? 1 : 0 : 0)
+                  .on("start", function(d) { 
+                    if (d.parent === focus) this.style.display = "inline"; })
+                  .on("end", function(d) { 
+                    if (d.parent !== focus) this.style.display = "none"; });
+        }
+
+        function switchPointerEvents() {
             // Turn on node pointer events if they are the children of current focus
             d3.selectAll("#node")
                 .attr("pointer-events", function(d) {
                     if (d.parent === focus) { return null; }
                     return "none";
                 })
-
             // Turn on leaf pointer-events if they are next in line
             d3.selectAll("#leaf")
                 .attr("pointer-events", function(d) {
@@ -128,30 +280,12 @@ export default function CirclePacking(props) {
                     if (root.height === focus.depth + 1 && d.parent === focus) { return null; } 
                     return "none";
                 })
-
             // Switch cursor of background to pointer when zoomed in
             d3.select("#outerSvg")
                 .style("cursor", function() {
                     if (focus === root) { return "default"; }
                     return "pointer";
                 })
-
-            const transition = svg.transition()
-                .duration(event.altKey ? 7500 : 750)
-                .tween("zoom", d => {
-                const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-                return t => zoomTo(i(t));
-                });
-
-            label
-                .filter(function(d) { 
-                    return d.parent === focus || this.style.display === "inline"; })
-                .transition(transition)
-                  .style("fill-opacity", d => d.parent === focus ? d.descendants().length > 1 ? 1 : 0 : 0)
-                  .on("start", function(d) { 
-                    if (d.parent === focus) this.style.display = "inline"; })
-                  .on("end", function(d) { 
-                    if (d.parent !== focus) this.style.display = "none"; });
         }
 
         function labelSetup() {
@@ -234,9 +368,15 @@ export default function CirclePacking(props) {
             .style("font", "12px montserrat");
     }
 
-    /*
-        Everything related to sortingScheme buttons here
-    */
+    //      Everything related to sortingScheme buttons start here
+    function handleSortButtonClick(attributeKey) {
+        if (sortingScheme.includes(attributeKey)) {
+            setSortingScheme(sortingScheme.filter(elem => elem !== attributeKey))
+        } else {
+            setSortingScheme([...sortingScheme, attributeKey]);
+        }
+    }
+
     function buttonSetup() {
         // BUTTON 1
         let button1_offset = 80
@@ -249,11 +389,7 @@ export default function CirclePacking(props) {
         let b1 = createButton("Equipment", button1_offset, b1_font_color, b1_img_path)
             .attr("y", button1_offset)
             .on("click", function() {
-                if (sortingScheme.includes("equipment")) {
-                    setSortingScheme(sortingScheme.filter(elem => elem !== "equipment"))
-                } else {
-                    setSortingScheme([...sortingScheme, "equipment"]);
-                }
+                handleSortButtonClick("equipment");
             })
 
         // BUTTON 2
@@ -267,11 +403,7 @@ export default function CirclePacking(props) {
         let b2 = createButton("Force", button2_offset, b2_font_color, b2_img_path)
             .attr("y", button2_offset)
             .on("click", function() {
-                if (sortingScheme.includes("force")) {
-                    setSortingScheme(sortingScheme.filter(elem => elem !== "force"))
-                } else {
-                    setSortingScheme([...sortingScheme, "force"]);
-                }
+                handleSortButtonClick("force");
             })
         
         // BUTTON 3
@@ -285,11 +417,7 @@ export default function CirclePacking(props) {
         let b3 = createButton("Mechanic", button3_offset, b3_font_color, b3_img_path)
             .attr("y", button3_offset)
             .on("click", function() {
-                if (sortingScheme.includes("mechanic")) {
-                    setSortingScheme(sortingScheme.filter(elem => elem !== "mechanic"))
-                } else {
-                    setSortingScheme([...sortingScheme, "mechanic"]);
-                }
+                handleSortButtonClick("mechanic");
             })
 
         // BUTTON 4
@@ -303,14 +431,8 @@ export default function CirclePacking(props) {
         let b4 = createButton("Difficulty", button4_offset, b4_font_color, b4_img_path)
             .attr("y", button4_offset)
             .on("click", function() {
-                if (sortingScheme.includes("difficulty")) {
-                    setSortingScheme(sortingScheme.filter(elem => elem !== "difficulty"))
-                } else {
-                    setSortingScheme([...sortingScheme, "difficulty"]);
-                }
+                handleSortButtonClick("difficulty");
             })
-
-        // END BUTTONS
 
         function createButton(sortName, yOffset, font_color, icon_path) {
             let buttons_x_offset = 10
@@ -396,7 +518,7 @@ export default function CirclePacking(props) {
             }
             return button;
         }
-    }
+    } //              End of everything button related   
 
     function legendSetup() {
         const colorScale = d3.scaleOrdinal()
