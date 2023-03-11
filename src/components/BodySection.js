@@ -6,14 +6,8 @@ import { musclesConst, allMuscles, colourPalette } from "@/public/musclesConst";
 import { GetExerciseById } from "./Functions";
 
 export default function BodySection(props) {
-  const frontMaleEmpty = "/front_male_empty.svg";
-  const backMaleEmpty = "/back_male_empty.svg";
-  const frontFemaleEmpty = "/front_female_empty.svg";
-  const backFemaleEmpty = "/back_female_empty.svg";
-
   const maleString = "Male";
   const femaleString = "Female";
-
   const mirror = "translate(330, 0) scale(-1, 1)";
 
   // musclesConst holds all the different muscle svg paths
@@ -83,7 +77,25 @@ export default function BodySection(props) {
         className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
         viewBox="0 0 330 860"
       >
-        <image href={bodyArg} width="330" height="860" />
+        <g
+          className="frontBody"
+          id="Front"
+          stroke="black"
+          fill="white"
+          fillOpacity="1"
+        >
+          <path d={frontMuscles.body} />
+          <path d={frontMuscles.body} transform={mirror} />
+        </g>
+        <g
+          className="frontHead"
+          id="FrontHead"
+          stroke="black"
+          fill="white"
+          fillOpacity="1"
+        >
+          <path d={frontMuscles.head} />
+        </g>
         <g
           className="traps"
           id="Traps"
@@ -236,7 +248,25 @@ export default function BodySection(props) {
         className="absolute w-[50%] h-[86%] top[13%] left-[45%]"
         viewBox="0 0 330 860"
       >
-        <image href={bodyArg} width="330" height="860" />
+        <g
+          className="backBody"
+          id="Back"
+          stroke="black"
+          fill="white"
+          fillOpacity="1"
+        >
+          <path d={backMuscles.body} />
+          <path d={backMuscles.body} transform={mirror} />
+        </g>
+        <g
+          className="backHead"
+          id="BackHead"
+          stroke="black"
+          fill="white"
+          fillOpacity="1"
+        >
+          <path d={backMuscles.head} />
+        </g>
         <g
           className="traps"
           id="Traps"
@@ -441,8 +471,8 @@ export default function BodySection(props) {
           optionText={isMale ? femaleString : maleString}
         />
       </div>
-      {drawFront(isMale ? frontMaleEmpty : frontFemaleEmpty)}
-      {drawBack(isMale ? backMaleEmpty : backFemaleEmpty)}
+      {drawFront()}
+      {drawBack()}
     </div>
   );
 }
