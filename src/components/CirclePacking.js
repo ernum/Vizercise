@@ -101,9 +101,9 @@ export default function CirclePacking(props) {
         const label = labelSetup();
         const toolTip = createTooltip();
         buttonSetup(); 
-
         lastFocus && adjustZoomFocus(lastFocus);
         zoomTo([focus.x, focus.y, focus.r * 2]);
+        labelTransition(zoomInitTransition);
 
         /*          
                 Might need this
@@ -209,9 +209,6 @@ export default function CirclePacking(props) {
                             }
                         }
                         else if (removedElemIndex === 1) { // Grandparent was removed
-                            oldFocus && console.log(oldFocus)
-                            console.log(root);
-                            console.log(oldFocus.parent.parent.parent)
                             for (let i = 0; i < root.children.length; i++) {
                                 if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
                                     findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
@@ -240,7 +237,7 @@ export default function CirclePacking(props) {
                 To find the correct element we start at the new root and traverse 
                 downwards in the hierarchy. At every level, we match the name of
                 the current hierarchy level to that of the corresponding ancestor
-                of oldFocus until oldFocus is found.
+                of oldFocus until the elem with the same ancestors as oldFocus is found.
             */   
             else {
                 if (oldFocus.depth === 1) {
@@ -342,6 +339,17 @@ export default function CirclePacking(props) {
             labelTransition(transition);     
         }
 
+        function zoomInitTransition() {
+            return (
+                svg.transition()
+                    .duration(0)
+                    .tween("zoom", d => {
+                    const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+                    return t => zoomTo(i(t));
+                    })
+            );
+        }
+
         // Moved outside of zoom() for later re-use
         function zoomTransition(e) {
             return (
@@ -360,7 +368,7 @@ export default function CirclePacking(props) {
                 .filter(function(d) { 
                     return d.parent === focus || this.style.display === "inline"; })
                 .transition(transitionArg)
-                  .style("fill-opacity", d => d.parent === focus ? d.descendants().length > 1 ? 1 : 0 : 0)
+                  .style("fill-opacity", d => d.parent === focus ? 1 : 0)
                   .on("start", function(d) { 
                     if (d.parent === focus) this.style.display = "inline"; })
                   .on("end", function(d) { 
@@ -394,6 +402,10 @@ export default function CirclePacking(props) {
         }
 
         function labelSetup() {
+            function filterOutLeaf(node) {
+                if (node.height > 0) { return true; }
+                return false;
+            }
             return(
                 svg.append("g")
                 .style("font", "18px montserrat")
@@ -401,10 +413,10 @@ export default function CirclePacking(props) {
                 .attr("pointer-events", "none")
                 .attr("text-anchor", "middle")
             .selectAll("text")
-            .data(root.descendants())
+            .data(root.descendants().filter(filterOutLeaf))
             .join("text")
-                .style("fill-opacity", d => d.parent === root ? d.descendants().length > 1 ? 1 : 0 : 0)
-                .style("display", d => d.parent === root ? "inline" : "none")
+                .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+                .style("display", "none") // Changes on init and on zoom
                 .text(d => d.data.name)
             );
         }
