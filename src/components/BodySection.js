@@ -81,7 +81,7 @@ export default function BodySection(props) {
     return (
       <svg
         className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
-        viewBox="0 0 330 860"
+            viewBox="0 0 330 860"
       >
         <image href={bodyArg} width="330" height="860" />
         <g
