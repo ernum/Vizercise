@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { GetExercises, getNestedData, dataReq } from "./Functions";
+import { GetExercises, getNestedData, dataReq, calculateMusclesInvolved } from "./Functions";
 import { ColorLegend } from './ColorLegend';
 
 export default function CirclePacking(props) {
@@ -9,6 +9,7 @@ export default function CirclePacking(props) {
     const height = 500;
     const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
     const [sortingScheme, setSortingScheme] = useState([]);
+    const [sizingScheme, setSizingScheme] = useState("popularity");
     const [removedElemIndex, setRemovedElemIndex] = useState(null);
     const [exerciseData, setExerciseData] = useState(getNestedData(dataReq, sortingScheme));
     const [lastFocus, setLastFocus] = useState();
@@ -18,7 +19,6 @@ export default function CirclePacking(props) {
     useEffect(() => {
         if (svgRef.current) {
             drawChart(d3.select(svgRef.current));
-            // if (didInit) {}      Might want to use something like this
         }
     }, [svgRef, exerciseData]);
 
@@ -27,7 +27,7 @@ export default function CirclePacking(props) {
         props.selectedMuscles.length
             ? setExerciseData(getNestedData([...new Set(props.selectedMuscles.flatMap(GetExercises))], sortingScheme))
             : setExerciseData(getNestedData(dataReq, sortingScheme));
-    }, [props.selectedMuscles, sortingScheme]);
+    }, [props.selectedMuscles, sortingScheme, sizingScheme]);
 
    // Update id of leafs if they have been selected and give selected leafs a border outline
     useEffect(() => {
@@ -57,7 +57,7 @@ export default function CirclePacking(props) {
     }, []);
 
     // Necessary "preprocessing" of data to be able to use it in CP chart
-    function pack(data) {
+    function packByPopularity(data) {
         return (
             d3.pack()
             .size([width, height])
@@ -68,13 +68,26 @@ export default function CirclePacking(props) {
         )
     }
 
+    function packByMusclesInvolved(data) {
+        return (
+            d3.pack()
+            .size([width, height])
+            .padding(3)
+        (d3.hierarchy(data)
+            .sum(d => calculateMusclesInvolved(d))
+            .sort((a,b) => b.value - a.value))
+        )
+    }
+
   /*
         Draw a Circle Packing chart. Core functionality copied from:
             https://observablehq.com/@d3/zoomable-circle-packing
   */
     function drawChart() {
         removePrevious();
-        const root = pack(exerciseData)
+        const root = sizingScheme === "popularity"
+            ? packByPopularity(exerciseData)
+            : packByMusclesInvolved(exerciseData);
         let focus = root;
         let view;
 
@@ -315,7 +328,7 @@ export default function CirclePacking(props) {
                     }
                 }
             }
-        } 
+        }
 
         function zoomTo(v) {
             const k = width / v[2];
@@ -507,7 +520,6 @@ export default function CirclePacking(props) {
             b1_font_color = "white";
         }
         let b1_img_path = "/icons/dumbbell.svg"
-
         let b1 = createButton("Equipment", button1_offset, b1_font_color, b1_img_path)
             .attr("y", button1_offset)
             .on("click", function() {
@@ -521,7 +533,6 @@ export default function CirclePacking(props) {
             b2_font_color = "white";
         }
         let b2_img_path = "/icons/force.svg"
-
         let b2 = createButton("Force", button2_offset, b2_font_color, b2_img_path)
             .attr("y", button2_offset)
             .on("click", function() {
@@ -535,7 +546,6 @@ export default function CirclePacking(props) {
             b3_font_color = "white";
         }
         let b3_img_path = "/icons/gear.svg"
-
         let b3 = createButton("Mechanic", button3_offset, b3_font_color, b3_img_path)
             .attr("y", button3_offset)
             .on("click", function() {
@@ -549,12 +559,25 @@ export default function CirclePacking(props) {
             b4_font_color = "white";
         }
         let b4_img_path = "/icons/difficulty.svg"
-
         let b4 = createButton("Difficulty", button4_offset, b4_font_color, b4_img_path)
             .attr("y", button4_offset)
             .on("click", function() {
                 handleSortButtonClick("difficulty");
             })
+
+        // sizingScheme button
+        let size_button_offset = 220
+        let size_button_font_color = "black";
+        let size_button_img_path = "/icons/circleSize.svg"
+        let size_button = createButton("CircleSize",
+        size_button_offset, size_button_font_color, size_button_img_path)
+            .attr("y", size_button_offset)
+            .on("click", function() {
+                sizingScheme === "popularity" 
+                    ? setSizingScheme("muscleSum")
+                    : setSizingScheme("popularity");
+            })
+
 
         function createButton(sortName, yOffset, font_color, icon_path) {
             let buttons_x_offset = 10
@@ -680,7 +703,6 @@ export default function CirclePacking(props) {
         d3.select(".tooltip")
             .remove();
         d3.select("#outerSvg")
-            .style("background", d3.interpolateOranges(0.1))
             .selectAll(".sortButton")
                 .remove();
         d3.select("#outerSvg")

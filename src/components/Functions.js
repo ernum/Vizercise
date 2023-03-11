@@ -16,22 +16,6 @@ function GetExerciseById(id) {
   return dataReq[id];
 }
 
-/* -- Currently not being used but keeping them here in case need arises later --
-function groupBy(objectArray, attribute) {
-  return objectArray.reduce((acc, obj) => {
-    const key = obj[attribute];
-    const curGroup = acc[key] ?? [];
-    return { ...acc, [key]: [...curGroup, obj], };
-  }, {});
-}
-
-function getGroupedData(exercisesArray, attribute) {
-  var grouped = groupBy(exercisesArray, attribute);
-  grouped = {"name": "exercises", "children":[grouped]};
-  return grouped;
-}
-*/
-
 function transformElementToObject(elementToTransform) {
   elementToTransform = {
     name: elementToTransform,
@@ -46,8 +30,8 @@ function nestByAttributes(attributeArray) {
     nodeArray = 
       [...nodeArray,
         {
-          "name": elem,
-          "children": GetUniqueValuesByAttribute(elem).map(transformElementToObject)
+          name: elem,
+          children: GetUniqueValuesByAttribute(elem).map(transformElementToObject)
         }
       ]
     })
@@ -233,9 +217,8 @@ function getExercisesByDifficulty(exerciseArray, difficultyValue) {
   );
 }
 
-function calculateMusclesInvolved(id) {
+function calculateMusclesInvolved(exercise) {
   let sum = 0;
-  const exercise = GetExerciseById(id);
   const muscles = [
     exercise.primaryMuscles,
     exercise.secondaryMuscles,
