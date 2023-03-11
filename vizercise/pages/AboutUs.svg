@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="45" viewBox="0 0 300 45">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 60px;
+        text-anchor: middle;
+        font-family: Cinzel;
+      }
+    </style>
+  </defs>
+  <text id="About_Us" data-name="About Us" class="cls-1" x="152" y="43"><tspan x="152">About Us</tspan></text>
+</svg>
