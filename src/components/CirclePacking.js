@@ -13,7 +13,6 @@ export default function CirclePacking(props) {
     const [removedElemIndex, setRemovedElemIndex] = useState(null);
     const [exerciseData, setExerciseData] = useState(getNestedData(dataReq, sortingScheme));
     const [lastFocus, setLastFocus] = useState();
-    const [didInit, setDidInit] = useState(false);
 
     // Redraw chart when svgRef or exerciseData changes
     useEffect(() => {
@@ -50,11 +49,6 @@ export default function CirclePacking(props) {
         });
         d3.selectAll("#selectedleaf").attr("stroke", "#000");
     }, [props.selectedExercises, exerciseData]);
-
-    // Draw legend only on first render
-    useEffect(() => {
-        !didInit && legendSetup();
-    }, []);
 
     // Necessary "preprocessing" of data to be able to use it in CP chart
     function packByPopularity(data) {
@@ -113,28 +107,18 @@ export default function CirclePacking(props) {
         const node = nodeSetup();
         const label = labelSetup();
         const toolTip = createTooltip();
+        legendSetup();
         buttonSetup(); 
         lastFocus && adjustZoomFocus(lastFocus);
         zoomTo([focus.x, focus.y, focus.r * 2]);
         labelTransition(zoomInitTransition);
-
-        /*          
-                Might need this
-        if (!didInit) {
-            zoomTo([focus.x, focus.y, focus.r * 2]);
-        } else {
-            
-        } */
-        
-        setDidInit(true);
 
         /*
             Adjusts the focus of newly drawn CP chart by finding the element that 
             was === focus before CP chart was redrawn by iterating over all ancestors
             of the previous focus until finding the element that corresponds to
             previous focus in the new hierarchy (i.e. until finding itself).
-            First part handles removals of sorting filters, 
-            second part handles additions of sorting filter.
+            First part handles removals of sorting filters, second part additions.
         */ 
         function adjustZoomFocus(oldFocus) {
             // Helper to find children and improve readability
@@ -248,7 +232,7 @@ export default function CirclePacking(props) {
             /* 
                 If an element (a nesting filter) has been ADDED to the CP chart.
                 To find the correct element we start at the new root and traverse 
-                downwards in the hierarchy. At every level, we match the name of
+                downwards in the hierarchy (BFS). At every level, we match the name of
                 the current hierarchy level to that of the corresponding ancestor
                 of oldFocus until the elem with the same ancestors as oldFocus is found.
             */   
@@ -521,7 +505,6 @@ export default function CirclePacking(props) {
         }
         let b1_img_path = "/icons/dumbbell.svg"
         let b1 = createButton("Equipment", button1_offset, b1_font_color, b1_img_path)
-            .attr("y", button1_offset)
             .on("click", function() {
                 handleSortButtonClick("equipment");
             })
@@ -534,7 +517,6 @@ export default function CirclePacking(props) {
         }
         let b2_img_path = "/icons/force.svg"
         let b2 = createButton("Force", button2_offset, b2_font_color, b2_img_path)
-            .attr("y", button2_offset)
             .on("click", function() {
                 handleSortButtonClick("force");
             })
@@ -547,7 +529,6 @@ export default function CirclePacking(props) {
         }
         let b3_img_path = "/icons/gear.svg"
         let b3 = createButton("Mechanic", button3_offset, b3_font_color, b3_img_path)
-            .attr("y", button3_offset)
             .on("click", function() {
                 handleSortButtonClick("mechanic");
             })
@@ -560,37 +541,32 @@ export default function CirclePacking(props) {
         }
         let b4_img_path = "/icons/difficulty.svg"
         let b4 = createButton("Difficulty", button4_offset, b4_font_color, b4_img_path)
-            .attr("y", button4_offset)
             .on("click", function() {
                 handleSortButtonClick("difficulty");
             })
 
         // sizingScheme button
-        let size_button_offset = 220
-        let size_button_font_color = "black";
-        let size_button_img_path = "/icons/circleSize.svg"
-        let size_button = createButton("CircleSize",
-        size_button_offset, size_button_font_color, size_button_img_path)
-            .attr("y", size_button_offset)
+        let size_btn_offset = 220
+        let size_btn_font_color = "black";
+        let size_btn_img_path = "/icons/circleSize.svg"
+        let bSize = createButton("CircleSize", size_btn_offset, size_btn_font_color, size_btn_img_path)
             .on("click", function() {
                 sizingScheme === "popularity" 
                     ? setSizingScheme("muscleSum")
                     : setSizingScheme("popularity");
             })
 
-
         function createButton(sortName, yOffset, font_color, icon_path) {
-            let buttons_x_offset = 10
-
-            let button_fill = "white";
-            if (sortingScheme.includes(sortName.toLowerCase())) {
-                button_fill = "DarkSlateGray"
-            }
-
+            let buttons_x_offset = 14;
+            let button_fill = sortingScheme.includes(sortName.toLowerCase())
+                ? "DarkSlateGray"
+                : "white";
             let button = d3.select("#outerSvg").append('rect')
             .style("cursor", "pointer")
             .attr("class", "sortButton")
+            .attr("id", sortName)
             .attr('x', 10)
+            .attr('y', yOffset)
             .attr('width', 30)
             .attr('height', 30)
             .attr('rx', 10)
@@ -630,34 +606,33 @@ export default function CirclePacking(props) {
                 .append("image")
                 .attr("class", "btn_img")
                 .attr("xlink:href", icon_path)
-                .attr("x", buttons_x_offset + 5.5)
-                .attr("y", yOffset + 5.5)
-                .attr('class', 'btn_img')
-                .attr('height', '5%')
+                .attr("x", buttons_x_offset)
+                .attr("y", yOffset + 4)
+                .attr('height', 22)
                 .attr('pointer-events', 'none')
 
             if (sortingScheme.includes(sortName.toLowerCase())) {
                 // Append a circle to the top left of the button,
                 // showing the order of the filter in the sorting scheme
-                let button_order = d3.select('#outerSvg')
+                d3.select('#outerSvg')
                     .append('circle')
                     .attr('class', 'btn_order')
-                    .attr('cx', buttons_x_offset + 3)
+                    .attr('cx', buttons_x_offset - 1)
                     .attr('cy', yOffset + 3)
                     .attr('r', 5)
                     .attr('fill', 'darkSlateBlue')
-                    .attr('pointer-events', 'none')
-            
-                let button_order_text = d3.select('#outerSvg')
+                    .attr('pointer-events', 'none');
+
+                d3.select('#outerSvg')
                     .append('text').text(sortingScheme.indexOf(sortName.toLowerCase()) + 1)
                     .style('font', 'montserrat')
                     .attr('class', 'btn_order_text')
-                    .attr('x', buttons_x_offset + 3)
+                    .attr('x', buttons_x_offset - 1)
                     .attr('y', yOffset + 3.5)
                     .attr('text-anchor', 'middle')
                     .attr('dominant-baseline', 'middle')
                     .attr('fill', 'white')
-                    .attr('font-size', 8)
+                    .attr('font-size', 8);
                 
                 button_img.classed("filter-white", true);
             }
@@ -717,6 +692,10 @@ export default function CirclePacking(props) {
         d3.select("#outerSvg")
             .selectAll(".btn_order_text")
                 .remove();
+        d3.selectAll(".legendContainer")
+            .remove();
+        d3.selectAll(".legend")
+            .remove();
     }
 
     return (
