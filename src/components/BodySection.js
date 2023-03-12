@@ -71,7 +71,7 @@ export default function BodySection(props) {
     }
   }, [props.selectedExercises]);
 
-  function drawFront(bodyArg) {
+  function drawFront() {
     return (
       <svg
         className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
@@ -242,7 +242,7 @@ export default function BodySection(props) {
     );
   }
 
-  function drawBack(bodyArg) {
+  function drawBack() {
     return (
       <svg
         className="absolute w-[50%] h-[86%] top[13%] left-[45%]"
