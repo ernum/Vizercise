@@ -56,8 +56,8 @@ export default function Home() {
       {/* Biggest Box */}
       <div
         className="box-border absolute w-[45%] h-[90%] left-[2%] top-[4%]
-                 bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-                 shadown-black/25 overflow-hidden"
+                 bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
+                 shadown-black/25 overflow-hidden" 
       >
         <div>
           <BodySection
@@ -85,7 +85,7 @@ export default function Home() {
       {/* Third Box */}
       <div
         className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[58.9%]
-        bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
+        bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
         shadown-black/25"
       >
         <DetailsList
