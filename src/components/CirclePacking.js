@@ -4,792 +4,792 @@ import { GetExercises, getNestedData, dataReq, calculateMusclesInvolved } from "
 import { ColorLegend } from './ColorLegend';
 
 export default function CirclePacking(props) {
-	const svgRef = useRef();
-	const width = 500;
-	const height = 500;
-	const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
-	const [sortingScheme, setSortingScheme] = useState([]);
-	const [sizingScheme, setSizingScheme] = useState("popularity");
-	const [removedElemIndex, setRemovedElemIndex] = useState(null);
-	const [exerciseData, setExerciseData] = useState(getNestedData(dataReq, sortingScheme));
-	const [lastFocus, setLastFocus] = useState();
-	const [currentFocus, setCurrentFocus] = useState();
-	const [prevSelectedMuscles, setPrevSelectedMuscles] = useState(props.selectedMuscles);
+  const svgRef = useRef();
+  const width = 500;
+  const height = 500;
+  const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
+  const [sortingScheme, setSortingScheme] = useState([]);
+  const [sizingScheme, setSizingScheme] = useState("popularity");
+  const [removedElemIndex, setRemovedElemIndex] = useState(null);
+  const [exerciseData, setExerciseData] = useState(getNestedData(dataReq, sortingScheme));
+  const [lastFocus, setLastFocus] = useState();
+  const [currentFocus, setCurrentFocus] = useState();
+  const [prevSelectedMuscles, setPrevSelectedMuscles] = useState(props.selectedMuscles);
 
-	// Redraw chart when svgRef or exerciseData changes
-	useEffect(() => {
-		if (svgRef.current) {
-			drawChart(d3.select(svgRef.current));
-		}
-	}, [svgRef, exerciseData]);
+  // Redraw chart when svgRef or exerciseData changes
+  useEffect(() => {
+    if (svgRef.current) {
+      drawChart(d3.select(svgRef.current));
+    }
+  }, [svgRef, exerciseData]);
 
-	// Update the data displayed in CP chart when a muscle or sorting button is clicked
-	useEffect(() => {
-		props.selectedMuscles.length
-			? setExerciseData(getNestedData([...new Set(props.selectedMuscles.flatMap(GetExercises))], sortingScheme))
-			: setExerciseData(getNestedData(dataReq, sortingScheme));
-	}, [props.selectedMuscles, sortingScheme, sizingScheme]);
+  // Update the data displayed in CP chart when a muscle or sorting button is clicked
+  useEffect(() => {
+    props.selectedMuscles.length
+      ? setExerciseData(getNestedData([...new Set(props.selectedMuscles.flatMap(GetExercises))], sortingScheme))
+      : setExerciseData(getNestedData(dataReq, sortingScheme));
+  }, [props.selectedMuscles, sortingScheme, sizingScheme]);
 
-	// Update id of leafs if they have been selected and give selected leafs a border outline
-	useEffect(() => {
-		d3.selectAll("#leaf")
-			.attr("id", function () {
-				let exerciseId = d3.select(this).attr("className");
-				if (props.selectedExercises.includes(exerciseId)) {
-					return "selectedleaf";
-				}
-				return "leaf";
-			});
-		d3.selectAll("#selectedleaf")
-			.attr("id", function () {
-				let exerciseId = d3.select(this).attr("className");
-				if (!props.selectedExercises.includes(exerciseId)) {
-					d3.select(this).attr("stroke", "none");
-					return "leaf";
-				}
-				return "selectedleaf";
-			});
-		d3.selectAll("#selectedleaf").attr("stroke", "#000");
-	}, [props.selectedExercises, exerciseData]);
+  // Update id of leafs if they have been selected and give selected leafs a border outline
+  useEffect(() => {
+    d3.selectAll("#leaf")
+      .attr("id", function () {
+        let exerciseId = d3.select(this).attr("className");
+        if (props.selectedExercises.includes(exerciseId)) {
+          return "selectedleaf";
+        }
+        return "leaf";
+      });
+    d3.selectAll("#selectedleaf")
+      .attr("id", function () {
+        let exerciseId = d3.select(this).attr("className");
+        if (!props.selectedExercises.includes(exerciseId)) {
+          d3.select(this).attr("stroke", "none");
+          return "leaf";
+        }
+        return "selectedleaf";
+      });
+    d3.selectAll("#selectedleaf").attr("stroke", "#000");
+  }, [props.selectedExercises, exerciseData]);
 
-	// Necessary "preprocessing" of data to be able to use it in CP chart
-	function packByPopularity(data) {
-		return (
-			d3.pack()
-				.size([width, height])
-				.padding(3)
-				(d3.hierarchy(data)
-					.sum(d => d.hasOwnProperty("popularity") ? d.popularity + popularityNorm : 0)
-					.sort((a, b) => b.value - a.value))
-		)
-	}
+  // Necessary "preprocessing" of data to be able to use it in CP chart
+  function packByPopularity(data) {
+    return (
+      d3.pack()
+        .size([width, height])
+        .padding(3)
+        (d3.hierarchy(data)
+          .sum(d => d.hasOwnProperty("popularity") ? d.popularity + popularityNorm : 0)
+          .sort((a, b) => b.value - a.value))
+    )
+  }
 
-	function packByMusclesInvolved(data) {
-		return (
-			d3.pack()
-				.size([width, height])
-				.padding(3)
-				(d3.hierarchy(data)
-					.sum(d => calculateMusclesInvolved(d))
-					.sort((a, b) => b.value - a.value))
-		)
-	}
+  function packByMusclesInvolved(data) {
+    return (
+      d3.pack()
+        .size([width, height])
+        .padding(3)
+        (d3.hierarchy(data)
+          .sum(d => calculateMusclesInvolved(d))
+          .sort((a, b) => b.value - a.value))
+    )
+  }
 
-	/*
-				Draw a Circle Packing chart. Core functionality copied from:
-						https://observablehq.com/@d3/zoomable-circle-packing
-	*/
-	function drawChart() {
-		removePrevious();
-		const root = sizingScheme === "popularity"
-			? packByPopularity(exerciseData)
-			: packByMusclesInvolved(exerciseData);
-		let focus = root;
-		let view;
+  /*
+        Draw a Circle Packing chart. Core functionality copied from:
+            https://observablehq.com/@d3/zoomable-circle-packing
+  */
+  function drawChart() {
+    removePrevious();
+    const root = sizingScheme === "popularity"
+      ? packByPopularity(exerciseData)
+      : packByMusclesInvolved(exerciseData);
+    let focus = root;
+    let view;
 
-		const svg = d3.select(svgRef.current)
-			.style("background", d3.interpolateOranges(0.1))
-			.append("svg")
-			.attr("id", "circlePackContainer")
-			.attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
-			.attr("class", "absolute h-[100%]")
-			.style("display", "block")
-			.style("margin", "0 -14px")
-			.style("cursor", "pointer")
+    const svg = d3.select(svgRef.current)
+      .style("background", d3.interpolateOranges(0.1))
+      .append("svg")
+      .attr("id", "circlePackContainer")
+      .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
+      .attr("class", "absolute h-[100%]")
+      .style("display", "block")
+      .style("margin", "0 -14px")
+      .style("cursor", "pointer")
 
-		d3.select("#outerSvg")
-			.on("click", function (event) {
-				if (focus === root) {
-					setLastFocus(focus);
-					setCurrentFocus(focus);
-					return;
-				}
-				zoom(event, focus.parent), event.stopPropagation();
-			});
+    d3.select("#outerSvg")
+      .on("click", function (event) {
+        if (focus === root) {
+          setLastFocus(focus);
+          setCurrentFocus(focus);
+          return;
+        }
+        zoom(event, focus.parent), event.stopPropagation();
+      });
 
-		const node = nodeSetup();
-		const label = labelSetup();
-		const toolTip = createTooltip();
-		legendSetup();
-		buttonSetup();
-		if (prevSelectedMuscles !== props.selectedMuscles) {
-			currentFocus && adjustZoomFocus(currentFocus);
-			setPrevSelectedMuscles(props.selectedMuscles);
-		} else {
-			lastFocus && adjustZoomFocus(lastFocus);
-		}
-		zoomTo([focus.x, focus.y, focus.r * 2]);
-		labelTransition(zoomInitTransition);
+    const node = nodeSetup();
+    const label = labelSetup();
+    const toolTip = createTooltip();
+    legendSetup();
+    buttonSetup();
+    if (prevSelectedMuscles !== props.selectedMuscles) {
+      currentFocus && adjustZoomFocus(currentFocus);
+      setPrevSelectedMuscles(props.selectedMuscles);
+    } else {
+      lastFocus && adjustZoomFocus(lastFocus);
+    }
+    zoomTo([focus.x, focus.y, focus.r * 2]);
+    labelTransition(zoomInitTransition);
 
-		/*
-				Adjusts the focus of newly drawn CP chart by finding the element that 
-				was === focus before CP chart was redrawn by iterating over all ancestors
-				of the previous focus until finding the element that corresponds to
-				previous focus in the new hierarchy (i.e. until finding itself).
-				First part handles removals of sorting filters, second part additions.
-		*/
-		function adjustZoomFocus(oldFocus) {	
-			// Helper to find children and improve readability
-			function findChild(ancestor, childToFind) {
-				for (let idx = 0; idx < ancestor.length; idx++) {
-					if (ancestor[idx].data.name === childToFind.data.name) {
-						focus = ancestor[idx];
-						setLastFocus(focus);
-						setCurrentFocus(focus);
-						setRemovedElemIndex(null);
-						switchPointerEvents();
-						return;
-					}
-				}
-			}
-			// Family matters
-			function findGrandChild(ancestor, childToFind, grandChildToFind) {
-				for (let idx = 0; idx < ancestor.length; idx++) {
-					if (ancestor[idx].data.name === childToFind.data.name) {
-						for (let jdx = 0; jdx < ancestor[idx].children.length; jdx++) {
-							if (ancestor[idx].children[jdx].data.name === grandChildToFind.data.name) {
-								focus = ancestor[idx].children[jdx];
-								setLastFocus(focus);
-								setCurrentFocus(focus);
-								setRemovedElemIndex(null);
-								switchPointerEvents();
-								return;
-							}
-						}
-					}
-				}
-			}
-			/*
-					If a sorting filter has been REMOVED from the CP chart.
-					This should never run on muscle selections/deselections.
-			*/
-			if (removedElemIndex !== null) {
-				// If oldFocus was previous root or current root is not nested
-				if (oldFocus.depth === 0 || root.height === 1) {
-					// Update lastFocus to current focus (root in this case)
-					setLastFocus(root);
-					setCurrentFocus(root);
-				}
-				// sortingScheme element was removed and we are currently nested
-				else if (oldFocus.depth + oldFocus.height > root.height) {
-					if (oldFocus.depth === 1) {
-						// If we removed an element above current focus
-						if (oldFocus.depth > removedElemIndex) { 
-							setLastFocus(focus);
-							setCurrentFocus(focus);
-						}
-						// If we removed an element below current focus...
-						else { // ... Find self in newly rendered CP chart 
-							findChild(root.children, oldFocus);
-						}
-					}
-					else if (oldFocus.depth === 2) {
-						// If we removed an element above current focus...
-						if (oldFocus.depth > removedElemIndex) {
-							// ... Find self in newly rendered CP chart
-							findChild(root.children, oldFocus);
-							// If we didn't find self, self was removed
-							findChild(root.children, oldFocus.parent);
-						}
-						else { // If we removed an element below current focus
-							findGrandChild(root.children, oldFocus.parent, oldFocus);
-						}
-					}
-					else if (oldFocus.depth === 3) {
-						if (removedElemIndex === 0) { // Grandparent was removed
-							findGrandChild(root.children, oldFocus.parent, oldFocus);
-						}
-						else if (removedElemIndex === 1) { // Parent was removed
-							findGrandChild(root.children, oldFocus.parent.parent, oldFocus);
-						}
-						else if (removedElemIndex === 2) { // Self was removed
-							findGrandChild(root.children, oldFocus.parent.parent, oldFocus.parent);
-						}
-						else { // Child of self was removed
-							for (let i = 0; i < root.children.length; i++) {
-								if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
-									findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
-								}
-							}
-						}
-					}
-					else { // Always some ancestor or self was removed if we get here
-						if (removedElemIndex === 0) { // Great-grandparent was removed
-							for (let i = 0; i < root.children.length; i++) {
-								if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
-									findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
-								}
-							}
-						}
-						else if (removedElemIndex === 1) { // Grandparent was removed
-							for (let i = 0; i < root.children.length; i++) {
-								if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-									findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
-								}
-							}
-						}
-						else if (removedElemIndex === 2) { // Parent was removed
-							for (let i = 0; i < root.children.length; i++) {
-								if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-									findGrandChild(root.children[i].children, oldFocus.parent.parent, oldFocus);
-								}
-							}
-						}
-						else { // Self was removed
-							for (let i = 0; i < root.children.length; i++) {
-								if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-									findGrandChild(root.children[i].children, oldFocus.parent.parent, oldFocus.parent);
-								}
-							}
-						}
-					}
-				} 
-			}
-			/* 
-					If a sorting filter has been ADDED to the CP chart OR if a muscle has 
-					been selected or deselected in the body map.
-					To find the correct element we start at the new root and traverse 
-					downwards in the hierarchy (BFS). At every level, we match the name of
-					the current hierarchy level to that of the corresponding ancestor
-					of oldFocus until the elem with the same ancestors as oldFocus is found.
-			*/
-			else {
-				if (oldFocus.depth === 1) {
-					let found = false;
-					let i = 0;
-					while (!found && i < root.children.length) {
-						if (root.children[i].data.name === oldFocus.data.name) {
-							focus = root.children[i];
-							setLastFocus(focus);
-							setCurrentFocus(focus);
-							switchPointerEvents();
-							found = true;
-						}
-						i++;
-					}
-				} else if (oldFocus.depth === 2) {
-					let foundParent = false;
-					let parent;
-					let i = 0;
-					while (!foundParent && i < root.children.length) {
-						if (root.children[i].data.name === oldFocus.parent.data.name) {
-							parent = root.children[i];
-							foundParent = true;
-						}
-						i++;
-					}
-					if (foundParent) {
-						let found = false;
-						i = 0;
-						while (!found && i < parent.children.length) {
-							if (parent.children[i].data.name === oldFocus.data.name) {
-								focus = parent.children[i];
-								setLastFocus(focus);
-								setCurrentFocus(focus);
-								switchPointerEvents();
-								found = true;
-							}
-							i++;
-						}
-					}
-				} else if (oldFocus.depth === 3) {
-					let foundGrandParent = false;
-					let grandParent;
-					let i = 0;
-					while (!foundGrandParent && i < root.children.length) {
-						if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
-							grandParent = root.children[i];
-							foundGrandParent = true;
-						}
-						i++;
-					}
-					if (foundGrandParent) {
-						let foundParent = false;
-						let parent;
-						i = 0;
-						while (!foundParent && i < grandParent.children.length) {
-							if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
-								parent = grandParent.children[i];
-								foundParent = true;
-							}
-							i++;
-						}
-						if (foundParent) {
-							let found = false;
-							i = 0;
-							while (!found && i < parent.children.length) {
-								if (parent.children[i].data.name === oldFocus.data.name) {
-									focus = parent.children[i];
-									setLastFocus(focus);
-									setCurrentFocus(focus);
-									switchPointerEvents();
-									found = true;
-								}
-								i++;
-							}
-						}
-					}
-				} else if (oldFocus.depth === 4) {
-					let foundGreatGrandParent = false;
-					let greatGrandParent;
-					let i = 0;
-					while (!foundGreatGrandParent && i < root.children.length) {
-						if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-							greatGrandParent = root.children[i];
-							foundGreatGrandParent = true;
-						}
-						i++;
-					}
-					if (foundGreatGrandParent) {
-						let foundGrandParent = false;
-						let grandParent;
-						i = 0;
-						while (!foundGrandParent && i < greatGrandParent.children.length) {
-							if (greatGrandParent.children[i].data.name === oldFocus.parent.parent.data.name) {
-								grandParent = greatGrandParent.children[i];
-								foundGrandParent = true;
-							}
-							i++;
-						}
-						if (foundGrandParent) {
-							let foundParent = false;
-							let parent;
-							i = 0;
-							while (!foundParent && i < grandParent.children.length) {
-								if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
-									parent = grandParent.children[i];
-									foundParent = true;
-								}
-								i++;
-							}
-							if (foundParent) {
-								let found = false;
-								i = 0;
-								while (!found && i < parent.children.length) {
-									if (parent.children[i].data.name === oldFocus.data.name) {
-										focus = parent.children[i];
-										setLastFocus(focus);
-										setCurrentFocus(focus);
-										switchPointerEvents();
-										found = true;
-									}
-									i++;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+    /*
+        Adjusts the focus of newly drawn CP chart by finding the element that
+        was === focus before CP chart was redrawn by iterating over all ancestors
+        of the previous focus until finding the element that corresponds to
+        previous focus in the new hierarchy (i.e. until finding itself).
+        First part handles removals of sorting filters, second part additions.
+    */
+    function adjustZoomFocus(oldFocus) {
+      // Helper to find children and improve readability
+      function findChild(ancestor, childToFind) {
+        for (let idx = 0; idx < ancestor.length; idx++) {
+          if (ancestor[idx].data.name === childToFind.data.name) {
+            focus = ancestor[idx];
+            setLastFocus(focus);
+            setCurrentFocus(focus);
+            setRemovedElemIndex(null);
+            switchPointerEvents();
+            return;
+          }
+        }
+      }
+      // Family matters
+      function findGrandChild(ancestor, childToFind, grandChildToFind) {
+        for (let idx = 0; idx < ancestor.length; idx++) {
+          if (ancestor[idx].data.name === childToFind.data.name) {
+            for (let jdx = 0; jdx < ancestor[idx].children.length; jdx++) {
+              if (ancestor[idx].children[jdx].data.name === grandChildToFind.data.name) {
+                focus = ancestor[idx].children[jdx];
+                setLastFocus(focus);
+                setCurrentFocus(focus);
+                setRemovedElemIndex(null);
+                switchPointerEvents();
+                return;
+              }
+            }
+          }
+        }
+      }
+      /*
+          If a sorting filter has been REMOVED from the CP chart.
+          This should never run on muscle selections/deselections.
+      */
+      if (removedElemIndex !== null) {
+        // If oldFocus was previous root or current root is not nested
+        if (oldFocus.depth === 0 || root.height === 1) {
+          // Update lastFocus to current focus (root in this case)
+          setLastFocus(root);
+          setCurrentFocus(root);
+        }
+        // sortingScheme element was removed and we are currently nested
+        else if (oldFocus.depth + oldFocus.height > root.height) {
+          if (oldFocus.depth === 1) {
+            // If we removed an element above current focus
+            if (oldFocus.depth > removedElemIndex) {
+              setLastFocus(focus);
+              setCurrentFocus(focus);
+            }
+            // If we removed an element below current focus...
+            else { // ... Find self in newly rendered CP chart
+              findChild(root.children, oldFocus);
+            }
+          }
+          else if (oldFocus.depth === 2) {
+            // If we removed an element above current focus...
+            if (oldFocus.depth > removedElemIndex) {
+              // ... Find self in newly rendered CP chart
+              findChild(root.children, oldFocus);
+              // If we didn't find self, self was removed
+              findChild(root.children, oldFocus.parent);
+            }
+            else { // If we removed an element below current focus
+              findGrandChild(root.children, oldFocus.parent, oldFocus);
+            }
+          }
+          else if (oldFocus.depth === 3) {
+            if (removedElemIndex === 0) { // Grandparent was removed
+              findGrandChild(root.children, oldFocus.parent, oldFocus);
+            }
+            else if (removedElemIndex === 1) { // Parent was removed
+              findGrandChild(root.children, oldFocus.parent.parent, oldFocus);
+            }
+            else if (removedElemIndex === 2) { // Self was removed
+              findGrandChild(root.children, oldFocus.parent.parent, oldFocus.parent);
+            }
+            else { // Child of self was removed
+              for (let i = 0; i < root.children.length; i++) {
+                if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
+                  findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
+                }
+              }
+            }
+          }
+          else { // Always some ancestor or self was removed if we get here
+            if (removedElemIndex === 0) { // Great-grandparent was removed
+              for (let i = 0; i < root.children.length; i++) {
+                if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
+                  findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
+                }
+              }
+            }
+            else if (removedElemIndex === 1) { // Grandparent was removed
+              for (let i = 0; i < root.children.length; i++) {
+                if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
+                  findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
+                }
+              }
+            }
+            else if (removedElemIndex === 2) { // Parent was removed
+              for (let i = 0; i < root.children.length; i++) {
+                if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
+                  findGrandChild(root.children[i].children, oldFocus.parent.parent, oldFocus);
+                }
+              }
+            }
+            else { // Self was removed
+              for (let i = 0; i < root.children.length; i++) {
+                if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
+                  findGrandChild(root.children[i].children, oldFocus.parent.parent, oldFocus.parent);
+                }
+              }
+            }
+          }
+        }
+      }
+      /*
+          If a sorting filter has been ADDED to the CP chart OR if a muscle has
+          been selected or deselected in the body map.
+          To find the correct element we start at the new root and traverse
+          downwards in the hierarchy (BFS). At every level, we match the name of
+          the current hierarchy level to that of the corresponding ancestor
+          of oldFocus until the elem with the same ancestors as oldFocus is found.
+      */
+      else {
+        if (oldFocus.depth === 1) {
+          let found = false;
+          let i = 0;
+          while (!found && i < root.children.length) {
+            if (root.children[i].data.name === oldFocus.data.name) {
+              focus = root.children[i];
+              setLastFocus(focus);
+              setCurrentFocus(focus);
+              switchPointerEvents();
+              found = true;
+            }
+            i++;
+          }
+        } else if (oldFocus.depth === 2) {
+          let foundParent = false;
+          let parent;
+          let i = 0;
+          while (!foundParent && i < root.children.length) {
+            if (root.children[i].data.name === oldFocus.parent.data.name) {
+              parent = root.children[i];
+              foundParent = true;
+            }
+            i++;
+          }
+          if (foundParent) {
+            let found = false;
+            i = 0;
+            while (!found && i < parent.children.length) {
+              if (parent.children[i].data.name === oldFocus.data.name) {
+                focus = parent.children[i];
+                setLastFocus(focus);
+                setCurrentFocus(focus);
+                switchPointerEvents();
+                found = true;
+              }
+              i++;
+            }
+          }
+        } else if (oldFocus.depth === 3) {
+          let foundGrandParent = false;
+          let grandParent;
+          let i = 0;
+          while (!foundGrandParent && i < root.children.length) {
+            if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
+              grandParent = root.children[i];
+              foundGrandParent = true;
+            }
+            i++;
+          }
+          if (foundGrandParent) {
+            let foundParent = false;
+            let parent;
+            i = 0;
+            while (!foundParent && i < grandParent.children.length) {
+              if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
+                parent = grandParent.children[i];
+                foundParent = true;
+              }
+              i++;
+            }
+            if (foundParent) {
+              let found = false;
+              i = 0;
+              while (!found && i < parent.children.length) {
+                if (parent.children[i].data.name === oldFocus.data.name) {
+                  focus = parent.children[i];
+                  setLastFocus(focus);
+                  setCurrentFocus(focus);
+                  switchPointerEvents();
+                  found = true;
+                }
+                i++;
+              }
+            }
+          }
+        } else if (oldFocus.depth === 4) {
+          let foundGreatGrandParent = false;
+          let greatGrandParent;
+          let i = 0;
+          while (!foundGreatGrandParent && i < root.children.length) {
+            if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
+              greatGrandParent = root.children[i];
+              foundGreatGrandParent = true;
+            }
+            i++;
+          }
+          if (foundGreatGrandParent) {
+            let foundGrandParent = false;
+            let grandParent;
+            i = 0;
+            while (!foundGrandParent && i < greatGrandParent.children.length) {
+              if (greatGrandParent.children[i].data.name === oldFocus.parent.parent.data.name) {
+                grandParent = greatGrandParent.children[i];
+                foundGrandParent = true;
+              }
+              i++;
+            }
+            if (foundGrandParent) {
+              let foundParent = false;
+              let parent;
+              i = 0;
+              while (!foundParent && i < grandParent.children.length) {
+                if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
+                  parent = grandParent.children[i];
+                  foundParent = true;
+                }
+                i++;
+              }
+              if (foundParent) {
+                let found = false;
+                i = 0;
+                while (!found && i < parent.children.length) {
+                  if (parent.children[i].data.name === oldFocus.data.name) {
+                    focus = parent.children[i];
+                    setLastFocus(focus);
+                    setCurrentFocus(focus);
+                    switchPointerEvents();
+                    found = true;
+                  }
+                  i++;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 
-		function zoomTo(v) {
-			const k = width / v[2];
-			view = v;
-			label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
-			node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
-			node.attr("r", d => d.r * k);
-		}
+    function zoomTo(v) {
+      const k = width / v[2];
+      view = v;
+      label.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+      node.attr("transform", d => `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`);
+      node.attr("r", d => d.r * k);
+    }
 
-		function zoom(event, d) {
-			let depthChange = Math.abs(d.depth - focus.depth);
-			// Only allow a depth change of 1
-			if (depthChange !== 0 && depthChange !== 1) { return; }
-			setLastFocus(focus);
-			focus = d;
-			setCurrentFocus(focus);
-			// If not node or outerSvg, event.target === sortButton
-			if (event.target.id !== "node" && event.target.id !== "outerSvg") { return; }
-			switchPointerEvents();
-			const transition = zoomTransition(event);
-			labelTransition(transition);
-		}
+    function zoom(event, d) {
+      let depthChange = Math.abs(d.depth - focus.depth);
+      // Only allow a depth change of 1
+      if (depthChange !== 0 && depthChange !== 1) { return; }
+      setLastFocus(focus);
+      focus = d;
+      setCurrentFocus(focus);
+      // If not node or outerSvg, event.target === sortButton
+      if (event.target.id !== "node" && event.target.id !== "outerSvg") { return; }
+      switchPointerEvents();
+      const transition = zoomTransition(event);
+      labelTransition(transition);
+    }
 
-		function zoomInitTransition() {
-			return (
-				svg.transition()
-					.duration(0)
-					.tween("zoom", d => {
-						const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-						return t => zoomTo(i(t));
-					})
-			);
-		}
+    function zoomInitTransition() {
+      return (
+        svg.transition()
+          .duration(0)
+          .tween("zoom", d => {
+            const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+            return t => zoomTo(i(t));
+          })
+      );
+    }
 
-		// Moved outside of zoom() for later re-use
-		function zoomTransition(e) {
-			return (
-				svg.transition()
-					.duration(e.altKey ? 7500 : 750)
-					.tween("zoom", d => {
-						const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-						return t => zoomTo(i(t));
-					})
-			);
-		}
+    // Moved outside of zoom() for later re-use
+    function zoomTransition(e) {
+      return (
+        svg.transition()
+          .duration(e.altKey ? 7500 : 750)
+          .tween("zoom", d => {
+            const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+            return t => zoomTo(i(t));
+          })
+      );
+    }
 
-		// Moved outside of zoom() for later re-use
-		function labelTransition(transitionArg) {
-			label
-				.filter(function (d) {
-					return d.parent === focus || this.style.display === "inline";
-				})
-				.transition(transitionArg)
-				.style("fill-opacity", d => d.parent === focus ? 1 : 0)
-				.on("start", function (d) {
-					if (d.parent === focus) this.style.display = "inline";
-				})
-				.on("end", function (d) {
-					if (d.parent !== focus) this.style.display = "none";
-				});
-		}
+    // Moved outside of zoom() for later re-use
+    function labelTransition(transitionArg) {
+      label
+        .filter(function (d) {
+          return d.parent === focus || this.style.display === "inline";
+        })
+        .transition(transitionArg)
+        .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+        .on("start", function (d) {
+          if (d.parent === focus) this.style.display = "inline";
+        })
+        .on("end", function (d) {
+          if (d.parent !== focus) this.style.display = "none";
+        });
+    }
 
-		function switchPointerEvents() {
-			// Turn on node pointer events if they are the children of current focus
-			d3.selectAll("#node")
-				.attr("pointer-events", function (d) {
-					if (d.parent === focus) { return null; }
-					return "none";
-				})
-			// Turn on leaf pointer-events if they are next in line
-			d3.selectAll("#leaf")
-				.attr("pointer-events", function (d) {
-					if (root.height === focus.depth + 1 && d.parent === focus) { return null; }
-					return "none";
-				})
-			d3.selectAll("#selectedleaf")
-				.attr("pointer-events", function (d) {
-					if (root.height === focus.depth + 1 && d.parent === focus) { return null; }
-					return "none";
-				})
-			// Switch cursor of background to pointer when zoomed in
-			d3.select("#outerSvg")
-				.style("cursor", function () {
-					if (focus === root) { return "default"; }
-					return "pointer";
-				})
-		}
+    function switchPointerEvents() {
+      // Turn on node pointer events if they are the children of current focus
+      d3.selectAll("#node")
+        .attr("pointer-events", function (d) {
+          if (d.parent === focus) { return null; }
+          return "none";
+        })
+      // Turn on leaf pointer-events if they are next in line
+      d3.selectAll("#leaf")
+        .attr("pointer-events", function (d) {
+          if (root.height === focus.depth + 1 && d.parent === focus) { return null; }
+          return "none";
+        })
+      d3.selectAll("#selectedleaf")
+        .attr("pointer-events", function (d) {
+          if (root.height === focus.depth + 1 && d.parent === focus) { return null; }
+          return "none";
+        })
+      // Switch cursor of background to pointer when zoomed in
+      d3.select("#outerSvg")
+        .style("cursor", function () {
+          if (focus === root) { return "default"; }
+          return "pointer";
+        })
+    }
 
-		function labelSetup() {
-			function filterOutLeaf(node) {
-				if (node.height > 0) { return true; }
-				return false;
-			}
-			return (
-				svg.append("g")
-					.style("font", "18px montserrat")
-					.style("font-weight", "700")
-					.attr("pointer-events", "none")
-					.attr("text-anchor", "middle")
-					.selectAll("text")
-					.data(root.descendants().filter(filterOutLeaf))
-					.join("text")
-					.style("fill-opacity", d => d.parent === focus ? 1 : 0)
-					.style("display", "none") // Changes on init and on zoom
-					.text(d => d.data.name)
-			);
-		}
+    function labelSetup() {
+      function filterOutLeaf(node) {
+        if (node.height > 0) { return true; }
+        return false;
+      }
+      return (
+        svg.append("g")
+          .style("font", "18px montserrat")
+          .style("font-weight", "700")
+          .attr("pointer-events", "none")
+          .attr("text-anchor", "middle")
+          .selectAll("text")
+          .data(root.descendants().filter(filterOutLeaf))
+          .join("text")
+          .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+          .style("display", "none") // Changes on init and on zoom
+          .text(d => d.data.name)
+      );
+    }
 
-		// Create nodes and define behavior in CP chart
-		function nodeSetup() {
-			const toolTipOffsetX = 40;
-			const toolTipOffsetY = 20;
-			return (
-				svg.append("g")
-					.attr("id", "realRoot")
-					.selectAll("circle")
-					.data(root.descendants().slice(1))
-					.join("circle")
-					.attr("className", d => d.children ? "node" : d.data.id)
-					.attr("id", d => d.children ? "node" : "leaf")
-					.attr("fill", d => d.children ? d3.interpolateOranges(0.2 + d.depth / 10) :
-						d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
-							d.data.difficulty === "Intermediate" ? 'gold' :
-								d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
-									d3.interpolateOranges(0.5))
-					.attr("pointer-events", d => d.depth === 1 ? null : "none")
-					.attr("transform", d => `translate(${d.x},${d.y})`)
-					.on("mouseover", function (event, d) {
-						if (d.parent === focus) {
-							d3.select(this).attr("stroke", "#000");
-							(d3.select(this).attr("id") === "leaf" ||
-								d3.select(this).attr("id") === "selectedleaf") &&
-								toolTip.style("visibility", "visible");
-						}
-					})
-					.on("mouseout", function () {
-						d3.select(this).attr("id") !== "selectedleaf" &&
-							d3.select(this).attr("stroke", null);
-						toolTip.style("visibility", "hidden")
-					})
-					.on("mousemove", function (event, d) {
-						const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
-						toolTip
-							.html(d.data.name)
-							.style("left", (event.clientX - svgRect.left - toolTipOffsetX) + "px")
-							.style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
-					})
-					.on("click", function (event, d) {
-						d3.select(this).attr("id") === "node"
-							? (zoom(event, d), event.stopPropagation())
-							: props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation();
-					})
-			);
-		}
-	};
+    // Create nodes and define behavior in CP chart
+    function nodeSetup() {
+      const toolTipOffsetX = 40;
+      const toolTipOffsetY = 20;
+      return (
+        svg.append("g")
+          .attr("id", "realRoot")
+          .selectAll("circle")
+          .data(root.descendants().slice(1))
+          .join("circle")
+          .attr("className", d => d.children ? "node" : d.data.id)
+          .attr("id", d => d.children ? "node" : "leaf")
+          .attr("fill", d => d.children ? d3.interpolateOranges(0.2 + d.depth / 10) :
+            d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
+              d.data.difficulty === "Intermediate" ? 'gold' :
+                d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
+                  d3.interpolateOranges(0.5))
+          .attr("pointer-events", d => d.depth === 1 ? null : "none")
+          .attr("transform", d => `translate(${d.x},${d.y})`)
+          .on("mouseover", function (event, d) {
+            if (d.parent === focus) {
+              d3.select(this).attr("stroke", "#000");
+              (d3.select(this).attr("id") === "leaf" ||
+                d3.select(this).attr("id") === "selectedleaf") &&
+                toolTip.style("visibility", "visible");
+            }
+          })
+          .on("mouseout", function () {
+            d3.select(this).attr("id") !== "selectedleaf" &&
+              d3.select(this).attr("stroke", null);
+            toolTip.style("visibility", "hidden")
+          })
+          .on("mousemove", function (event, d) {
+            const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
+            toolTip
+              .html(d.data.name)
+              .style("left", (event.clientX - svgRect.left - toolTipOffsetX) + "px")
+              .style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
+          })
+          .on("click", function (event, d) {
+            d3.select(this).attr("id") === "node"
+              ? (zoom(event, d), event.stopPropagation())
+              : props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation();
+          })
+      );
+    }
+  };
 
-	function createTooltip() {
-		return d3
-			.select("#toolTipAppender")
-			.append("div")
-			.attr("class", "tooltip")
-			.attr("pointer-events", "none")
-			.style("visibility", "hidden")
-			.style("background-color", "white")
-			.style("position", "absolute")
-			.style("border", "solid")
-			.style("border-width", "2px")
-			.style("border-radius", "5px")
-			.style("padding", "5px")
-			.style("font", "12px montserrat");
-	}
+  function createTooltip() {
+    return d3
+      .select("#toolTipAppender")
+      .append("div")
+      .attr("class", "tooltip")
+      .attr("pointer-events", "none")
+      .style("visibility", "hidden")
+      .style("background-color", "white")
+      .style("position", "absolute")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px")
+      .style("font", "12px montserrat");
+  }
 
-	//
-	//      Everything related to sortingScheme buttons start here
-	//
+  //
+  //      Everything related to sortingScheme buttons start here
+  //
 
-	function handleSortButtonClick(attributeKey) {
-		if (sortingScheme.includes(attributeKey)) {
-			setRemovedElemIndex(sortingScheme.findIndex(elem => elem === attributeKey));
-			setSortingScheme(sortingScheme.filter(elem => elem !== attributeKey))
-		} else {
-			setRemovedElemIndex(null);
-			setSortingScheme([...sortingScheme, attributeKey]);
-		}
-	}
+  function handleSortButtonClick(attributeKey) {
+    if (sortingScheme.includes(attributeKey)) {
+      setRemovedElemIndex(sortingScheme.findIndex(elem => elem === attributeKey));
+      setSortingScheme(sortingScheme.filter(elem => elem !== attributeKey))
+    } else {
+      setRemovedElemIndex(null);
+      setSortingScheme([...sortingScheme, attributeKey]);
+    }
+  }
 
-	function createExplainText(textToCreate, yOffset, fontSize) {
-		d3.select('#outerSvg').append('text').text(textToCreate)
-			.style('font', 'montserrat')
-			.attr('class', 'explainText')
-			.attr('x', 12)
-			.attr('y', yOffset)
-			.attr('text-anchor', 'left')
-			.attr('fill', 'black')
-			.attr('font-size', fontSize)
-			.attr('font-weight', 'bold')
-			.attr('font-variant', 'small-caps')
-			.attr('text-decoration', 'underline')
-			.attr("pointer-events", "none")
-	}
+  function createExplainText(textToCreate, yOffset, fontSize) {
+    d3.select('#outerSvg').append('text').text(textToCreate)
+      .style('font', 'montserrat')
+      .attr('class', 'explainText')
+      .attr('x', 12)
+      .attr('y', yOffset)
+      .attr('text-anchor', 'left')
+      .attr('fill', 'black')
+      .attr('font-size', fontSize)
+      .attr('font-weight', 'bold')
+      .attr('font-variant', 'small-caps')
+      .attr('text-decoration', 'underline')
+      .attr("pointer-events", "none")
+  }
 
-	function buttonSetup() {
-		createExplainText("Sorting filters", 90, 12);
-		createExplainText("Circle size mapping", 265, 12)
-		// BUTTON 1
-		let b1_font_color = "black";
-		if (sortingScheme.includes("equipment")) {
-			b1_font_color = "white";
-		}
-		let b1_img_path = "/icons/dumbbell.svg"
-		createButton("Equipment", 80, b1_font_color, b1_img_path, "sortButton", 100);
+  function buttonSetup() {
+    createExplainText("Sorting filters", 90, 12);
+    createExplainText("Circle size mapping", 265, 12)
+    // BUTTON 1
+    let b1_font_color = "black";
+    if (sortingScheme.includes("equipment")) {
+      b1_font_color = "white";
+    }
+    let b1_img_path = "/icons/dumbbell.svg"
+    createButton("Equipment", 80, b1_font_color, b1_img_path, "sortButton", 100);
 
-		// BUTTON 2
-		let b2_font_color = "black";
-		if (sortingScheme.includes("force")) {
-			b2_font_color = "white";
-		}
-		let b2_img_path = "/icons/force.svg"
-		createButton("Force", 115, b2_font_color, b2_img_path, "sortButton", 100);
+    // BUTTON 2
+    let b2_font_color = "black";
+    if (sortingScheme.includes("force")) {
+      b2_font_color = "white";
+    }
+    let b2_img_path = "/icons/force.svg"
+    createButton("Force", 115, b2_font_color, b2_img_path, "sortButton", 100);
 
-		// BUTTON 3
-		let b3_font_color = "black";
-		if (sortingScheme.includes("mechanic")) {
-			b3_font_color = "white";
-		}
-		let b3_img_path = "/icons/gear.svg"
-		createButton("Mechanic", 150, b3_font_color, b3_img_path, "sortButton", 100);
+    // BUTTON 3
+    let b3_font_color = "black";
+    if (sortingScheme.includes("mechanic")) {
+      b3_font_color = "white";
+    }
+    let b3_img_path = "/icons/gear.svg"
+    createButton("Mechanic", 150, b3_font_color, b3_img_path, "sortButton", 100);
 
-		// BUTTON 4
-		let b4_font_color = "black";
-		if (sortingScheme.includes("difficulty")) {
-			b4_font_color = "white";
-		}
-		let b4_img_path = "/icons/difficulty.svg"
-		createButton("Difficulty", 185, b4_font_color, b4_img_path, "sortButton", 100);
+    // BUTTON 4
+    let b4_font_color = "black";
+    if (sortingScheme.includes("difficulty")) {
+      b4_font_color = "white";
+    }
+    let b4_img_path = "/icons/difficulty.svg"
+    createButton("Difficulty", 185, b4_font_color, b4_img_path, "sortButton", 100);
 
-		// sizingScheme button
-		createButton("Google search volume", 255, "black", 
-			"/icons/circleSize.svg", "sizeButton", 160);
+    // sizingScheme button
+    createButton("Google search volume", 255, "black",
+      "/icons/circleSize.svg", "sizeButton", 160);
 
-		function createButton(sortName, yOffset, font_color, icon_path, buttonClass, expandWidth) {
-			let yOffsetGlobal = 20;
-			let buttons_x_offset = 14;
-			let button_fill = sortingScheme.includes(sortName.toLowerCase())
-				? "DarkSlateGray"
-				: "white";
-			let button = d3.select("#outerSvg").append('rect')
-				.style("cursor", "pointer")
-				.attr("class", buttonClass)
-				.attr("id", sortName)
-				.attr('x', 10)
-				.attr('y', yOffset + yOffsetGlobal)
-				.attr('width', 30)
-				.attr('height', 30)
-				.attr('rx', 10)
-				.attr('fill', button_fill)
-				.attr("pointer-events", null)
-				.attr('opacity', 0.6)
-				.on("click", function () {
-					if (d3.select(this).attr("class") === "sortButton") {
-						handleSortButtonClick(sortName.toLowerCase());
-					} else {
-						sizingScheme === "popularity"
-							? setSizingScheme("muscleSum")
-							: setSizingScheme("popularity");
-					}
-				})
-				.on("mouseover", function () {
-					// when mouse is over the button, expand its width to expandWidth
-					d3.select(this)
-						.transition()
-						.duration(100)
-						.attr("width", expandWidth)
+    function createButton(sortName, yOffset, font_color, icon_path, buttonClass, expandWidth) {
+      let yOffsetGlobal = 20;
+      let buttons_x_offset = 14;
+      let button_fill = sortingScheme.includes(sortName.toLowerCase())
+        ? "DarkSlateGray"
+        : "white";
+      let button = d3.select("#outerSvg").append('rect')
+        .style("cursor", "pointer")
+        .attr("class", buttonClass)
+        .attr("id", sortName)
+        .attr('x', 10)
+        .attr('y', yOffset + yOffsetGlobal)
+        .attr('width', 30)
+        .attr('height', 30)
+        .attr('rx', 10)
+        .attr('fill', button_fill)
+        .attr("pointer-events", null)
+        .attr('opacity', 0.6)
+        .on("click", function () {
+          if (d3.select(this).attr("class") === "sortButton") {
+            handleSortButtonClick(sortName.toLowerCase());
+          } else {
+            sizingScheme === "popularity"
+              ? setSizingScheme("muscleSum")
+              : setSizingScheme("popularity");
+          }
+        })
+        .on("mouseover", function () {
+          // when mouse is over the button, expand its width to expandWidth
+          d3.select(this)
+            .transition()
+            .duration(100)
+            .attr("width", expandWidth)
 
-					let textToAppend;
-					if (d3.select(this).attr("class") === "sizeButton") {
-						textToAppend = sizingScheme === "popularity"
-							?	"Google search volume"
-							: "Nr of muscles activated";
-					} else {
-						textToAppend = sortName;
-					}
+          let textToAppend;
+          if (d3.select(this).attr("class") === "sizeButton") {
+            textToAppend = sizingScheme === "popularity"
+              ? "Google search volume"
+              : "Nr of muscles activated";
+          } else {
+            textToAppend = sortName;
+          }
 
-					d3.select('#outerSvg')
-						.append('text').text(textToAppend)
-						.style("fill", font_color)
-						.style("font", "10px montserrat")
-						.style("cursor", "default")
-						.attr("class", "sortButtonText")
-						.attr('x', 43)
-						.attr('y', yOffset + 19 + yOffsetGlobal)
-						.attr("pointer-events", "none")
-						.style("animation", "fadein 0.5s")
-				})
-				.on("mouseout", function () {
-					d3.select(this)
-						.transition()
-						.duration(200)
-						.attr("width", 30)
+          d3.select('#outerSvg')
+            .append('text').text(textToAppend)
+            .style("fill", font_color)
+            .style("font", "10px montserrat")
+            .style("cursor", "default")
+            .attr("class", "sortButtonText")
+            .attr('x', 43)
+            .attr('y', yOffset + 19 + yOffsetGlobal)
+            .attr("pointer-events", "none")
+            .style("animation", "fadein 0.5s")
+        })
+        .on("mouseout", function () {
+          d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("width", 30)
 
-					d3.select('#outerSvg')
-						.selectAll(".sortButtonText")
-						.remove()
-				})
+          d3.select('#outerSvg')
+            .selectAll(".sortButtonText")
+            .remove()
+        })
 
-			let button_img = d3.select("#outerSvg")
-				.append("image")
-				.attr("class", "btn_img")
-				.attr("xlink:href", icon_path)
-				.attr("x", buttons_x_offset)
-				.attr("y", yOffset + 4 + yOffsetGlobal)
-				.attr('height', 22)
-				.attr('pointer-events', 'none')
+      let button_img = d3.select("#outerSvg")
+        .append("image")
+        .attr("class", "btn_img")
+        .attr("xlink:href", icon_path)
+        .attr("x", buttons_x_offset)
+        .attr("y", yOffset + 4 + yOffsetGlobal)
+        .attr('height', 22)
+        .attr('pointer-events', 'none')
 
-			if (sortingScheme.includes(sortName.toLowerCase())) {
-				// Append a circle to the top left of the button,
-				// showing the order of the filter in the sorting scheme
-				d3.select('#outerSvg')
-					.append('circle')
-					.attr('class', 'btn_order')
-					.attr('cx', buttons_x_offset - 1)
-					.attr('cy', yOffset + 3 + yOffsetGlobal)
-					.attr('r', 5)
-					.attr('fill', 'darkSlateBlue')
-					.attr('pointer-events', 'none');
+      if (sortingScheme.includes(sortName.toLowerCase())) {
+        // Append a circle to the top left of the button,
+        // showing the order of the filter in the sorting scheme
+        d3.select('#outerSvg')
+          .append('circle')
+          .attr('class', 'btn_order')
+          .attr('cx', buttons_x_offset - 1)
+          .attr('cy', yOffset + 3 + yOffsetGlobal)
+          .attr('r', 5)
+          .attr('fill', 'darkSlateBlue')
+          .attr('pointer-events', 'none');
 
-				d3.select('#outerSvg')
-					.append('text').text(sortingScheme.indexOf(sortName.toLowerCase()) + 1)
-					.style('font', 'montserrat')
-					.attr('class', 'btn_order_text')
-					.attr('x', buttons_x_offset - 1)
-					.attr('y', yOffset + 3.5 + yOffsetGlobal)
-					.attr('text-anchor', 'middle')
-					.attr('dominant-baseline', 'middle')
-					.attr('fill', 'white')
-					.attr('font-size', 8);
+        d3.select('#outerSvg')
+          .append('text').text(sortingScheme.indexOf(sortName.toLowerCase()) + 1)
+          .style('font', 'montserrat')
+          .attr('class', 'btn_order_text')
+          .attr('x', buttons_x_offset - 1)
+          .attr('y', yOffset + 3.5 + yOffsetGlobal)
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
+          .attr('fill', 'white')
+          .attr('font-size', 8);
 
-				button_img.classed("filter-white", true);
-			}
-			return button;
-		}
-	} //         End of everything button related   
+        button_img.classed("filter-white", true);
+      }
+      return button;
+    }
+  } //         End of everything button related
 
-	function legendSetup() {
-		const colorScale = d3.scaleOrdinal()
-			.domain(['Beginner', 'Intermediate', 'Advanced'])
-			.range(['#75c47c', '#fcd405', '#fa684c']);
+  function legendSetup() {
+    const colorScale = d3.scaleOrdinal()
+      .domain(['Beginner', 'Intermediate', 'Advanced'])
+      .range(['#75c47c', '#fcd405', '#fa684c']);
 
-		d3.select("#outerSvg").append('rect')
-			.style("cursor", "default")
-			.attr("class", "legendContainer")
-			.attr('x', 10)
-			.attr('y', 10)
-			.attr('width', 100)
-			.attr('height', 60)
-			.attr('rx', 10)
-			.attr('fill', 'white')
-			.attr("pointer-events", "none")
-			.attr('opacity', 0.6);
+    d3.select("#outerSvg").append('rect')
+      .style("cursor", "default")
+      .attr("class", "legendContainer")
+      .attr('x', 10)
+      .attr('y', 10)
+      .attr('width', 100)
+      .attr('height', 60)
+      .attr('rx', 10)
+      .attr('fill', 'white')
+      .attr("pointer-events", "none")
+      .attr('opacity', 0.6);
 
-		d3.select("#outerSvg").append('g')
-			.style("font", "10px montserrat")
-			.style("cursor", "default")
-			.attr("class", "legend")
-			.attr('transform', `translate(25,25)`)
-			.attr("pointer-events", "none")
-			.call(ColorLegend, {
-				colorScale,
-				circleRadius: 4,
-				spacing: 14,
-				textOffset: 10,
-			});
-	}
+    d3.select("#outerSvg").append('g')
+      .style("font", "10px montserrat")
+      .style("cursor", "default")
+      .attr("class", "legend")
+      .attr('transform', `translate(25,25)`)
+      .attr("pointer-events", "none")
+      .call(ColorLegend, {
+        colorScale,
+        circleRadius: 4,
+        spacing: 14,
+        textOffset: 10,
+      });
+  }
 
-	// Remove all previous CP chart elements before redrawing
-	function removePrevious() {
-		d3.select("#circlePackContainer")
-			.remove();
-		d3.select(".tooltip")
-			.remove();
-		d3.selectAll(".sortButton")
-			.remove();
-		d3.selectAll(".sizeButton")		
-			.remove();
-		d3.selectAll(".btn_img")	
-			.remove();
-		d3.selectAll(".sortButtonText")
-			.remove();
-		d3.selectAll(".btn_order")
-			.remove();
-		d3.selectAll(".btn_order_text")
-			.remove();
-		d3.selectAll(".legendContainer")
-			.remove();
-		d3.selectAll(".legend")
-			.remove();
-		d3.selectAll(".explainText")
-			.remove();
-	}
+  // Remove all previous CP chart elements before redrawing
+  function removePrevious() {
+    d3.select("#circlePackContainer")
+      .remove();
+    d3.select(".tooltip")
+      .remove();
+    d3.selectAll(".sortButton")
+      .remove();
+    d3.selectAll(".sizeButton")
+      .remove();
+    d3.selectAll(".btn_img")
+      .remove();
+    d3.selectAll(".sortButtonText")
+      .remove();
+    d3.selectAll(".btn_order")
+      .remove();
+    d3.selectAll(".btn_order_text")
+      .remove();
+    d3.selectAll(".legendContainer")
+      .remove();
+    d3.selectAll(".legend")
+      .remove();
+    d3.selectAll(".explainText")
+      .remove();
+  }
 
-	return (
-		<div id="toolTipAppender">
-			<svg
-				id="outerSvg"
-				className={props.css}
-				ref={svgRef}
-				width={width + 10}
-				height={height + 10}
-			/>
-		</div>
-	);
+  return (
+    <div id="toolTipAppender">
+      <svg
+        id="outerSvg"
+        className={props.css}
+        ref={svgRef}
+        width={width + 10}
+        height={height + 10}
+      />
+    </div>
+  );
 }
