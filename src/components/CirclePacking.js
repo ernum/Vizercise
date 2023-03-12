@@ -13,6 +13,8 @@ export default function CirclePacking(props) {
 	const [removedElemIndex, setRemovedElemIndex] = useState(null);
 	const [exerciseData, setExerciseData] = useState(getNestedData(dataReq, sortingScheme));
 	const [lastFocus, setLastFocus] = useState();
+	const [currentFocus, setCurrentFocus] = useState();
+	const [prevSelectedMuscles, setPrevSelectedMuscles] = useState(props.selectedMuscles);
 
 	// Redraw chart when svgRef or exerciseData changes
 	useEffect(() => {
@@ -99,6 +101,7 @@ export default function CirclePacking(props) {
 			.on("click", function (event) {
 				if (focus === root) {
 					setLastFocus(focus);
+					setCurrentFocus(focus);
 					return;
 				}
 				zoom(event, focus.parent), event.stopPropagation();
@@ -109,7 +112,12 @@ export default function CirclePacking(props) {
 		const toolTip = createTooltip();
 		legendSetup();
 		buttonSetup();
-		lastFocus && adjustZoomFocus(lastFocus);
+		if (prevSelectedMuscles !== props.selectedMuscles) {
+			currentFocus && adjustZoomFocus(currentFocus);
+			setPrevSelectedMuscles(props.selectedMuscles);
+		} else {
+			lastFocus && adjustZoomFocus(lastFocus);
+		}
 		zoomTo([focus.x, focus.y, focus.r * 2]);
 		labelTransition(zoomInitTransition);
 
@@ -120,13 +128,15 @@ export default function CirclePacking(props) {
 				previous focus in the new hierarchy (i.e. until finding itself).
 				First part handles removals of sorting filters, second part additions.
 		*/
-		function adjustZoomFocus(oldFocus) {
+		function adjustZoomFocus(oldFocus) {	
 			// Helper to find children and improve readability
 			function findChild(ancestor, childToFind) {
 				for (let idx = 0; idx < ancestor.length; idx++) {
 					if (ancestor[idx].data.name === childToFind.data.name) {
 						focus = ancestor[idx];
 						setLastFocus(focus);
+						setCurrentFocus(focus);
+						setRemovedElemIndex(null);
 						switchPointerEvents();
 						return;
 					}
@@ -140,6 +150,8 @@ export default function CirclePacking(props) {
 							if (ancestor[idx].children[jdx].data.name === grandChildToFind.data.name) {
 								focus = ancestor[idx].children[jdx];
 								setLastFocus(focus);
+								setCurrentFocus(focus);
+								setRemovedElemIndex(null);
 								switchPointerEvents();
 								return;
 							}
@@ -148,20 +160,24 @@ export default function CirclePacking(props) {
 				}
 			}
 			/*
-					If an element (a nesting filter) has been REMOVED from the CP chart
+					If a sorting filter has been REMOVED from the CP chart.
+					This should never run on muscle selections/deselections.
 			*/
 			if (removedElemIndex !== null) {
 				// If oldFocus was previous root or current root is not nested
 				if (oldFocus.depth === 0 || root.height === 1) {
 					// Update lastFocus to current focus (root in this case)
 					setLastFocus(root);
-					return;
+					setCurrentFocus(root);
 				}
 				// sortingScheme element was removed and we are currently nested
 				else if (oldFocus.depth + oldFocus.height > root.height) {
 					if (oldFocus.depth === 1) {
-						// If we removed an element above current focus, do nothing
-						if (oldFocus.depth > removedElemIndex) { return; }
+						// If we removed an element above current focus
+						if (oldFocus.depth > removedElemIndex) { 
+							setLastFocus(focus);
+							setCurrentFocus(focus);
+						}
 						// If we removed an element below current focus...
 						else { // ... Find self in newly rendered CP chart 
 							findChild(root.children, oldFocus);
@@ -227,10 +243,11 @@ export default function CirclePacking(props) {
 							}
 						}
 					}
-				}
+				} 
 			}
 			/* 
-					If an element (a nesting filter) has been ADDED to the CP chart.
+					If a sorting filter has been ADDED to the CP chart OR if a muscle has 
+					been selected or deselected in the body map.
 					To find the correct element we start at the new root and traverse 
 					downwards in the hierarchy (BFS). At every level, we match the name of
 					the current hierarchy level to that of the corresponding ancestor
@@ -244,6 +261,7 @@ export default function CirclePacking(props) {
 						if (root.children[i].data.name === oldFocus.data.name) {
 							focus = root.children[i];
 							setLastFocus(focus);
+							setCurrentFocus(focus);
 							switchPointerEvents();
 							found = true;
 						}
@@ -267,6 +285,7 @@ export default function CirclePacking(props) {
 							if (parent.children[i].data.name === oldFocus.data.name) {
 								focus = parent.children[i];
 								setLastFocus(focus);
+								setCurrentFocus(focus);
 								switchPointerEvents();
 								found = true;
 							}
@@ -302,11 +321,60 @@ export default function CirclePacking(props) {
 								if (parent.children[i].data.name === oldFocus.data.name) {
 									focus = parent.children[i];
 									setLastFocus(focus);
+									setCurrentFocus(focus);
 									switchPointerEvents();
 									found = true;
-									console.log(focus);
 								}
 								i++;
+							}
+						}
+					}
+				} else if (oldFocus.depth === 4) {
+					let foundGreatGrandParent = false;
+					let greatGrandParent;
+					let i = 0;
+					while (!foundGreatGrandParent && i < root.children.length) {
+						if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
+							greatGrandParent = root.children[i];
+							foundGreatGrandParent = true;
+						}
+						i++;
+					}
+					if (foundGreatGrandParent) {
+						let foundGrandParent = false;
+						let grandParent;
+						i = 0;
+						while (!foundGrandParent && i < greatGrandParent.children.length) {
+							if (greatGrandParent.children[i].data.name === oldFocus.parent.parent.data.name) {
+								grandParent = greatGrandParent.children[i];
+								foundGrandParent = true;
+							}
+							i++;
+						}
+						if (foundGrandParent) {
+							let foundParent = false;
+							let parent;
+							i = 0;
+							while (!foundParent && i < grandParent.children.length) {
+								if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
+									parent = grandParent.children[i];
+									foundParent = true;
+								}
+								i++;
+							}
+							if (foundParent) {
+								let found = false;
+								i = 0;
+								while (!found && i < parent.children.length) {
+									if (parent.children[i].data.name === oldFocus.data.name) {
+										focus = parent.children[i];
+										setLastFocus(focus);
+										setCurrentFocus(focus);
+										switchPointerEvents();
+										found = true;
+									}
+									i++;
+								}
 							}
 						}
 					}
@@ -328,6 +396,7 @@ export default function CirclePacking(props) {
 			if (depthChange !== 0 && depthChange !== 1) { return; }
 			setLastFocus(focus);
 			focus = d;
+			setCurrentFocus(focus);
 			// If not node or outerSvg, event.target === sortButton
 			if (event.target.id !== "node" && event.target.id !== "outerSvg") { return; }
 			switchPointerEvents();
