@@ -63,7 +63,6 @@ export default function CirclePacking(props) {
           .sort((a, b) => b.value - a.value))
     )
   }
-
   function packByMusclesInvolved(data) {
     return (
       d3.pack()
@@ -129,119 +128,78 @@ export default function CirclePacking(props) {
         First part handles removals of sorting filters, second part additions.
     */
     function adjustZoomFocus(oldFocus) {
-      // Helper to find children and improve readability
-      function findChild(ancestor, childToFind) {
-        for (let idx = 0; idx < ancestor.length; idx++) {
-          if (ancestor[idx].data.name === childToFind.data.name) {
-            focus = ancestor[idx];
-            setLastFocus(focus);
-            setCurrentFocus(focus);
-            setRemovedElemIndex(null);
-            switchPointerEvents();
-            return;
+      function setFocus(focusToSet) {
+        focus = focusToSet;
+        setLastFocus(focus);
+        setCurrentFocus(focus);
+        setRemovedElemIndex(null);
+        switchPointerEvents();
+      }
+      // BFS helper
+      function findChild(parent, childToFind) {
+        for (let i = 0; i < parent.children.length; i++) {
+          if (parent.children[i].data.name === childToFind.data.name) {
+            return parent.children[i];
           }
         }
+        return null;
       }
-      // Family matters
-      function findGrandChild(ancestor, childToFind, grandChildToFind) {
-        for (let idx = 0; idx < ancestor.length; idx++) {
-          if (ancestor[idx].data.name === childToFind.data.name) {
-            for (let jdx = 0; jdx < ancestor[idx].children.length; jdx++) {
-              if (ancestor[idx].children[jdx].data.name === grandChildToFind.data.name) {
-                focus = ancestor[idx].children[jdx];
-                setLastFocus(focus);
-                setCurrentFocus(focus);
-                setRemovedElemIndex(null);
-                switchPointerEvents();
-                return;
-              }
-            }
-          }
-        }
-      }
-      /*
-          If a sorting filter has been REMOVED from the CP chart.
-          This should never run on muscle selections/deselections.
-      */
+
+      let child;
+      
       if (removedElemIndex !== null) {
         // If oldFocus was previous root or current root is not nested
-        if (oldFocus.depth === 0 || root.height === 1) {
-          // Update lastFocus to current focus (root in this case)
-          setLastFocus(root);
-          setCurrentFocus(root);
-        }
-        // sortingScheme element was removed and we are currently nested
-        else if (oldFocus.depth + oldFocus.height > root.height) {
-          if (oldFocus.depth === 1) {
-            // If we removed an element above current focus
-            if (oldFocus.depth > removedElemIndex) {
-              setLastFocus(focus);
-              setCurrentFocus(focus);
-            }
-            // If we removed an element below current focus...
-            else { // ... Find self in newly rendered CP chart
-              findChild(root.children, oldFocus);
-            }
+        if (oldFocus.depth === 0 || root.height === 1) { // Do nothing
+        } else if (oldFocus.depth === 1) {
+          // If we removed an element above current focus
+          if (removedElemIndex === 0) { // Do nothing
+          } else { // Else find self in newly rendered CP chart
+            child = findChild(root, oldFocus);
           }
-          else if (oldFocus.depth === 2) {
-            // If we removed an element above current focus...
-            if (oldFocus.depth > removedElemIndex) {
-              // ... Find self in newly rendered CP chart
-              findChild(root.children, oldFocus);
-              // If we didn't find self, self was removed
-              findChild(root.children, oldFocus.parent);
-            }
-            else { // If we removed an element below current focus
-              findGrandChild(root.children, oldFocus.parent, oldFocus);
-            }
+        } else if (oldFocus.depth === 2) {
+          // If we removed an element above current focus...
+          if (removedElemIndex === 0) {
+            // ... Find self in newly rendered CP chart
+            child = findChild(root, oldFocus);
+          } else if (removedElemIndex === 1) {
+            // If we didn't find self, self was removed
+            child = findChild(root, oldFocus.parent);
+          } else { // If we removed an element below current focus
+            child = findChild(root, oldFocus.parent);
+            child = child ? findChild(child, oldFocus) : null;
           }
-          else if (oldFocus.depth === 3) {
-            if (removedElemIndex === 0) { // Grandparent was removed
-              findGrandChild(root.children, oldFocus.parent, oldFocus);
-            }
-            else if (removedElemIndex === 1) { // Parent was removed
-              findGrandChild(root.children, oldFocus.parent.parent, oldFocus);
-            }
-            else if (removedElemIndex === 2) { // Self was removed
-              findGrandChild(root.children, oldFocus.parent.parent, oldFocus.parent);
-            }
-            else { // Child of self was removed
-              for (let i = 0; i < root.children.length; i++) {
-                if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
-                  findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
-                }
-              }
-            }
+        } else if (oldFocus.depth === 3) {
+          if (removedElemIndex === 0) { // Grandparent was removed
+            child = findChild(root, oldFocus.parent);
+            child = child ? findChild(child, oldFocus) : null;
+          } else if (removedElemIndex === 1) { // Parent was removed
+            child = findChild(root, oldFocus.parent.parent);
+            child = child ? findChild(child, oldFocus) : null;
+          } else if (removedElemIndex === 2) { // Self was removed
+            child = findChild(root, oldFocus.parent.parent);
+            child = child ? findChild(child, oldFocus.parent) : null;
+          } else { // Child of self was removed
+            child = findChild(root, oldFocus.parent.parent);
+            child = child ? findChild(child, oldFocus.parent) : null;
+            child = child ? findChild(child, oldFocus) : null;
           }
-          else { // Always some ancestor or self was removed if we get here
-            if (removedElemIndex === 0) { // Great-grandparent was removed
-              for (let i = 0; i < root.children.length; i++) {
-                if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
-                  findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
-                }
-              }
-            }
-            else if (removedElemIndex === 1) { // Grandparent was removed
-              for (let i = 0; i < root.children.length; i++) {
-                if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-                  findGrandChild(root.children[i].children, oldFocus.parent, oldFocus);
-                }
-              }
-            }
-            else if (removedElemIndex === 2) { // Parent was removed
-              for (let i = 0; i < root.children.length; i++) {
-                if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-                  findGrandChild(root.children[i].children, oldFocus.parent.parent, oldFocus);
-                }
-              }
-            }
-            else { // Self was removed
-              for (let i = 0; i < root.children.length; i++) {
-                if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-                  findGrandChild(root.children[i].children, oldFocus.parent.parent, oldFocus.parent);
-                }
-              }
-            }
+        } else { // Always some ancestor or self was removed if we get here
+          if (removedElemIndex === 0) { // Great-grandparent was removed
+            child = findChild(root, oldFocus.parent.parent);
+            child = child ? findChild(child, oldFocus.parent) : null;
+            child = child ? findChild(child, oldFocus) : null;
+          } else if (removedElemIndex === 1) { // Grandparent was removed
+            child = findChild(root, oldFocus.parent.parent.parent);
+            child = child ? findChild(child, oldFocus.parent) : null;
+            child = child ? findChild(child, oldFocus) : null;
+          } else if (removedElemIndex === 2) { // Parent was removed
+            child = findChild(root, oldFocus.parent.parent.parent);
+            child = child ? findChild(child, oldFocus.parent.parent) : null;
+            child = child ? findChild(child, oldFocus) : null;
+          } else { // Self was removed
+            child = findChild(root, oldFocus.parent.parent.parent);
+            child = child ? findChild(child, oldFocus.parent.parent) : null;
+            child = child ? findChild(child, oldFocus.parent) : null;
           }
         }
       }
@@ -255,131 +213,22 @@ export default function CirclePacking(props) {
       */
       else {
         if (oldFocus.depth === 1) {
-          let found = false;
-          let i = 0;
-          while (!found && i < root.children.length) {
-            if (root.children[i].data.name === oldFocus.data.name) {
-              focus = root.children[i];
-              setLastFocus(focus);
-              setCurrentFocus(focus);
-              switchPointerEvents();
-              found = true;
-            }
-            i++;
-          }
+          child = findChild(root, oldFocus);
         } else if (oldFocus.depth === 2) {
-          let foundParent = false;
-          let parent;
-          let i = 0;
-          while (!foundParent && i < root.children.length) {
-            if (root.children[i].data.name === oldFocus.parent.data.name) {
-              parent = root.children[i];
-              foundParent = true;
-            }
-            i++;
-          }
-          if (foundParent) {
-            let found = false;
-            i = 0;
-            while (!found && i < parent.children.length) {
-              if (parent.children[i].data.name === oldFocus.data.name) {
-                focus = parent.children[i];
-                setLastFocus(focus);
-                setCurrentFocus(focus);
-                switchPointerEvents();
-                found = true;
-              }
-              i++;
-            }
-          }
+          child = findChild(root, oldFocus.parent);
+          child = child ? findChild(child, oldFocus) : null;
         } else if (oldFocus.depth === 3) {
-          let foundGrandParent = false;
-          let grandParent;
-          let i = 0;
-          while (!foundGrandParent && i < root.children.length) {
-            if (root.children[i].data.name === oldFocus.parent.parent.data.name) {
-              grandParent = root.children[i];
-              foundGrandParent = true;
-            }
-            i++;
-          }
-          if (foundGrandParent) {
-            let foundParent = false;
-            let parent;
-            i = 0;
-            while (!foundParent && i < grandParent.children.length) {
-              if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
-                parent = grandParent.children[i];
-                foundParent = true;
-              }
-              i++;
-            }
-            if (foundParent) {
-              let found = false;
-              i = 0;
-              while (!found && i < parent.children.length) {
-                if (parent.children[i].data.name === oldFocus.data.name) {
-                  focus = parent.children[i];
-                  setLastFocus(focus);
-                  setCurrentFocus(focus);
-                  switchPointerEvents();
-                  found = true;
-                }
-                i++;
-              }
-            }
-          }
+          child = findChild(root, oldFocus.parent.parent);
+          child = child ? findChild(child, oldFocus.parent) : null;
+          child = child ? findChild(child, oldFocus) : null;
         } else if (oldFocus.depth === 4) {
-          let foundGreatGrandParent = false;
-          let greatGrandParent;
-          let i = 0;
-          while (!foundGreatGrandParent && i < root.children.length) {
-            if (root.children[i].data.name === oldFocus.parent.parent.parent.data.name) {
-              greatGrandParent = root.children[i];
-              foundGreatGrandParent = true;
-            }
-            i++;
-          }
-          if (foundGreatGrandParent) {
-            let foundGrandParent = false;
-            let grandParent;
-            i = 0;
-            while (!foundGrandParent && i < greatGrandParent.children.length) {
-              if (greatGrandParent.children[i].data.name === oldFocus.parent.parent.data.name) {
-                grandParent = greatGrandParent.children[i];
-                foundGrandParent = true;
-              }
-              i++;
-            }
-            if (foundGrandParent) {
-              let foundParent = false;
-              let parent;
-              i = 0;
-              while (!foundParent && i < grandParent.children.length) {
-                if (grandParent.children[i].data.name === oldFocus.parent.data.name) {
-                  parent = grandParent.children[i];
-                  foundParent = true;
-                }
-                i++;
-              }
-              if (foundParent) {
-                let found = false;
-                i = 0;
-                while (!found && i < parent.children.length) {
-                  if (parent.children[i].data.name === oldFocus.data.name) {
-                    focus = parent.children[i];
-                    setLastFocus(focus);
-                    setCurrentFocus(focus);
-                    switchPointerEvents();
-                    found = true;
-                  }
-                  i++;
-                }
-              }
-            }
-          }
+          child = findChild(root, oldFocus.parent.parent.parent);
+          child = child ? findChild(child, oldFocus.parent.parent) : null;
+          child = child ? findChild(child, oldFocus.parent) : null;
+          child = child ? findChild(child, oldFocus) : null;
         }
       }
+      (child && setFocus(child)) || setFocus(focus);
     }
 
     function zoomTo(v) {
@@ -470,10 +319,7 @@ export default function CirclePacking(props) {
     }
 
     function labelSetup() {
-      function filterOutLeaf(node) {
-        if (node.height > 0) { return true; }
-        return false;
-      }
+      function filterOutLeaf(node) { return node.height > 0 }
       return (
         svg.append("g")
           .style("font", "18px montserrat")
