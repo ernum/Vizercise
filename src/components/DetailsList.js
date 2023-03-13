@@ -1,4 +1,5 @@
 import { GetExerciseById } from "./Functions";
+import { XIcon } from "@heroicons/react/solid";
 
 export default function DetailsList(props) {
   const setId = (id) => {
@@ -19,7 +20,7 @@ export default function DetailsList(props) {
         <tr className="border-b" key={currentId}>
           <td className="text-center">
             <button className="text-center" onClick={removeClickEvent}>
-              ✖
+              <XIcon className="mt-1.5 h-4 w-4 text-gray-700" />
             </button>{" "}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm text-sky-600 hover:underline font-medium">
