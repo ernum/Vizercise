@@ -60,11 +60,11 @@ export default function Home() {
 
       <div className="font-[NeueHaasDisplay] tracking-wider">
           {/* Title and Button */}
-          <div className="flex justify-between items-center py-0 px-8">
-              <h1 className="text-4xl sm:text-2xl md:text-3xl lg:text-4xl text-[#E2E1EF]" style={{ fontFamily: "Bandar" }}>
+          <div className="flex justify-between items-center py-0 px-4 sm:px-8">
+              <h1 className="text-4xl sm:text-2xl md:text-3xl lg:text-4xl text-[#E2E1EF] w-1/2 md:w-auto" style={{ fontFamily: "Bandar" }}>
                   Vizercise
               </h1>
-              <button className="bg-gray-100 hover:bg-gray-200 text-sm sm:text-xs md:text-sm lg:text-base text-gray-700 font-bold py-1 px-3 rounded" onClick={() => setShowPopup(true)}>
+              <button className="bg-gray-100 hover:bg-gray-200 text-sm sm:text-xs md:text-sm lg:text-base text-gray-700 font-bold py-1 px-3 rounded w-1/2 md:w-auto" onClick={() => setShowPopup(true)}>
                   About Us
               </button>
           </div>
