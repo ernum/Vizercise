@@ -16,22 +16,6 @@ function GetExerciseById(id) {
   return dataReq[id];
 }
 
-/* -- Currently not being used but keeping them here in case need arises later --
-function groupBy(objectArray, attribute) {
-  return objectArray.reduce((acc, obj) => {
-    const key = obj[attribute];
-    const curGroup = acc[key] ?? [];
-    return { ...acc, [key]: [...curGroup, obj], };
-  }, {});
-}
-
-function getGroupedData(exercisesArray, attribute) {
-  var grouped = groupBy(exercisesArray, attribute);
-  grouped = {"name": "exercises", "children":[grouped]};
-  return grouped;
-}
-*/
-
 function transformElementToObject(elementToTransform) {
   elementToTransform = {
     name: elementToTransform,
@@ -43,22 +27,25 @@ function transformElementToObject(elementToTransform) {
 function nestByAttributes(attributeArray) {
   let nodeArray = [];
   attributeArray.forEach((elem) => {
-    nodeArray = [
-      ...nodeArray,
-      {
-        name: elem,
-        children: GetUniqueValuesByAttribute(elem).map(
-          transformElementToObject
-        ),
-      },
-    ];
-  });
+    nodeArray = 
+      [...nodeArray,
+        {
+          name: elem,
+          children: GetUniqueValuesByAttribute(elem).map(transformElementToObject)
+        }
+      ]
+    })
+  if (attributeArray.length > 3 ) {
+    nodeArray[2].children.forEach((elem) => {
+      elem.children = JSON.parse(JSON.stringify(nodeArray[3].children));
+    })
+  }
+  if (attributeArray.length > 2) {
+    nodeArray[1].children.forEach((elem) => {
+      elem.children = JSON.parse(JSON.stringify(nodeArray[2].children));
+    })
+  }
   if (attributeArray.length > 1) {
-    if (attributeArray.length === 3) {
-      nodeArray[1].children.forEach((elem) => {
-        elem.children = JSON.parse(JSON.stringify(nodeArray[2].children));
-      });
-    }
     nodeArray[0].children.forEach((elem) => {
       // Deep copies (stringify -> parse) to allow value changes
       elem.children = JSON.parse(JSON.stringify(nodeArray[1].children));
@@ -70,9 +57,7 @@ function nestByAttributes(attributeArray) {
 /*  
   Gets the data nested according to order of elements in attributeArray so that
   attributeArray[0] = root and attributeArray[length-1] = leaf.
-  Returns the root object.
-  Maximum depth is 3 with current implementation but can be modified if we would
-  like to allow for a bigger depth.
+  Returns the root object. Maximum depth is 4 with current implementation
 */
 function getNestedData(exerciseArray, attributeArray) {
   if (attributeArray.length === 0) {
@@ -87,9 +72,8 @@ function getNestedData(exerciseArray, attributeArray) {
   const firstLevel = getArrayByAttribute(attributeArray[0], exerciseArray);
 
   if (depth > 1) {
-    const secondLevel = firstLevel.map((elem) =>
-      getArrayByAttribute(attributeArray[1], elem)
-    );
+    const secondLevel = firstLevel.map((elem) => 
+      getArrayByAttribute(attributeArray[1], elem));
 
     if (depth === 2) {
       for (let i = 0; i < rootObject.children.length; i++) {
@@ -100,17 +84,23 @@ function getNestedData(exerciseArray, attributeArray) {
     } else if (depth === 3) {
       for (let i = 0; i < rootObject.children.length; i++) {
         for (let j = 0; j < rootObject.children[i].children.length; j++) {
-          let exercises = getArrayByAttribute(
-            attributeArray[2],
-            secondLevel[i][j]
-          );
-          for (
-            let k = 0;
-            k < rootObject.children[i].children[j].children.length;
-            k++
-          ) {
-            rootObject.children[i].children[j].children[k].children =
-              exercises[k];
+          let exercises = getArrayByAttribute(attributeArray[2], secondLevel[i][j]);
+          for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
+            rootObject.children[i].children[j].children[k].children = exercises[k];
+          }
+        }
+      }
+    } else if (depth === 4) {
+      const thirdLevel = secondLevel.map((outerElem) =>
+        outerElem.map((innerElem) =>
+          getArrayByAttribute(attributeArray[2], innerElem)));
+      for (let i = 0; i < rootObject.children.length; i++) {
+        for (let j = 0; j < rootObject.children[i].children.length; j++) {
+          for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
+            let exercises = getArrayByAttribute(attributeArray[3], thirdLevel[i][j][k]);
+            for (let l = 0; l < rootObject.children[i].children[j].children[k].children.length; l++) {
+              rootObject.children[i].children[j].children[k].children[l].children = exercises[l];
+            }
           }
         }
       }
@@ -227,9 +217,8 @@ function getExercisesByDifficulty(exerciseArray, difficultyValue) {
   );
 }
 
-function calculateMusclesInvolved(id) {
+function calculateMusclesInvolved(exercise) {
   let sum = 0;
-  const exercise = GetExerciseById(id);
   const muscles = [
     exercise.primaryMuscles,
     exercise.secondaryMuscles,

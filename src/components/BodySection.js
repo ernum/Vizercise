@@ -89,12 +89,13 @@ export default function BodySection(props) {
     return (
       <svg
         className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
-        viewBox="0 0 330 860"
+            viewBox="0 0 330 860"
       >
         <g
           className="frontBody"
           id="Front"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
@@ -102,9 +103,20 @@ export default function BodySection(props) {
           <path d={frontMuscles.body} transform={mirror} />
         </g>
         <g
-          className="frontHead"
-          id="FrontHead"
+          className="frontFace"
+          id="FrontFace"
           stroke="black"
+          strokeWidth={2}
+          fill="white"
+          fillOpacity="1"
+        >
+          <path d={frontMuscles.face} />
+        </g>
+        <g
+          className="frontHead"
+          id="Front"
+          stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
@@ -275,6 +287,7 @@ export default function BodySection(props) {
           className="backBody"
           id="Back"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
@@ -285,6 +298,7 @@ export default function BodySection(props) {
           className="backHead"
           id="BackHead"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
