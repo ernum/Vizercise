@@ -50,7 +50,7 @@ export default function Home() {
   }
 
   return (
-    <div className="font-[NeueHaasDisplay]">
+    <div className="font-[NeueHaasDisplay] tracking-wider">
       {/*PopUp Box*/}
       <div>{detailPopup()}</div>
       {/* Biggest Box */}
