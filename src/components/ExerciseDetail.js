@@ -19,7 +19,8 @@ export default function Detail(props) {
               onClick={() => props.onSetBoolValue(false)}
               className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
             >
-                <div className="hover:cursor-default flex shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20">
+              <div className="hover:cursor-default flex shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20">
+
                 <div className="overflow-auto p-5 ">
                   <div className="flex flex-col items-center my-5 ">
                     <button
