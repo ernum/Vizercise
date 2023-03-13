@@ -70,7 +70,7 @@ export default function Home() {
       <div>{detailPopup()}</div>
       {/* Biggest Box */}
       <div
-              className="box-border absolute w-[45%] h-[90%] left-[2%] top-[8%]
+              className="box-border absolute w-[45%] h-[90%] left-[2%] top-[7%]
                  bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
                  shadown-black/25 overflow-hidden"
       >
@@ -85,7 +85,7 @@ export default function Home() {
 
       {/* Second Box */}
       <div
-        className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[8%]
+        className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[7%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25 overflow-hidden"
       >
@@ -100,7 +100,7 @@ export default function Home() {
       {/* Third Box */}
       <div
 
-        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[62.9%]
+        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[61.9%]
 
         bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
         shadown-black/25"
