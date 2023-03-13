@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import BodySection from "../components/BodySection";
-import DetailsList from "../components/DetailsList";
+
 import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
+import Presenter from "../components/Presenter";
 
 export default function Home() {
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
   const [idFromSetId, setnewId] = useState();
-  const [isClosed, setBoolValue] = useState();
+  const [isClosed, setIsClosed] = useState();
 
   function detailPopup() {
     if (isClosed == true)
-      return <Detail id={idFromSetId} onSetBoolValue={setBoolValue} />;
+      return <Detail id={idFromSetId} onSetIsClosed={setIsClosed} />;
     else return "";
   }
 
@@ -55,10 +56,9 @@ export default function Home() {
       <div>{detailPopup()}</div>
       {/* Biggest Box */}
       <div
-        className="box-border absolute w-[45%] h-[90%] left-[2%] top-[4%]
+        className='box-border absolute w-[45%] h-[90%] left-[2%] top-[4%]
                  bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
-                 shadown-black/25 overflow-hidden" 
-      >
+                 shadown-black/25 overflow-hidden'>
         <div>
           <BodySection
             onClick={onMuscleClicked}
@@ -70,10 +70,9 @@ export default function Home() {
 
       {/* Second Box */}
       <div
-        className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[4%]
+        className='box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[4%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-        shadown-black/25 overflow-hidden"
-      >
+        shadown-black/25 overflow-hidden'>
         <CirclePacking
           css={"absolute w-[100%] h-[100%] top-[0%]"}
           selectedExercises={selectedExercises}
@@ -84,15 +83,14 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[58.9%]
+        className='overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[58.9%]
         bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
-        shadown-black/25"
-      >
-        <DetailsList
+        shadown-black/25'>
+        <Presenter
           selectedExercises={selectedExercises}
           onExerciseRemoval={removeExercise}
           onSetNewId={setnewId}
-          onSetBoolValue={setBoolValue}
+          onSetIsClosed={setIsClosed}
         />
       </div>
     </div>
