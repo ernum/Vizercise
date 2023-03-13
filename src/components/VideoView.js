@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import { TableButton } from "./Buttons";
 import { GetExerciseById } from "./Functions";
 import { useState } from "react";
@@ -12,6 +12,10 @@ export default function VideoView(props) {
   const arr = props.selectedExercises;
   const arrLength = props.selectedExercises.length;
   var [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    setIndex(0);
+  }, [props]);
 
   if (arrLength !== 0) {
     var videoURL = GetExerciseById(props.selectedExercises[index]).video;
@@ -37,15 +41,15 @@ export default function VideoView(props) {
   function displayVideo() {
     if (arrLength !== 0) {
       return (
-        <div className='flex justify-center gap-20'>
+        <div className=' relative justify-evenly flex'>
           <button onClick={handleDecrement}>
             <FontAwesomeIcon
               icon={faChevronLeft}
               className='  text-gray-400 text-4xl hover:text-gray-800 transition duration-400'
             />
           </button>
-          <div className=' shadow-2xl  w-1/2 p-3 rounded-lg'>
-            <h1 className='text-center text-2xl text-neutral-600 font-medium'>
+          <div className=' shadow-2xl w-1/2 p-3 rounded-lg'>
+            <h1 className='text-center text-2xl text-neutral-700 font-medium'>
               {exerciseName}
             </h1>
             <div className='relative overflow-hidden pt-[56.60%]'>
@@ -105,8 +109,8 @@ export default function VideoView(props) {
 
   return (
     <>
-      <div className='flex mx-6 my-4 '>
-        <div className=''>
+      <div className='flex  '>
+        <div className=' absolute mx-6 my-4 z-10'>
           <TableButton
             view={"video"}
             onSetExerciseOrVideo={props.onSetExerciseOrVideo}
