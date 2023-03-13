@@ -103,7 +103,6 @@ export default function CirclePacking(props) {
           setCurrentFocus(focus);
           return;
         }
-
         zoom(event, focus.parent), event.stopPropagation();
       });
 
@@ -117,7 +116,6 @@ export default function CirclePacking(props) {
       setPrevSelectedMuscles(props.selectedMuscles);
     } else {
       lastFocus && adjustZoomFocus(lastFocus);
-
     }
     zoomTo([focus.x, focus.y, focus.r * 2]);
     labelTransition(zoomInitTransition);
