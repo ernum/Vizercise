@@ -283,7 +283,10 @@ export default function CirclePacking(props) {
           return d.parent === focus || this.style.display === "inline";
         })
         .transition(transitionArg)
-        .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+        .style("fill-opacity", function (d) {
+          if (d.parent !== focus) { return 0; }
+          return d.value === 0 ? 0.5 : 1;
+        })
         .on("start", function (d) {
           if (d.parent === focus) this.style.display = "inline";
         })
@@ -322,15 +325,19 @@ export default function CirclePacking(props) {
       function filterOutLeaf(node) { return node.height > 0 }
       return (
         svg.append("g")
-              .style("font", "18px NeueHaasDisplay")
-          .style("font-weight", "700")
           .attr("pointer-events", "none")
           .attr("text-anchor", "middle")
           .selectAll("text")
           .data(root.descendants().filter(filterOutLeaf))
           .join("text")
-          .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+          .style("fill-opacity", function (d) {
+            if (d.parent !== focus) { return 0; }
+            return d.value === 0 ? 0.25 : 1;
+          })
           .style("display", "none") // Changes on init and on zoom
+          .style("font", d => d.value === 0
+            ? "8px NeueHaasDisplay" : "18px NeueHaasDisplay")
+          .style("font-weight", "700")
           .text(d => d.data.name)
       );
     }
