@@ -88,8 +88,17 @@ export default function BodySection(props) {
           <path d={frontMuscles.body} transform={mirror} />
         </g>
         <g
+          className="frontFace"
+          id="FrontFace"
+          stroke="black"
+          fill="white"
+          fillOpacity="1"
+        >
+          <path d={frontMuscles.face} />
+        </g>
+        <g
           className="frontHead"
-          id="FrontHead"
+          id="Front"
           stroke="black"
           fill="white"
           fillOpacity="1"
