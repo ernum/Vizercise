@@ -502,12 +502,16 @@ export default function BodySection(props) {
                   if (muscle == inputId) return true;
             return false;
           })
-          .map((exercise) => <li>{exercise.name}</li>);
+          .map((exercise) => (
+            <li className="ml-6" key={exercise.id}>
+              {exercise.name}
+            </li>
+          ));
 
         const JSX = (
           <div>
             <p>{inputId}</p>
-            <ol className="list-decimal px-6">{listItems}</ol>
+            <ol className="list-decimal">{listItems}</ol>
           </div>
         );
 
