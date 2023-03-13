@@ -76,7 +76,7 @@ export default function CirclePacking(props) {
         let view;
 
         const svg = d3.select(svgRef.current)
-            .style("background", d3.interpolateOranges(0.1))
+            .style("background", d3.interpolatePurples(0.2))
             .append("svg")
                 .attr("id", "circlePackContainer")
                 .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
@@ -183,7 +183,7 @@ export default function CirclePacking(props) {
                 .join("circle")
                     .attr("className", d => d.children ? "node" : d.data.id)
                     .attr("id", d => d.children ? "node" : "leaf")
-                    .attr("fill", d => d.children ? d3.interpolateOranges(0.2 + d.depth / 10) : 
+                    .attr("fill", d => d.children ? d3.interpolatePurples(0.6 - d.depth / 15) :
                         d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
                         d.data.difficulty === "Intermediate" ? 'gold' :
                         d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
