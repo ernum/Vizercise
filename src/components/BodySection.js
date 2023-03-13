@@ -81,6 +81,7 @@ export default function BodySection(props) {
           className="frontBody"
           id="Front"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
@@ -91,6 +92,7 @@ export default function BodySection(props) {
           className="frontFace"
           id="FrontFace"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
@@ -100,6 +102,7 @@ export default function BodySection(props) {
           className="frontHead"
           id="Front"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
@@ -261,6 +264,7 @@ export default function BodySection(props) {
           className="backBody"
           id="Back"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
@@ -271,6 +275,7 @@ export default function BodySection(props) {
           className="backHead"
           id="BackHead"
           stroke="black"
+          strokeWidth={2}
           fill="white"
           fillOpacity="1"
         >
