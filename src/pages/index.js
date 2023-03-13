@@ -119,7 +119,11 @@ export default function Home() {
                   className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
                   onClick={closePopup}
               >
-                  <div className="hover:cursor-default shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20 overflow-y-scroll">
+                  <div className="hover:cursor-default shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20 overflow-y-scroll" style={{ direction: 'rtl' }}
+                  >
+                      <style>
+                          {`::-webkit-scrollbar { direction: rtl; }`}
+                      </style>
                       <About/>
                   </div>
               </div>
