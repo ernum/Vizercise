@@ -3,35 +3,81 @@
 @tailwind utilities;
 
 body {
-    background-color: #8782BC;
+  background-color: #8782bc;
 }
 
 @font-face {
-    font-family: 'Lato';
-    src: url('/fonts/lato/Lato-Regular.ttf') format('truetype');
+  font-family: "Lato";
+  src: url("/fonts/lato/Lato-Regular.ttf") format("truetype");
 }
 
 @font-face {
-    font-family: 'Montserrat';
-    src: url('/fonts/montserrat/Montserrat-Regular.ttf') format('truetype');
+  font-family: "Montserrat";
+  src: url("/fonts/montserrat/Montserrat-Regular.ttf") format("truetype");
 }
 
 /* import bold montserrat font */
 @font-face {
-    font-family: 'Montserrat';
-    font-weight: 700;
-    src: url('/fonts/montserrat/Montserrat-Bold.ttf') format('truetype');
+  font-family: "Montserrat";
+  font-weight: 700;
+  src: url("/fonts/montserrat/Montserrat-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NeueHaasDisplay";
+  src: url("/fonts/NeueHaasDisplay/NeueHaasDisplayLight.ttf") format("truetype");
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "NeueHaasDisplayRoman";
+  src: url("/fonts/NeueHaasDisplay/NeueHaasDisplayRoman.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NeueHaasDisplayBlack";
+  src: url("/fonts/NeueHaasDisplay/NeueHaasDisplayBlack.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NeueHaasDisplayMedium";
+  src: url("/fonts/NeueHaasDisplay/NeueHaasDisplayMediu.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NeueHaasDisplay";
+  src: url("/fonts/NeueHaasDisplay/NeueHaasDisplayBold.ttf") format("truetype");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "NeueHaasDisplay";
+  src: url("/fonts/NeueHaasDisplay/NeueHaasDisplayLightItalic.ttf")
+    format("truetype");
+  font-style: italic;
 }
 
 .pulsing {
-    animation: pulses 0.5s 0s linear infinite alternate;
+  animation: pulses 0.5s 0s linear infinite alternate;
 }
 
 @keyframes pulses {
-    from   {fill:#FFFFFF;}
-    to     {fill:#8b0000;}
+  from {
+    fill: #ffffff;
+  }
+  to {
+    fill: #8b0000;
+  }
 }
 
 .filter-white {
-    filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
+  filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg)
+    brightness(102%) contrast(102%);
+}
+
+@font-face {
+  font-family: "Bandar";
+  src: url("/fonts/Bandar/Bandar.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
