@@ -90,7 +90,7 @@ export default function BodySection(props) {
   function drawFront() {
     return (
       <svg
-        className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
+        className="absolute w-[50%] h-[86%] top[13%] left-[5%] bottom-[1%]"
         viewBox="0 0 330 860"
       >
         <g
@@ -282,7 +282,7 @@ export default function BodySection(props) {
   function drawBack() {
     return (
       <svg
-        className="absolute w-[50%] h-[86%] top[13%] left-[45%]"
+        className="absolute w-[50%] h-[86%] top[13%] left-[45%] bottom-[1%]"
         viewBox="0 0 330 860"
       >
         <g
