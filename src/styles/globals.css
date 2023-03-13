@@ -74,3 +74,11 @@ body {
   filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg)
     brightness(102%) contrast(102%);
 }
+
+@font-face {
+    font-family: 'Bandar';
+    src: url('/fonts/Bandar/Bandar.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
