@@ -3,6 +3,7 @@ import BodySection from "../components/BodySection";
 import DetailsList from "../components/DetailsList";
 import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
+//import Link from "next/link";
 
 export default function Home() {
   const [exerciseSelected, setExerciseSelected] = useState(null);
@@ -10,12 +11,17 @@ export default function Home() {
   const [selectedMuscles, setSelectedMuscles] = useState([]);
   const [idFromSetId, setnewId] = useState();
   const [isClosed, setBoolValue] = useState();
+  const [showPopup, setShowPopup] = useState(false);
 
   function detailPopup() {
     if (isClosed == true)
       return <Detail id={idFromSetId} onSetBoolValue={setBoolValue} />;
     else return "";
   }
+
+   function closePopup() {
+        setShowPopup(false);
+    }
 
   // This seems like a bad solution but for some reason I can't get it to work the same
   // way that onMuscleClicked() works (array is not appended to, only replaces the elem)
@@ -50,12 +56,20 @@ export default function Home() {
   }
 
   return (
-    <div>
+      <div>
+          {/* Title and Button */}
+          <div className="flex justify-between items-center py-0 px-8">
+              <h1 className="text-4xl text-[#E2E1EF]" style={{ fontFamily: "Bandar" }}> Vizercise</h1>
+              <button className="bg-gray-100 hover:bg-gray-200 text-sm text-gray-700 font-bold py-1 px-3 rounded" /*style={{fontFamily:}}*/ onClick={() => setShowPopup(true)}>
+                  About Us
+              </button>
+          </div>
+
       {/*PopUp Box*/}
       <div>{detailPopup()}</div>
       {/* Biggest Box */}
       <div
-        className="box-border absolute w-[45%] h-[90%] left-[2%] top-[4%]
+              className="box-border absolute w-[45%] h-[90%] left-[2%] top-[8%]
                  bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
                  shadown-black/25 overflow-hidden"
       >
@@ -70,7 +84,7 @@ export default function Home() {
 
       {/* Second Box */}
       <div
-        className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[4%]
+        className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[8%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
         shadown-black/25 overflow-hidden"
       >
@@ -94,7 +108,7 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[58.9%]
+        className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[62.9%]
         bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
         shadown-black/25"
       >
@@ -104,7 +118,19 @@ export default function Home() {
           onSetNewId={setnewId}
           onSetBoolValue={setBoolValue}
         />
-      </div>
+          </div>
+          {/*About Us PopUp Bloc*/}
+          {showPopup && (
+              <div
+                  className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
+                  onClick={closePopup}
+              >
+                  <div className="hover:cursor-default shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20">
+                      <h2 className="text-2xl font-bold mb-2" style={{textAlign: "center"}}>About Us</h2>
+                      <p className="text-gray-700 text-base">text</p>
+                  </div>
+              </div>
+          )}
     </div>
   );
 }
