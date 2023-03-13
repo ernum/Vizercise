@@ -24,6 +24,7 @@ export default function BodySection(props) {
   const [toolTipFront, setToolTipFront] = useState();
   const [toolTipMuscle, setToolTipMuscle] = useState();
   const [toolTipExercises, setToolTipExercises] = useState();
+  const [musclesHighlighted, setMusclesHighlighted] = useState();
 
   const genderString = isMale ? maleString : femaleString;
   const frontMuscles = isMale ? frontMusclesMale : frontMusclesFemale;
@@ -83,13 +84,14 @@ export default function BodySection(props) {
     }
     // Refresh tooltip
     setToolTipMuscle(null);
+    setMusclesHighlighted(musclesToHighlight);
   }, [props.selectedExercises]);
 
   function drawFront() {
     return (
       <svg
         className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
-            viewBox="0 0 330 860"
+        viewBox="0 0 330 860"
       >
         <g
           className="frontBody"
@@ -501,6 +503,9 @@ export default function BodySection(props) {
   function muscleToolTip(isFront, inputId, event) {
     function createToolTipList() {
       if (toolTipMuscle != inputId) {
+        const sum = musclesHighlighted[inputId]
+          ? musclesHighlighted[inputId]
+          : -1;
         const listItems = props.selectedExercises
           .map((id) => GetExerciseById(id))
           .filter((exercise) => {
@@ -524,8 +529,13 @@ export default function BodySection(props) {
 
         const JSX = (
           <div>
-            <p>{inputId}</p>
+            <p className="font-bold">{inputId}</p>
             <ol className="list-decimal">{listItems}</ol>
+            {sum >= 9 && (
+              <p className="font-bold">
+                Limit exercises for this muscle
+              </p>
+            )}
           </div>
         );
 
