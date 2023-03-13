@@ -63,7 +63,7 @@ body {
 
 @keyframes pulses {
   from {
-    fill: #e27b7b;
+    fill: #ffffff;
   }
   to {
     fill: #8b0000;
@@ -76,9 +76,8 @@ body {
 }
 
 @font-face {
-    font-family: 'Bandar';
-    src: url('/fonts/Bandar/Bandar.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: "Bandar";
+  src: url("/fonts/Bandar/Bandar.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
-
