@@ -23,6 +23,7 @@ export default function VideoView(props) {
       <div className='flex justify-center items-center'>
         {arr.map((NULL, i) => (
           <div
+            key={i}
             className={`${
               index === i
                 ? "bg-gray-500 w-2 h-2 m-1 rounded-full p-2"
