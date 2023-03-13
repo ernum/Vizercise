@@ -61,8 +61,10 @@ export default function Home() {
       <div className="font-[NeueHaasDisplay] tracking-wider">
           {/* Title and Button */}
           <div className="flex justify-between items-center py-0 px-8">
-              <h1 className="text-4xl text-[#E2E1EF]" style={{ fontFamily: "Bandar" }}> Vizercise</h1>
-              <button className="bg-gray-100 hover:bg-gray-200 text-sm text-gray-700 font-bold py-1 px-3 rounded" /*style={{fontFamily:}}*/ onClick={() => setShowPopup(true)}>
+              <h1 className="text-4xl sm:text-2xl md:text-3xl lg:text-4xl text-[#E2E1EF]" style={{ fontFamily: "Bandar" }}>
+                  Vizercise
+              </h1>
+              <button className="bg-gray-100 hover:bg-gray-200 text-sm sm:text-xs md:text-sm lg:text-base text-gray-700 font-bold py-1 px-3 rounded" onClick={() => setShowPopup(true)}>
                   About Us
               </button>
           </div>
@@ -122,7 +124,7 @@ export default function Home() {
                   <div className="hover:cursor-default shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20 overflow-y-scroll" style={{ direction: 'rtl' }}
                   >
                       <style>
-                          {`::-webkit-scrollbar { direction: rtl; }`}
+                          {`::-webkit-scrollbar { direction: rtl; background: transparent; }`}
                       </style>
                       <About/>
                   </div>
