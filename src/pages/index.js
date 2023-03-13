@@ -57,7 +57,8 @@ export default function Home() {
   }
 
   return (
-      <div>
+
+      <div className="font-[NeueHaasDisplay] tracking-wider">
           {/* Title and Button */}
           <div className="flex justify-between items-center py-0 px-8">
               <h1 className="text-4xl text-[#E2E1EF]" style={{ fontFamily: "Bandar" }}> Vizercise</h1>
