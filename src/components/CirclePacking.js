@@ -324,7 +324,7 @@ export default function CirclePacking(props) {
       function filterOutLeaf(node) { return node.height > 0 }
       return (
         svg.append("g")
-              .style("font", "18px montserrat")
+              .style("font", "18px NeueHaasDisplay")
           .style("font-weight", "700")
           .attr("pointer-events", "none")
           .attr("text-anchor", "middle")
@@ -398,7 +398,7 @@ export default function CirclePacking(props) {
       .style("border-width", "2px")
       .style("border-radius", "5px")
       .style("padding", "5px")
-      .style("font", "12px montserrat");
+      .style("font", "12px NeueHaasDisplay");
   }
 
   //
@@ -417,7 +417,7 @@ export default function CirclePacking(props) {
 
   function createExplainText(textToCreate, yOffset, fontSize) {
     d3.select('#outerSvg').append('text').text(textToCreate)
-      .style('font', 'montserrat')
+      .style('font', 'NeueHaasDisplay')
       .attr('class', 'explainText')
       .attr('x', 12)
       .attr('y', yOffset)
@@ -514,7 +514,7 @@ export default function CirclePacking(props) {
           d3.select('#outerSvg')
             .append('text').text(textToAppend)
             .style("fill", font_color)
-            .style("font", "10px montserrat")
+            .style("font", "10px NeueHaasDisplay")
             .style("cursor", "default")
             .attr("class", "sortButtonText")
             .attr('x', 43)
@@ -556,7 +556,7 @@ export default function CirclePacking(props) {
 
         d3.select('#outerSvg')
           .append('text').text(sortingScheme.indexOf(sortName.toLowerCase()) + 1)
-          .style('font', 'montserrat')
+          .style('font', 'NeueHaasDisplay')
           .attr('class', 'btn_order_text')
           .attr('x', buttons_x_offset - 1)
           .attr('y', yOffset + 3.5 + yOffsetGlobal)
@@ -589,7 +589,7 @@ export default function CirclePacking(props) {
       .attr('opacity', 0.6);
 
     d3.select("#outerSvg").append('g')
-      .style("font", "10px montserrat")
+      .style("font", "10px NeueHaasDisplay")
       .style("cursor", "default")
       .attr("class", "legend")
       .attr('transform', `translate(25,25)`)
