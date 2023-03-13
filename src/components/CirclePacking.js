@@ -424,13 +424,12 @@ export default function CirclePacking(props) {
       .attr('font-size', fontSize)
       .attr('font-weight', 'bold')
       .attr('font-variant', 'small-caps')
-      .attr('text-decoration', 'underline')
       .attr("pointer-events", "none")
   }
 
   function buttonSetup() {
-    createExplainText("Sorting filters", 90, 12);
-    createExplainText("Circle size mapping", 265, 12)
+    createExplainText("Sorting Filters", 90, 12);
+    createExplainText("Circle Size", 265, 12)
     // BUTTON 1
     let b1_font_color = "black";
     if (sortingScheme.includes("equipment")) {
