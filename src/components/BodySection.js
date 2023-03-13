@@ -545,7 +545,8 @@ export default function BodySection(props) {
       return toolTipExercises;
     }
 
-    const toolTipOffsetY = 120;
+    const toolTipOffsetX = 20;
+    const toolTipOffsetY = 135;
     const toolTip = isFront ? toolTipFront : toolTipBack;
     const toolTipID = isFront ? "#toolTipFront" : "#toolTipBack";
     const svgRect = d3.select(toolTipID).node().getBoundingClientRect();
@@ -553,7 +554,7 @@ export default function BodySection(props) {
     if (toolTip)
       toolTip
         .html(createToolTipList)
-        .style("left", event.clientX - svgRect.left + "px")
+        .style("left", event.clientX - svgRect.left - toolTipOffsetX + "px")
         .style("top", event.clientY - svgRect.top + toolTipOffsetY + "px");
   }
 
@@ -594,7 +595,7 @@ export default function BodySection(props) {
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      <div className="relative grid grid-cols-1 top-8 px-60 gap-x-16 pb-16">
+      <div className="flex justify-center my-10">
         <BodyButton
           menuOrientation="left"
           action={() => {
