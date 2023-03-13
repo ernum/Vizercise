@@ -2,8 +2,9 @@ import * as d3 from "d3";
 import Script from "next/script";
 import BodyButton from "./Buttons";
 import { useEffect, useState } from "react";
-import { musclesConst, allMuscles, colourPalette } from "@/public/musclesConst";
+import ReactDOMServer from "react-dom/server";
 import { GetExerciseById } from "./Functions";
+import { musclesConst, allMuscles, colourPalette } from "@/public/musclesConst";
 
 export default function BodySection(props) {
   const maleString = "Male";
@@ -80,6 +81,8 @@ export default function BodySection(props) {
         .duration(300)
         .style("fill", colour);
     }
+    // Refresh tooltip
+    setToolTipMuscle(null);
   }, [props.selectedExercises]);
 
   function drawFront() {
@@ -482,6 +485,38 @@ export default function BodySection(props) {
   }
 
   function muscleToolTip(isFront, inputId, event) {
+    function createToolTipList() {
+      if (toolTipMuscle != inputId) {
+        const listItems = props.selectedExercises
+          .map((id) => GetExerciseById(id))
+          .filter((exercise) => {
+            const muscles = [
+              exercise.primaryMuscles,
+              exercise.secondaryMuscles,
+              exercise.tertiaryMuscles,
+            ];
+
+            for (let i = 0; i < 3; i++)
+              if (muscles[i])
+                for (const muscle of muscles[i])
+                  if (muscle == inputId) return true;
+            return false;
+          })
+          .map((exercise) => <li>{exercise.name}</li>);
+
+        const JSX = (
+          <div>
+            <p>{inputId}</p>
+            <ol className="list-decimal px-6">{listItems}</ol>
+          </div>
+        );
+
+        setToolTipMuscle(inputId);
+        setToolTipExercises(ReactDOMServer.renderToStaticMarkup(JSX));
+      }
+      return toolTipExercises;
+    }
+
     const toolTipOffsetY = 120;
     const toolTip = isFront ? toolTipFront : toolTipBack;
     const toolTipID = isFront ? "#toolTipFront" : "#toolTipBack";
@@ -489,7 +524,7 @@ export default function BodySection(props) {
 
     if (toolTip)
       toolTip
-        .html(inputId)
+        .html(createToolTipList)
         .style("left", event.clientX - svgRect.left + "px")
         .style("top", event.clientY - svgRect.top + toolTipOffsetY + "px");
   }
@@ -524,7 +559,8 @@ export default function BodySection(props) {
       .style("border-width", "2px")
       .style("border-radius", "5px")
       .style("padding", "5px")
-      .style("font", "12px montserrat");
+      .style("font", "12px montserrat")
+      .style("z-index", 2);
   }
 
   return (
