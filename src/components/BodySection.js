@@ -531,11 +531,18 @@ export default function BodySection(props) {
           <div>
             <p className="font-bold">{inputId}</p>
             <ol className="list-decimal">{listItems}</ol>
-            {sum >= 9 && (
-              <p className="font-bold">
-                Limit exercises for this muscle
-              </p>
-            )}
+            {(sum >= 0.5 && sum < 3 && (
+              <p className="font-bold">Status: Low Strain</p>
+            )) ||
+              (sum >= 3 && sum < 6 && (
+                <p className="font-bold">Status: Medium Strain</p>
+              )) ||
+              (sum >= 6 && sum < 9 && (
+                <p className="font-bold">Status: High Strain</p>
+              )) ||
+              (sum >= 9 && (
+                <p className="font-bold">Status: At Risk of Overtraining</p>
+              ))}
           </div>
         );
 
