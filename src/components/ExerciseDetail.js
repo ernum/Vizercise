@@ -20,7 +20,10 @@ export default function Detail(props) {
               className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
             >
               <div className="hover:cursor-default flex shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20">
-                <div className="overflow-auto p-5 ">
+                      <style>
+                          {`::-webkit-scrollbar { direction: rtl; background: transparent; width: 0px }`}
+                      </style>
+                      <div className="overflow-auto p-5 ">
                   <div className="flex flex-col items-center my-5 ">
                     <button
                       onClick={() => props.onSetBoolValue(false)}
