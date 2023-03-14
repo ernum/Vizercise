@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
 import BodySection from "../components/BodySection";
-import DetailsList from "../components/DetailsList";
+
 import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
+import Presenter from "../components/Presenter";
 import About from "./about"
-//import Link from "next/link";
 
 export default function Home() {
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
   const [idFromSetId, setnewId] = useState();
-  const [isClosed, setBoolValue] = useState();
+  const [isClosed, setIsClosed] = useState();
   const [showPopup, setShowPopup] = useState(false);
 
   function detailPopup() {
     if (isClosed == true)
-      return <Detail id={idFromSetId} onSetBoolValue={setBoolValue} />;
+      return <Detail id={idFromSetId} onSetIsClosed={setIsClosed} />;
     else return "";
   }
 
@@ -94,8 +94,7 @@ export default function Home() {
       <div
         className="box-border absolute w-[49.3%] h-[52%] left-[48.6%] top-[7%]
         bg-white border-[1px] border-solid border-[##CAC4C4] rounded-[30px] 
-        shadown-black/25 overflow-hidden"
-      >
+        shadown-black/25 overflow-hidden">
         <CirclePacking
           css={"absolute w-[100%] h-[100%] top-[0%]"}
           selectedExercises={selectedExercises}
@@ -106,17 +105,13 @@ export default function Home() {
 
       {/* Third Box */}
       <div
-
         className="overflow-auto box-border absolute w-[49.3%] h-[35.1%] left-[48.6%] top-[61.9%]
-
-        bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px]
-        shadown-black/25"
-      >
-        <DetailsList
+        bg-[#E2E1EF] border-[1px] border-solid border-[##CAC4C4] rounded-[30px] shadown-black/25">
+        <Presenter
           selectedExercises={selectedExercises}
           onExerciseRemoval={removeExercise}
           onSetNewId={setnewId}
-          onSetBoolValue={setBoolValue}
+          onSetIsClosed={setIsClosed}
         />
           </div>
           {/*About Us PopUp Bloc*/}
@@ -125,7 +120,10 @@ export default function Home() {
                   className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
                   onClick={closePopup}
               >
-                  <div className="hover:cursor-default shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20 overflow-y-scroll" style={{ direction: 'rtl'}}
+                  <div 
+                    className="hover:cursor-default shadow-2xl bg-[#E2E1EF]
+                    rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20 overflow-y-scroll" 
+                    style={{ direction: 'rtl'}}
                   >
                       <style>
                           {`::-webkit-scrollbar { direction: rtl; background: transparent; width: 0px }`}

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { useEffect, useState } from "react";
-import ReactPlayer from "react-player";
 
 export default function Detail(props) {
   const [showPosts, setShowPosts] = useState();
@@ -16,51 +15,48 @@ export default function Detail(props) {
           return (
             <div
               key={exercise.id}
-              onClick={() => props.onSetBoolValue(false)}
-              className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
-            >
-              <div className="hover:cursor-default flex shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20">
-                <div className="overflow-auto p-5 ">
-                  <div className="flex flex-col items-center my-5 ">
+              onClick={() => props.onSetIsClosed(false)}
+              className='hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800'>
+              <div className='hover:cursor-default flex shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20'>
+                <div className='relative overflow-auto p-20 '>
+                  <div className=' absolute right-5 top-0 my-5'>
                     <button
-                      onClick={() => props.onSetBoolValue(false)}
-                      className="transition  bg-gray-400 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full items-center"
-                    >
+                      onClick={() => props.onSetIsClosed(false)}
+                      className='transition hover:bg-gray-300 font-bold py-2 px-3 rounded-full'>
                       ✖
                     </button>
                   </div>
                   <iframe
-                    className="m-auto rounded-xl"
+                    className='m-auto rounded-xl'
                     src={exercise.video}
-                    width="400px"
-                    height="225px"
-                    allow="autoplay; encrypted-media"
+                    width='400px'
+                    height='225px'
+                    allow='autoplay; encrypted-media'
                     allowFullScreen
-                    title="video"
-                  ></iframe>
-                  <div className="p-10">
-                    <h1 className="text-center p-2 text-3xl text-neutral-600 font-medium">
+                    title='video'></iframe>
+                  <div className='p-10'>
+                    <h1 className='text-center p-2 text-3xl text-neutral-600 font-medium'>
                       {exercise.name}
                     </h1>
-                    <p className="py-2 font-normal">
+                    <p className='py-2 font-normal'>
                       <b>Equipment:</b> {exercise.equipment}
                     </p>
-                    <p className="py-2 font-normal">
+                    <p className='py-2 font-normal'>
                       <b>Difficulty: </b>
                       <span className={difficultyColor(exercise.difficulty)}>
                         {exercise.difficulty}
                       </span>
                     </p>
-                    <p className="py-2 font-normal">
+                    <p className='py-2 font-normal'>
                       <b>Grips:</b> {exercise.grips}
                     </p>
-                    <p className="py-2 font-normal">
+                    <p className='py-2 font-normal'>
                       <b>Mechanic:</b> {exercise.mechanic}
                     </p>
-                    <p className="py-2 font-normal">
+                    <p className='py-2 font-normal'>
                       <b>Force:</b> {exercise.force}
                     </p>
-                    <p className="py-2 font-normal">
+                    <p className='py-2 font-normal'>
                       <b>Instructions:</b> {exercise.howTo}
                     </p>
                     <hr />
