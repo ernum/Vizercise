@@ -18,6 +18,7 @@ export default function Detail(props) {
               onClick={() => props.onSetIsClosed(false)}
               className='hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800'>
               <div className='hover:cursor-default flex shadow-2xl bg-[#E2E1EF] rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20'>
+                <style>{`::-webkit-scrollbar { direction: rtl; background: transparent; width: 0px }`}</style>
                 <div className='relative overflow-auto p-20 '>
                   <div className=' absolute right-5 top-0 my-5'>
                     <button
