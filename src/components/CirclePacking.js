@@ -283,7 +283,10 @@ export default function CirclePacking(props) {
           return d.parent === focus || this.style.display === "inline";
         })
         .transition(transitionArg)
-        .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+        .style("fill-opacity", function (d) {
+          if (d.parent !== focus) { return 0; }
+          return d.value === 0 ? 0.5 : 1;
+        })
         .on("start", function (d) {
           if (d.parent === focus) this.style.display = "inline";
         })
@@ -322,15 +325,19 @@ export default function CirclePacking(props) {
       function filterOutLeaf(node) { return node.height > 0 }
       return (
         svg.append("g")
-              .style("font", "18px NeueHaasDisplay")
-          .style("font-weight", "700")
           .attr("pointer-events", "none")
           .attr("text-anchor", "middle")
           .selectAll("text")
           .data(root.descendants().filter(filterOutLeaf))
           .join("text")
-          .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+          .style("fill-opacity", function (d) {
+            if (d.parent !== focus) { return 0; }
+            return d.value === 0 ? 0.25 : 1;
+          })
           .style("display", "none") // Changes on init and on zoom
+          .style("font", d => d.value === 0
+            ? "8px NeueHaasDisplay" : "18px NeueHaasDisplay")
+          .style("font-weight", "700")
           .text(d => d.data.name)
       );
     }
@@ -347,11 +354,12 @@ export default function CirclePacking(props) {
           .join("circle")
           .attr("className", d => d.children ? "node" : d.data.id)
           .attr("id", d => d.children ? "node" : "leaf")
-          .attr("fill", d => d.children ? d3.interpolatePurples(0.6 - d.depth / 15) ://interpolatesPurples(0.3 + d.depth/10)
+          .attr("fill", d => d.children ?
+            d3.interpolatePurples(0.6 - d.depth / 15) : //interpolatesPurples(0.3 + d.depth/10)
             d.data.difficulty === "Advanced" ? d3.interpolateReds(0.5) :
-                  d.data.difficulty === "Intermediate" ? 'gold' : //background - color: #FBF4EF;
-                d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) :
-                  d3.interpolateOranges(0.5))
+            d.data.difficulty === "Intermediate" ? 'gold' : //background - color: #FBF4EF;
+            d.data.difficulty === "Beginner" ? d3.interpolateGreens(0.5) : "black")
+          .attr("fill-opacity", d => d.value === 0 ? 0.3 : 1)
           .attr("pointer-events", d => d.depth === 1 ? null : "none")
           .attr("transform", d => `translate(${d.x},${d.y})`)
           .on("mouseover", function (event, d) {
