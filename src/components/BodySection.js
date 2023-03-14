@@ -24,6 +24,7 @@ export default function BodySection(props) {
   const [toolTipFront, setToolTipFront] = useState();
   const [toolTipMuscle, setToolTipMuscle] = useState();
   const [toolTipExercises, setToolTipExercises] = useState();
+  const [musclesHighlighted, setMusclesHighlighted] = useState();
 
   const genderString = isMale ? maleString : femaleString;
   const frontMuscles = isMale ? frontMusclesMale : frontMusclesFemale;
@@ -83,13 +84,14 @@ export default function BodySection(props) {
     }
     // Refresh tooltip
     setToolTipMuscle(null);
+    setMusclesHighlighted(musclesToHighlight);
   }, [props.selectedExercises]);
 
   function drawFront() {
     return (
       <svg
-        className="absolute w-[50%] h-[86%] top[13%] left-[5%]"
-            viewBox="0 0 330 860"
+        className="absolute w-[50%] h-[86%] top[13%] left-[5%] bottom-[1%]"
+        viewBox="0 0 330 860"
       >
         <g
           className="frontBody"
@@ -280,7 +282,7 @@ export default function BodySection(props) {
   function drawBack() {
     return (
       <svg
-        className="absolute w-[50%] h-[86%] top[13%] left-[45%]"
+        className="absolute w-[50%] h-[86%] top[13%] left-[45%] bottom-[1%]"
         viewBox="0 0 330 860"
       >
         <g
@@ -501,6 +503,9 @@ export default function BodySection(props) {
   function muscleToolTip(isFront, inputId, event) {
     function createToolTipList() {
       if (toolTipMuscle != inputId) {
+        const sum = musclesHighlighted[inputId]
+          ? musclesHighlighted[inputId]
+          : -1;
         const listItems = props.selectedExercises
           .map((id) => GetExerciseById(id))
           .filter((exercise) => {
@@ -524,8 +529,20 @@ export default function BodySection(props) {
 
         const JSX = (
           <div>
-            <p>{inputId}</p>
+            <p className="font-bold">{inputId}</p>
             <ol className="list-decimal">{listItems}</ol>
+            {(sum >= 0.5 && sum < 3 && (
+              <p className="font-bold">Status: Low Strain</p>
+            )) ||
+              (sum >= 3 && sum < 6 && (
+                <p className="font-bold">Status: Medium Strain</p>
+              )) ||
+              (sum >= 6 && sum < 9 && (
+                <p className="font-bold">Status: High Strain</p>
+              )) ||
+              (sum >= 9 && (
+                <p className="font-bold">Status: At Risk of Overtraining</p>
+              ))}
           </div>
         );
 
@@ -535,7 +552,8 @@ export default function BodySection(props) {
       return toolTipExercises;
     }
 
-    const toolTipOffsetY = 120;
+    const toolTipOffsetX = 20;
+    const toolTipOffsetY = 135;
     const toolTip = isFront ? toolTipFront : toolTipBack;
     const toolTipID = isFront ? "#toolTipFront" : "#toolTipBack";
     const svgRect = d3.select(toolTipID).node().getBoundingClientRect();
@@ -543,7 +561,7 @@ export default function BodySection(props) {
     if (toolTip)
       toolTip
         .html(createToolTipList)
-        .style("left", event.clientX - svgRect.left + "px")
+        .style("left", event.clientX - svgRect.left - toolTipOffsetX + "px")
         .style("top", event.clientY - svgRect.top + toolTipOffsetY + "px");
   }
 
@@ -577,14 +595,14 @@ export default function BodySection(props) {
       .style("border-width", "2px")
       .style("border-radius", "5px")
       .style("padding", "5px")
-      .style("font", "12px montserrat")
+      .style("font", "12px NeueHaasDisplay")
       .style("z-index", 2);
   }
 
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      <div className="relative grid grid-cols-1 top-8 px-60 gap-x-16 pb-16">
+      <div className="flex justify-center my-10">
         <BodyButton
           menuOrientation="left"
           action={() => {
