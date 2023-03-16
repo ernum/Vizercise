@@ -99,6 +99,7 @@ export default function Home() {
           <BodySection
             onClick={onMuscleClicked}
             onSelectionSchemeButtonClick={switchMuscleSelectionScheme}
+            selectionScheme={muscleSelectionScheme}
             selectedMuscles={selectedMuscles}
             selectedExercises={selectedExercises}
           />

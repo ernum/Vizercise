@@ -3,7 +3,8 @@ import Script from "next/script";
 import BodyButton from "./Buttons";
 import { useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
-import { GetExerciseById } from "./Functions";
+import { GetExerciseById, createExplainTextNoD3,
+  createButtonNoD3, createButtonImage } from "./Functions";
 import { musclesConst, allMuscles, colourPalette } from "@/public/musclesConst";
 
 export default function BodySection(props) {
@@ -115,7 +116,7 @@ export default function BodySection(props) {
         </g>
         <g
           className="frontHead"
-          id="Front"
+          id="FrontHead"
           stroke="black"
           strokeWidth={2}
           fill="white"
@@ -598,6 +599,96 @@ export default function BodySection(props) {
       .style("z-index", 2);
   }
 
+  // Switch font, fill & image colors on click
+  function selectionButtonClickHandler(e) {
+    if ((e.target.id === "unionButton" && 
+    props.selectionScheme === "Intersection")) {
+      props.onSelectionSchemeButtonClick();
+      d3.select("#unionText")
+        .style("fill", "white");
+      d3.select("#intersectionText")
+        .style("fill", "black");
+      d3.select("#unionButton")
+        .attr("cursor", "default")
+        .attr("fill", "DarkSlateGray");
+      d3.select("#intersectionButton")
+        .attr("cursor", "pointer")
+        .attr("fill", "white");
+      d3.select("#unionImage")
+        .classed("filter-white", true)
+      d3.select("#intersectionImage")
+        .classed("filter-white", false)
+    } else if (e.target.id === "intersectionButton" &&
+    props.selectionScheme === "Union") {
+      props.onSelectionSchemeButtonClick();
+      d3.select("#intersectionText")
+        .style("fill", "white")
+      d3.select("#unionText")
+        .style("fill", "black")
+      d3.select("#intersectionButton")
+        .attr("cursor", "default")
+        .attr("fill", "DarkSlateGray");
+      d3.select("#unionButton")
+        .attr("cursor", "pointer")
+        .attr("fill", "white");
+      d3.select("#intersectionImage")
+        .classed("filter-white", true)
+      d3.select("#unionImage")
+        .classed("filter-white", false)
+    }
+  }
+
+  // Get expanding text on mouse enter
+  function mouseEnterHandler(e) {
+    let expandWidth, textToAppend, button, font_color, y, id;
+    if (e.target.id === "intersectionButton") {
+      expandWidth = 100;
+      textToAppend = "Intersection"
+      button = d3.select("#intersectionButton")
+      font_color = props.selectionScheme === "Intersection"
+        ? "white"
+        : "black";
+      y = 73;
+      id = "intersectionText";
+    } else {
+      expandWidth = 75;
+      textToAppend = "Union"
+      button = d3.select("#unionButton");
+      font_color = props.selectionScheme === "Union"
+        ? "white"
+        : "black";
+      y = 38;
+      id = "unionText";
+    }
+
+    d3.select(e.target)
+      .transition()
+      .duration(100)
+      .attr("width", expandWidth);
+
+    d3.select('#selectionButtonContainer')
+      .append('text').text(textToAppend)
+      .style("fill", font_color)
+      .style("font", "10px NeueHaasDisplay")
+      .style("cursor", "default")
+      .attr("id", id)
+      .attr("class", "selectionButtonText")
+      .attr('x', 45)
+      .attr('y', y)
+      .attr("pointer-events", "none")
+      .style("animation", "fadein 0.5s")
+  }
+
+  function mouseLeaveHandler(e) {
+    d3.select(e.target)
+      .transition()
+      .duration(200)
+      .attr("width", 30);
+    d3.select("#selectionButtonContainer")
+      .selectAll(".selectionButtonText")
+        .remove();
+  }
+
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
@@ -610,19 +701,20 @@ export default function BodySection(props) {
           buttonText={genderString}
           optionText={isMale ? femaleString : maleString}
         />
-      </div>
-      <div className="flex justify-right my-10">
-        <BodyButton
-          menuOrientation="left"
-          action={() => {
-            props.onSelectionSchemeButtonClick();
-          }}
-          buttonText={"Union"}
-          optionText={"Intersection"}
-        />
-      </div>
+      </div>  
       <div id="toolTipFront">{drawFront()}</div>
       <div id="toolTipBack">{drawBack()}</div>
+      <svg id="selectionButtonContainer">
+        {createExplainTextNoD3(121, 16, "Get Exercises As", 12, 12, 12, "left")}
+        {createButtonNoD3("unionButton", 12, 20, 30, 30, "DarkSlateGray",
+        selectionButtonClickHandler, null, "default", mouseEnterHandler, mouseLeaveHandler)}
+        {createButtonImage("unionImage", 16, 24,
+        "/icons/union.svg", 22, 1)}
+        {createButtonNoD3("intersectionButton", 12, 55, 30, 30, "white",
+        selectionButtonClickHandler, null, "pointer", mouseEnterHandler, mouseLeaveHandler)}
+        {createButtonImage("intersectionImage", 16, 59,
+        "/icons/intersection.svg", 22, 1)}
+      </svg>
     </div>
   );
 }

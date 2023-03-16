@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { GetExercises, getNestedData, dataReq, calculateMusclesInvolved } from "./Functions";
+import { GetExercises, getNestedData, dataReq,
+  calculateMusclesInvolved, createExplainText } from "./Functions";
 import { ColorLegend } from './ColorLegend';
 
 export default function CirclePacking(props) {
@@ -437,23 +438,9 @@ export default function CirclePacking(props) {
     }
   }
 
-  function createExplainText(textToCreate, yOffset, fontSize) {
-    d3.select('#outerSvg').append('text').text(textToCreate)
-      .style('font', 'NeueHaasDisplay')
-      .attr('class', 'explainText')
-      .attr('x', 12)
-      .attr('y', yOffset)
-      .attr('text-anchor', 'left')
-      .attr('fill', 'black')
-      .attr('font-size', fontSize)
-      .attr('font-weight', 'bold')
-      .attr('font-variant', 'small-caps')
-      .attr("pointer-events", "none")
-  }
-
   function buttonSetup() {
-    createExplainText("Sorting Filters", 90, 12);
-    createExplainText("Circle Size", 265, 12)
+    createExplainText("#outerSvg" ,"Sorting Filters", 12, 90, 12);
+    createExplainText("#outerSvg", "Circle Size", 12, 265, 12)
     // BUTTON 1
     let b1_font_color = "black";
     if (sortingScheme.includes("equipment")) {
@@ -646,8 +633,9 @@ export default function CirclePacking(props) {
       .remove();
     d3.selectAll(".legend")
       .remove();
-    d3.selectAll(".explainText")
-      .remove();
+    d3.select("#outerSvg")
+      .selectAll(".explainText")
+        .remove();
   }
 
   return (
