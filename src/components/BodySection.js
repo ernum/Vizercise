@@ -17,7 +17,6 @@ export default function BodySection(props) {
   const frontMusclesFemale = musclesConst[2];
   const backMusclesFemale = musclesConst[3];
 
-  // the value of body decides what is rendered
   const [isMale, setIsMale] = useState(true);
 
   const [toolTipBack, setToolTipBack] = useState();
@@ -610,6 +609,16 @@ export default function BodySection(props) {
           }}
           buttonText={genderString}
           optionText={isMale ? femaleString : maleString}
+        />
+      </div>
+      <div className="flex justify-right my-10">
+        <BodyButton
+          menuOrientation="left"
+          action={() => {
+            props.onSelectionSchemeButtonClick();
+          }}
+          buttonText={"Union"}
+          optionText={"Intersection"}
         />
       </div>
       <div id="toolTipFront">{drawFront()}</div>
