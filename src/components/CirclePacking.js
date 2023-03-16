@@ -16,6 +16,7 @@ export default function CirclePacking(props) {
   const [lastFocus, setLastFocus] = useState();
   const [currentFocus, setCurrentFocus] = useState();
   const [prevSelectedMuscles, setPrevSelectedMuscles] = useState(props.selectedMuscles);
+  const [prevSelectionScheme, setPrevSelectionScheme] = useState(props.selectionScheme);
 
   // Redraw chart when svgRef or exerciseData changes
   useEffect(() => {
@@ -131,6 +132,9 @@ export default function CirclePacking(props) {
     if (prevSelectedMuscles !== props.selectedMuscles) {
       currentFocus && adjustZoomFocus(currentFocus);
       setPrevSelectedMuscles(props.selectedMuscles);
+    } else if (prevSelectionScheme !== props.selectionScheme) {
+      currentFocus && adjustZoomFocus(currentFocus);
+      setPrevSelectionScheme(props.selectionScheme);
     } else {
       lastFocus && adjustZoomFocus(lastFocus);
     }
