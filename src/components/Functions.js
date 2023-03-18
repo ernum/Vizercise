@@ -14,6 +14,16 @@ function GetExercises(currentMuscle) {
       );
 }
 
+function getIntersectionExercises(currentMuscle) {
+  return currentMuscle == null
+    ? dataReq
+    : dataReq.filter((exercise) =>
+        exercise.primaryMuscles.includes(currentMuscle) ||
+        (exercise.secondaryMuscles && exercise.secondaryMuscles.includes(currentMuscle)) ||
+        (exercise.tertiaryMuscles && exercise.tertiaryMuscles.includes(currentMuscle))
+      );
+}
+
 function GetExerciseById(id) {
   return dataReq[id];
 }
@@ -330,5 +340,6 @@ export {
   createExplainTextNoD3,
   createButtonNoD3,
   createButtonImage,
-  createMouseOverText
+  createMouseOverText,
+  getIntersectionExercises
 };

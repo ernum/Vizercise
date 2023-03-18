@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { GetExercises, getNestedData, dataReq,
-  calculateMusclesInvolved, createExplainText } from "./Functions";
+  calculateMusclesInvolved, createExplainText, getIntersectionExercises } from "./Functions";
 import { ColorLegend } from './ColorLegend';
 
 export default function CirclePacking(props) {
@@ -35,10 +35,10 @@ export default function CirclePacking(props) {
       } 
       // Boolean && selection
       else {
-        let intersectionArray = GetExercises(props.selectedMuscles[0]);
+        let intersectionArray = getIntersectionExercises(props.selectedMuscles[0]);
         // Loop over selected muscles and only include exercises that intersect
         for (let i = 1; i < props.selectedMuscles.length; i++) {
-          let tempArr = GetExercises(props.selectedMuscles[i])
+          let tempArr = getIntersectionExercises(props.selectedMuscles[i])
           intersectionArray = intersectionArray.filter(elem => tempArr.includes(elem));
         }
         setExerciseData(getNestedData([...new Set(intersectionArray)], sortingScheme))
