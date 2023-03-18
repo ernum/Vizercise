@@ -692,7 +692,7 @@ export default function BodySection(props) {
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      <div className="flex justify-center my-10">
+      <div className="translate-y-10 flex justify-center">
         <BodyButton
           menuOrientation="left"
           action={() => {
@@ -701,10 +701,8 @@ export default function BodySection(props) {
           buttonText={genderString}
           optionText={isMale ? femaleString : maleString}
         />
-      </div>  
-      <div id="toolTipFront">{drawFront()}</div>
-      <div id="toolTipBack">{drawBack()}</div>
-      <svg id="selectionButtonContainer">
+      </div>
+      <svg className="-translate-y-6" id="selectionButtonContainer" width={120} height={86}>
         {createExplainTextNoD3(121, 16, "Get Exercises As", 12, 12, 12, "left")}
         {createButtonNoD3("unionButton", 12, 20, 30, 30, "DarkSlateGray",
         selectionButtonClickHandler, null, "default", mouseEnterHandler, mouseLeaveHandler)}
@@ -715,6 +713,8 @@ export default function BodySection(props) {
         {createButtonImage("intersectionImage", 16, 59,
         "/icons/intersection.svg", 22, 1)}
       </svg>
+      <div id="toolTipFront">{drawFront()}</div>
+      <div id="toolTipBack">{drawBack()}</div>
     </div>
   );
 }
