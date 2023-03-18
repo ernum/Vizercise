@@ -51,7 +51,6 @@ export default function BodyButton(props) {
 }
 
 export function TableButton(props) {
-  console.log(props.view);
   function changeIcon() {
     if (props.view == "table") {
       return <FontAwesomeIcon icon={faCirclePlay} className='text-2xl' />;

@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 const dataReq = require("../../public/scraped-data.json");
 
 function classNames(...classes) {
@@ -9,6 +11,16 @@ function GetExercises(currentMuscle) {
     ? dataReq
     : dataReq.filter((exercise) =>
         exercise.primaryMuscles.includes(currentMuscle)
+      );
+}
+
+function getIntersectionExercises(currentMuscle) {
+  return currentMuscle == null
+    ? dataReq
+    : dataReq.filter((exercise) =>
+        exercise.primaryMuscles.includes(currentMuscle) ||
+        (exercise.secondaryMuscles && exercise.secondaryMuscles.includes(currentMuscle)) ||
+        (exercise.tertiaryMuscles && exercise.tertiaryMuscles.includes(currentMuscle))
       );
 }
 
@@ -229,6 +241,92 @@ function calculateMusclesInvolved(exercise) {
   return sum;
 }
 
+function createExplainText(elemToAppendTo,textToCreate, xOffset, yOffset, fontSize) {
+  d3.select(elemToAppendTo).append('text').text(textToCreate)
+    .style('font', 'NeueHaasDisplay')
+    .attr('class', 'explainText')
+    .attr('x', xOffset)
+    .attr('y', yOffset)
+    .attr('text-anchor', 'left')
+    .attr('fill', 'black')
+    .attr('font-size', fontSize)
+    .attr('font-weight', 'bold')
+    .attr('font-variant', 'small-caps')
+    .attr("pointer-events", "none")
+}
+
+function createExplainTextNoD3(svgW, svgH, textToCreate, xOffset, yOffset, fontSize, anchor) {
+  return (
+    <svg width={svgW} height={svgH}>
+      <text
+        className="explainText"
+        fontStyle={"NeueHaasDisplay"}
+        textAnchor={anchor}
+        x={xOffset}
+        y={yOffset}
+        fill={"black"}
+        fontSize={fontSize}
+        fontWeight={"bold"}
+        fontVariant={"small-caps"}
+        pointerEvents={"none"}
+      >
+        {textToCreate}
+      </text>
+    </svg>
+  )
+}
+
+function createButtonNoD3(id, x, y, width, height, fillColor, clickHandler,
+  pointerEvents, cursorType, mouseEnterHandler, mouseLeaveHandler) {
+  return (
+    <rect
+      className="buttonRect"
+      id={id}
+      cursor={cursorType}
+      x={x}
+      y={y}
+      rx={10}
+      width={width}
+      height={height}
+      fill={fillColor}
+      pointerEvents={pointerEvents}
+      opacity={0.6}
+      onClick={clickHandler}
+      onMouseEnter={mouseEnterHandler}
+      onMouseLeave={mouseLeaveHandler}
+    />
+  )
+}
+
+function createButtonImage(id, x, y, imgPath, height, opacity) {
+  return (
+    <image
+      className={id === "unionImage" ? "button_img filter-white" : "button_img"}
+      id={id}
+      xlinkHref={imgPath}
+      x={x}
+      y={y}
+      height={height}
+      pointerEvents={"none"}
+      opacity={opacity}
+    />
+  )
+}
+
+function createMouseOverText(textToShow, expandWidth, fontColor) {
+  return (
+    <text
+      className="expandText"
+      fill={fontColor}
+      fontStyle={"10px NeueHaasDisplay"}
+      cursor={"default"}
+      pointerEvents={"none"}
+    >
+      {textToShow}
+    </text>
+  )
+}
+
 export {
   classNames,
   GetExercises,
@@ -238,4 +336,10 @@ export {
   exerciseDataByEquipment,
   calculateMusclesInvolved,
   dataReq,
+  createExplainText,
+  createExplainTextNoD3,
+  createButtonNoD3,
+  createButtonImage,
+  createMouseOverText,
+  getIntersectionExercises
 };

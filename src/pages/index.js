@@ -7,9 +7,12 @@ import Presenter from "../components/Presenter";
 import About from "./about";
 
 export default function Home() {
+  const selectionSchemeTexts = ["Union", "Intersection"];
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
+  const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(selectionSchemeTexts[0]);
+
   const [idFromSetId, setnewId] = useState();
   const [isClosed, setIsClosed] = useState();
   const [showPopup, setShowPopup] = useState(false);
@@ -56,6 +59,12 @@ export default function Home() {
     setExerciseSelected(null);
   }
 
+  function switchMuscleSelectionScheme() {
+    muscleSelectionScheme === selectionSchemeTexts[0]
+      ? setMuscleSelectionScheme(selectionSchemeTexts[1])
+      : setMuscleSelectionScheme(selectionSchemeTexts[0]);
+  }
+
   return (
     <div className="font-[NeueHaasDisplay] tracking-wider">
       {/* Title and Button */}
@@ -89,6 +98,8 @@ export default function Home() {
         <div>
           <BodySection
             onClick={onMuscleClicked}
+            onSelectionSchemeButtonClick={switchMuscleSelectionScheme}
+            selectionScheme={muscleSelectionScheme}
             selectedMuscles={selectedMuscles}
             selectedExercises={selectedExercises}
           />
@@ -105,6 +116,7 @@ export default function Home() {
           css={"absolute w-[100%] h-[100%] top-[0%]"}
           selectedExercises={selectedExercises}
           selectedMuscles={selectedMuscles}
+          selectionScheme={muscleSelectionScheme}
           onExerciseClick={setExerciseSelected}
         />
       </div>

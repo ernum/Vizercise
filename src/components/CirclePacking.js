@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { GetExercises, getNestedData, dataReq, calculateMusclesInvolved } from "./Functions";
+import { GetExercises, getNestedData, dataReq,
+  calculateMusclesInvolved, createExplainText, getIntersectionExercises } from "./Functions";
 import { ColorLegend } from './ColorLegend';
 
 export default function CirclePacking(props) {
@@ -15,6 +16,7 @@ export default function CirclePacking(props) {
   const [lastFocus, setLastFocus] = useState();
   const [currentFocus, setCurrentFocus] = useState();
   const [prevSelectedMuscles, setPrevSelectedMuscles] = useState(props.selectedMuscles);
+  const [prevSelectionScheme, setPrevSelectionScheme] = useState(props.selectionScheme);
 
   // Redraw chart when svgRef or exerciseData changes
   useEffect(() => {
@@ -25,10 +27,26 @@ export default function CirclePacking(props) {
 
   // Update the data displayed in CP chart when a muscle or sorting button is clicked
   useEffect(() => {
-    props.selectedMuscles.length
-      ? setExerciseData(getNestedData([...new Set(props.selectedMuscles.flatMap(GetExercises))], sortingScheme))
-      : setExerciseData(getNestedData(dataReq, sortingScheme));
-  }, [props.selectedMuscles, sortingScheme, sizingScheme]);
+    // If selectedMuscles is not empty
+    if (props.selectedMuscles.length) {
+      // Boolean || selection
+      if (props.selectionScheme === "Union") {
+        setExerciseData(getNestedData([...new Set(props.selectedMuscles.flatMap(GetExercises))], sortingScheme))
+      } 
+      // Boolean && selection
+      else {
+        let intersectionArray = getIntersectionExercises(props.selectedMuscles[0]);
+        // Loop over selected muscles and only include exercises that intersect
+        for (let i = 1; i < props.selectedMuscles.length; i++) {
+          let tempArr = getIntersectionExercises(props.selectedMuscles[i])
+          intersectionArray = intersectionArray.filter(elem => tempArr.includes(elem));
+        }
+        setExerciseData(getNestedData([...new Set(intersectionArray)], sortingScheme))
+      }
+    } else {
+      setExerciseData(getNestedData(dataReq, sortingScheme));
+    }
+  }, [props.selectedMuscles, sortingScheme, sizingScheme, props.selectionScheme]);
 
   // Update id of leafs if they have been selected and give selected leafs a border outline
   useEffect(() => {
@@ -114,6 +132,9 @@ export default function CirclePacking(props) {
     if (prevSelectedMuscles !== props.selectedMuscles) {
       currentFocus && adjustZoomFocus(currentFocus);
       setPrevSelectedMuscles(props.selectedMuscles);
+    } else if (prevSelectionScheme !== props.selectionScheme) {
+      currentFocus && adjustZoomFocus(currentFocus);
+      setPrevSelectionScheme(props.selectionScheme);
     } else {
       lastFocus && adjustZoomFocus(lastFocus);
     }
@@ -421,23 +442,9 @@ export default function CirclePacking(props) {
     }
   }
 
-  function createExplainText(textToCreate, yOffset, fontSize) {
-    d3.select('#outerSvg').append('text').text(textToCreate)
-      .style('font', 'NeueHaasDisplay')
-      .attr('class', 'explainText')
-      .attr('x', 12)
-      .attr('y', yOffset)
-      .attr('text-anchor', 'left')
-      .attr('fill', 'black')
-      .attr('font-size', fontSize)
-      .attr('font-weight', 'bold')
-      .attr('font-variant', 'small-caps')
-      .attr("pointer-events", "none")
-  }
-
   function buttonSetup() {
-    createExplainText("Sorting Filters", 90, 12);
-    createExplainText("Circle Size", 265, 12)
+    createExplainText("#outerSvg" ,"Sorting Filters", 12, 90, 12);
+    createExplainText("#outerSvg", "Circle Size", 12, 265, 12)
     // BUTTON 1
     let b1_font_color = "black";
     if (sortingScheme.includes("equipment")) {
@@ -630,8 +637,9 @@ export default function CirclePacking(props) {
       .remove();
     d3.selectAll(".legend")
       .remove();
-    d3.selectAll(".explainText")
-      .remove();
+    d3.select("#outerSvg")
+      .selectAll(".explainText")
+        .remove();
   }
 
   return (
