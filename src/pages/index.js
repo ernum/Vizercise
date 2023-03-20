@@ -5,13 +5,18 @@ import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
 import Presenter from "../components/Presenter";
 import About from "./about";
+import { allMuscles } from "../../public/musclesConst";
 
 export default function Home() {
   const selectionSchemeTexts = ["Union", "Intersection"];
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
-  const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(selectionSchemeTexts[0]);
+  const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(
+    selectionSchemeTexts[0]
+  );
+  const [muscleSelectOrDeselect, setMuscleSelectOrDeselect] =
+    useState("Select");
 
   const [idFromSetId, setnewId] = useState();
   const [isClosed, setIsClosed] = useState();
@@ -65,6 +70,12 @@ export default function Home() {
       : setMuscleSelectionScheme(selectionSchemeTexts[0]);
   }
 
+  function applyMuscleSelectionFunctionality() {
+    muscleSelectOrDeselect === "Select"
+      ? (setSelectedMuscles(allMuscles), setMuscleSelectOrDeselect("Deselect"))
+      : (setSelectedMuscles([]), setMuscleSelectOrDeselect("Select"));
+  }
+
   return (
     <div className="font-[NeueHaasDisplay] tracking-wider">
       {/* Title and Button */}
@@ -100,6 +111,8 @@ export default function Home() {
             onClick={onMuscleClicked}
             onSelectionSchemeButtonClick={switchMuscleSelectionScheme}
             selectionScheme={muscleSelectionScheme}
+            onMuscleSelectionButtonClick={applyMuscleSelectionFunctionality}
+            selectOrDeselect={muscleSelectOrDeselect}
             selectedMuscles={selectedMuscles}
             selectedExercises={selectedExercises}
           />
@@ -133,7 +146,7 @@ export default function Home() {
           onSetIsClosed={setIsClosed}
         />
       </div>
-      
+
       {/*About Us PopUp Bloc*/}
       {showPopup && (
         <div

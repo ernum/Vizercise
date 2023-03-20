@@ -480,7 +480,7 @@ export default function CirclePacking(props) {
 
               const listItems = muscles.map((muscle) => {
                 return (
-                  <li className="ml-6" key={muscle}>
+                  <li className="ml-6 mr-2" key={muscle}>
                     {muscle}
                   </li>
                 );
