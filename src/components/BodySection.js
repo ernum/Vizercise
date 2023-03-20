@@ -559,8 +559,8 @@ export default function BodySection(props) {
       return toolTipExercises;
     }
 
-    const toolTipOffsetX = 20;
-    const toolTipOffsetY = 135;
+    const toolTipOffsetX = 25;
+    const toolTipOffsetY = 255;
     const toolTip = isFront ? toolTipFront : toolTipBack;
     const toolTipID = isFront ? "#toolTipFront" : "#toolTipBack";
     const svgRect = d3.select(toolTipID).node().getBoundingClientRect();

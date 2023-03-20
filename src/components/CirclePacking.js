@@ -99,7 +99,7 @@ export default function CirclePacking(props) {
       return "selectedleaf";
     });
     d3.selectAll("#selectedleaf").attr("stroke", "#000");
-  }, [props.selectedExercises, exerciseData]);
+  }, [props.selectedExercises, exerciseData, toolTipExercise]);
 
   // Necessary "preprocessing" of data to be able to use it in CP chart
   function packByPopularity(data) {
