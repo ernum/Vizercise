@@ -11,7 +11,9 @@ export default function Home() {
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
-  const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(selectionSchemeTexts[0]);
+  const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(
+    selectionSchemeTexts[0]
+  );
 
   const [idFromSetId, setnewId] = useState();
   const [isClosed, setIsClosed] = useState();
@@ -133,7 +135,7 @@ export default function Home() {
           onSetIsClosed={setIsClosed}
         />
       </div>
-      
+
       {/*About Us PopUp Bloc*/}
       {showPopup && (
         <div
