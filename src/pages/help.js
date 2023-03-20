@@ -23,6 +23,7 @@ function Help() {
                     <h2 className="text-center p-2 text-neutral-600 py-2 font-medium">Detailed List</h2>
                     <p className="text-center p-2 text-neutral-600 py-2 font-normal">This representation is a list of all the selected exercises in the Circle Packing Chart. It aims to give more details on each exercise, by reading the table but also clicking on the name of an exercise to open a pop-up page with more information, such as a demonstration video and description of the exercise
                     </p><p className="text-center p-2 text-neutral-600 py-2 font-normal">The icon on the top left allows moving to the video-only view. In this view, the table chart is replaced by a new view. All the exercises that are listed in the Detailed List are added to this new view as follows: each page represents one exercise with the name of the exercise and the corresponding demonstration video. You can move to the next or previous exercise by using the arrows on each side. You can come back to the Detailed List view by pressing the top left icon</p>
+                    <a className="text-center p-2 text-blue-600 py-2 font-normal " href="https://musclewiki.com/">Data was scrapped from MuscleWiki</a>
                 </div>
             </div>
 
