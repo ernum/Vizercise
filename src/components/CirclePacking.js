@@ -9,6 +9,13 @@ export default function CirclePacking(props) {
   const width = 500;
   const height = 500;
   const popularityNorm = 4;   // Somewhat arbitrary popularity normalizer
+  const force = ["Push", "Pull", "Hold"];
+  const difficulty = ["Beginner", "Intermediate", "Advanced"];
+  const equipment = 
+    ["Stretch", "Plate", "Machine", "Kettlebell", "Cable",
+    "Bodyweight", "TRX", "Dumbbell", "Barbell", "Band"];
+  const mechanic = ["Compound", "Isolation"];
+
   const [sortingScheme, setSortingScheme] = useState([]);
   const [sizingScheme, setSizingScheme] = useState("popularity");
   const [removedElemIndex, setRemovedElemIndex] = useState(null);
@@ -104,15 +111,15 @@ export default function CirclePacking(props) {
     let focus = root;
     let view;
 
-        const svg = d3.select(svgRef.current)
-            .style("background", d3.interpolatePurples(0.2))
-            .append("svg")
-                .attr("id", "circlePackContainer")
-                .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
-                .attr("class", "absolute h-[100%]")
-                .style("display", "block")
-                .style("margin", "0 -14px")
-                .style("cursor", "pointer")
+    const svg = d3.select(svgRef.current)
+      .style("background", d3.interpolatePurples(0.2))
+      .append("svg")
+        .attr("id", "circlePackContainer")
+        .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
+        .attr("class", "absolute h-[100%]")
+        .style("display", "block")
+        .style("margin", "0 -14px")
+        .style("cursor", "pointer")
 
     d3.select("#outerSvg")
       .on("click", function (event) {
@@ -140,6 +147,9 @@ export default function CirclePacking(props) {
     }
     zoomTo([focus.x, focus.y, focus.r * 2]);
     labelTransition(zoomInitTransition);
+    // Put the hierarchy display in front of CPC
+    d3.selectAll("#hierarchyContainer").raise();
+    updateHierarchyFocus(focus);
 
     /*
         Adjusts the focus of newly drawn CP chart by finding the element that
@@ -265,6 +275,7 @@ export default function CirclePacking(props) {
       // Only allow a depth change of 1
       if (depthChange !== 0 && depthChange !== 1) { return; }
       setLastFocus(focus);
+      updateHierarchyFocus(d, focus);
       focus = d;
       setCurrentFocus(focus);
       // If not node or outerSvg, event.target === sortButton
@@ -432,11 +443,14 @@ export default function CirclePacking(props) {
   //      Everything related to sortingScheme buttons start here
   //
 
-  function handleSortButtonClick(attributeKey) {
+  function handleSortButtonClick(attributeKey, capitalizedKey) {
     if (sortingScheme.includes(attributeKey)) {
-      setRemovedElemIndex(sortingScheme.findIndex(elem => elem === attributeKey));
+      let removedIndex = sortingScheme.findIndex(elem => elem === attributeKey);
+      updateHierarchyDisplayOnRemove(removedIndex, attributeKey);
+      setRemovedElemIndex(removedIndex);
       setSortingScheme(sortingScheme.filter(elem => elem !== attributeKey))
     } else {
+      updateHierarchyDisplayOnAdd(capitalizedKey);
       setRemovedElemIndex(null);
       setSortingScheme([...sortingScheme, attributeKey]);
     }
@@ -444,7 +458,8 @@ export default function CirclePacking(props) {
 
   function buttonSetup() {
     createExplainText("#outerSvg" ,"Sorting Filters", 12, 90, 12);
-    createExplainText("#outerSvg", "Circle Size", 12, 265, 12)
+    createExplainText("#outerSvg", "Circle Size", 12, 265, 12);
+    createExplainText("#outerSvg", "Hierarchy", 12, 335, 12);
     // BUTTON 1
     let b1_font_color = "black";
     if (sortingScheme.includes("equipment")) {
@@ -501,7 +516,7 @@ export default function CirclePacking(props) {
         .attr('opacity', 0.6)
         .on("click", function () {
           if (d3.select(this).attr("class") === "sortButton") {
-            handleSortButtonClick(sortName.toLowerCase());
+            handleSortButtonClick(sortName.toLowerCase(), sortName);
           } else {
             sizingScheme === "popularity"
               ? setSizingScheme("muscleSum")
@@ -614,6 +629,214 @@ export default function CirclePacking(props) {
         textOffset: 10,
       });
   }
+  
+  function createHierarchyDisplay(focus) {
+    function createHierarchyLevel(id, x, y, w, h, fill_color) {
+      return (
+        <rect
+          className="hierarchyRect"
+          id={id}
+          x={x}
+          y={y}
+          width={w}
+          height={h}
+          rx={10}
+          opacity={0.6}
+          visibility="hidden"
+          fill={fill_color}
+        >
+        </rect>
+      )
+    }
+    let fillOne, fillTwo, fillThree, fillFour = "white";
+    if (focus) {
+      fillOne = focus.depth === 1 ? "DarkSlateGray" : "white";
+      fillTwo = focus.depth === 2 ? "DarkSlateGray" : "white";
+      fillThree = focus.depth === 3 ? "DarkSlateGray" : "white";
+      fillFour = focus.depth === 4 ? "DarkSlateGray" : "white";
+    }
+    return (
+      <g id="hierarchyContainer">
+        {createHierarchyLevel("levelOne", 10, 340, 100, 18, fillOne)}
+        {createHierarchyLevel("levelTwo", 15, 360, 90, 18, fillTwo)}
+        {createHierarchyLevel("levelThree", 20, 380, 80, 18, fillThree)}
+        {createHierarchyLevel("levelFour", 25, 400, 70, 18, fillFour)}
+      </g>
+    )
+  }
+
+  function createHierarchyText(id, x, y, textToAppend, font_color) {
+    d3.select("#hierarchyContainer")
+      .append('text').text(textToAppend)
+      .style("fill", font_color)
+      .style("font", "10px NeueHaasDisplay")
+      .attr("text-align", "center")
+      .attr("id", id)
+      .attr("class", "hierarchyText")
+      .attr('x', x)
+      .attr('y', y)
+      .attr("pointer-events", "none")
+      .attr("alignment-baseline", "middle")
+      .attr("text-anchor", "middle")
+  }
+
+  function updateHierarchyDisplayOnAdd(capitalizedKey) {
+    if (sortingScheme.length === 0) {
+      d3.select("#levelOne")
+        .style("visibility", "visible");
+      createHierarchyText("levelOneText", 60, 352, capitalizedKey, "black");
+    } else if (sortingScheme.length === 1) {
+      d3.select("#levelTwo")
+        .style("visibility", "visible")
+      createHierarchyText("levelTwoText", 60, 372, capitalizedKey, "black");
+    } else if (sortingScheme.length === 2) {
+      d3.select("#levelThree")
+        .style("visibility", "visible")
+      createHierarchyText("levelThreeText", 60, 392, capitalizedKey, "black");
+    } else {
+      d3.select("#levelFour")
+        .style("visibility", "visible")
+      createHierarchyText("levelFourText", 60, 412, capitalizedKey, "black");
+    }
+  }
+
+  function updateHierarchyDisplayOnRemove(removedIndex) {
+    if (sortingScheme.length === 4) {
+      d3.select("#levelFour")
+        .style("visibility", "hidden");
+      if (removedIndex === 0) {
+        d3.select("#levelOneText").text(d3.select("#levelTwoText").text())
+        d3.select("#levelTwoText").text(d3.select("#levelThreeText").text())
+        d3.select("#levelThreeText").text(d3.select("#levelFourText").text())
+      } else if (removedIndex === 1) {
+        d3.select("#levelTwoText").text(d3.select("#levelThreeText").text())
+        d3.select("#levelThreeText").text(d3.select("#levelFourText").text())
+      } else if (removedIndex === 2) {
+        d3.select("#levelThreeText").text(d3.select("#levelFourText").text())
+      }  
+      d3.select("#levelFourText")
+        .remove();
+    }
+    else if (sortingScheme.length === 3) {
+      d3.select("#levelThree")
+        .style("visibility", "hidden");
+      if (removedIndex === 0) {
+        d3.select("#levelOneText").text(d3.select("#levelTwoText").text())
+        d3.select("#levelTwoText").text(d3.select("#levelThreeText").text())
+      } else if (removedIndex === 1) {
+        d3.select("#levelTwoText").text(d3.select("#levelThreeText").text())
+      }
+      d3.select("#levelThreeText")
+        .remove();
+    }
+    else if (sortingScheme.length === 2) {
+      d3.select("#levelTwo")
+        .style("visibility", "hidden");
+      if (removedIndex === 0) {
+        d3.select("#levelOneText").text(d3.select("#levelTwoText").text())
+      }
+      d3.select("#levelTwoText")
+        .remove();
+    } 
+    else {
+      d3.select("#levelOne")
+        .style("visibility", "hidden");
+      d3.select("#levelOneText")
+        .remove();
+    }
+  }
+
+  function updateHierarchyText(oldText, updatedText, selectId) {
+    if (!d3.select(selectId).empty()) {
+      oldText = d3.select(selectId).text();
+      if (force.includes(oldText))
+        updatedText = "Force";
+      else if (equipment.includes(oldText))
+        updatedText = "Equipment";
+      else if (difficulty.includes(oldText))
+        updatedText = "Difficulty";
+      else if (mechanic.includes(oldText))
+        updatedText = "Mechanic";
+      else 
+        updatedText = oldText;
+      d3.select(selectId).text(updatedText)
+        .style("fill", "black");
+    }
+  }
+
+  function updateHierarchyFocus(newFocus, oldFocus) {
+    let oldText, updatedText;
+    if (newFocus.depth === 0) {
+      d3.selectAll(".hierarchyRect")
+        .attr("fill", "white");
+      d3.selectAll(".hierarchyText")
+        .style("fill", "black");
+      if (oldFocus && newFocus.depth < oldFocus.depth) {
+        updateHierarchyText(oldText, updatedText, "#levelOneText");
+      }
+    } 
+    else if (newFocus.depth === 1) {
+      d3.selectAll(".hierarchyRect")
+        .attr("fill", function () {
+          if (d3.select(this).attr("id") === "levelOne")
+            return "DarkSlateGray";
+          return "white";
+        })
+      d3.select("#levelOneText").text(newFocus.data.name)
+        .style("fill", "white");
+      if (oldFocus && newFocus.depth < oldFocus.depth) {
+        updateHierarchyText(oldText, updatedText, "#levelTwoText");
+      }
+    } 
+    else if (newFocus.depth === 2) {
+      d3.selectAll(".hierarchyRect")
+        .attr("fill", function () {
+          if (d3.select(this).attr("id") === "levelTwo")
+            return "DarkSlateGray";
+          return "white";
+        })
+      d3.select("#levelOneText").text(newFocus.parent.data.name)
+        .style("fill", "black");
+      d3.select("#levelTwoText").text(newFocus.data.name)
+        .style("fill", "white");
+      if (oldFocus && newFocus.depth < oldFocus.depth) {
+        updateHierarchyText(oldText, updatedText, "#levelThreeText");
+      }
+    } 
+    else if (newFocus.depth === 3) {
+      d3.selectAll(".hierarchyRect")
+        .attr("fill", function () {
+          if (d3.select(this).attr("id") === "levelThree")
+            return "DarkSlateGray";
+          return "white";
+        })
+      d3.select("#levelOneText").text(newFocus.parent.parent.data.name)
+        .style("fill", "black");
+      d3.select("#levelTwoText").text(newFocus.parent.data.name)
+        .style("fill", "black");
+      d3.select("#levelThreeText").text(newFocus.data.name)
+        .style("fill", "white");
+      if (oldFocus && newFocus.depth < oldFocus.depth) {
+        updateHierarchyText(oldText, updatedText, "#levelFourText");
+      }
+    } 
+    else if (newFocus.depth === 4) {
+      d3.selectAll(".hierarchyRect")
+        .attr("fill", function () {
+          if (d3.select(this).attr("id") === "levelFour")
+            return "DarkSlateGray";
+          return "white";
+        })
+      d3.select("#levelOneText").text(newFocus.parent.parent.parent.data.name)
+        .style("fill", "black");
+      d3.select("#levelTwoText").text(newFocus.parent.parent.data.name)
+        .style("fill", "black");
+      d3.select("#levelThreeText").text(newFocus.parent.data.name)
+        .style("fill", "black");
+      d3.select("#levelFourText").text(newFocus.data.name)
+        .style("fill", "white");
+    }
+  }
 
   // Remove all previous CP chart elements before redrawing
   function removePrevious() {
@@ -640,7 +863,7 @@ export default function CirclePacking(props) {
     d3.select("#outerSvg")
       .selectAll(".explainText")
         .remove();
-  }
+}
 
   return (
     <div id="toolTipAppender">
@@ -650,7 +873,9 @@ export default function CirclePacking(props) {
         ref={svgRef}
         width={width + 10}
         height={height + 10}
-      />
+      >
+        {createHierarchyDisplay(currentFocus)}
+      </svg>
     </div>
   );
 }
