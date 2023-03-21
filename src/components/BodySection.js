@@ -40,12 +40,15 @@ export default function BodySection(props) {
   }, []);
 
   useEffect(() => {
-    props.selectedMuscles.forEach((element) => {
-      selectHelper(element)
+    allMuscles.forEach((muscle) => {
+      selectHelper(muscle)
         .transition()
         .ease(d3.easeLinear)
         .duration(200)
-        .style("stroke-width", "3")
+        .style(
+          "stroke-width",
+          props.selectedMuscles.includes(muscle) ? "4" : "1"
+        )
         .style("cursor", "pointer");
     });
   }, [props.selectedMuscles]);
@@ -556,8 +559,8 @@ export default function BodySection(props) {
       return toolTipExercises;
     }
 
-    const toolTipOffsetX = 20;
-    const toolTipOffsetY = 135;
+    const toolTipOffsetX = 25;
+    const toolTipOffsetY = 255;
     const toolTip = isFront ? toolTipFront : toolTipBack;
     const toolTipID = isFront ? "#toolTipFront" : "#toolTipBack";
     const svgRect = d3.select(toolTipID).node().getBoundingClientRect();
@@ -633,6 +636,18 @@ export default function BodySection(props) {
       d3.select("#unionButton").attr("cursor", "pointer").attr("fill", "white");
       d3.select("#intersectionImage").classed("filter-white", true);
       d3.select("#unionImage").classed("filter-white", false);
+    } else if (
+      e.target.id === "muscleSelectionButton" &&
+      props.selectOrDeselect === "Deselect"
+    ) {
+      props.onMuscleSelectionButtonClick();
+      d3.select("#muscleSelectionText").text("Select All Muscles");
+    } else if (
+      e.target.id === "muscleSelectionButton" &&
+      props.selectOrDeselect === "Select"
+    ) {
+      props.onMuscleSelectionButtonClick();
+      d3.select("#muscleSelectionText").text("Deselect Muscles");
     }
   }
 
@@ -646,13 +661,23 @@ export default function BodySection(props) {
       font_color = props.selectionScheme === "Intersection" ? "white" : "black";
       y = 73;
       id = "intersectionText";
-    } else {
+    } else if (e.target.id === "unionButton") {
       expandWidth = 75;
       textToAppend = "Union";
       button = d3.select("#unionButton");
       font_color = props.selectionScheme === "Union" ? "white" : "black";
       y = 38;
       id = "unionText";
+    } else if (e.target.id === "muscleSelectionButton") {
+      expandWidth = 130;
+      textToAppend =
+        props.selectOrDeselect === "Select"
+          ? "Select All Muscles"
+          : "Deselect Muscles";
+      button = d3.select("#unionButton");
+      font_color = "black";
+      y = 132;
+      id = "muscleSelectionText";
     }
 
     d3.select(e.target).transition().duration(100).attr("width", expandWidth);
@@ -662,7 +687,6 @@ export default function BodySection(props) {
       .text(textToAppend)
       .style("fill", font_color)
       .style("font", "10px NeueHaasDisplay")
-      .style("cursor", "default")
       .attr("id", id)
       .attr("class", "selectionButtonText")
       .attr("x", 45)
@@ -694,8 +718,8 @@ export default function BodySection(props) {
       <svg
         className="-translate-y-6"
         id="selectionButtonContainer"
-        width={120}
-        height={86}
+        width={150}
+        height={200}
       >
         {createExplainTextNoD3(121, 16, "Get Exercises As", 12, 12, 12, "left")}
         {createButtonNoD3(
@@ -730,6 +754,36 @@ export default function BodySection(props) {
           16,
           59,
           "/icons/intersection.svg",
+          22,
+          1
+        )}
+        {createExplainTextNoD3(
+          125,
+          106,
+          "Muscle Selection",
+          12,
+          106,
+          12,
+          "left"
+        )}
+        {createButtonNoD3(
+          "muscleSelectionButton",
+          12,
+          115,
+          30,
+          30,
+          "white",
+          selectionButtonClickHandler,
+          null,
+          "pointer",
+          mouseEnterHandler,
+          mouseLeaveHandler
+        )}
+        {createButtonImage(
+          "muscleSelectionImage",
+          16,
+          119,
+          "/icons/select.svg",
           22,
           1
         )}

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import BodySection from "../components/BodySection";
-
 import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
 import Presenter from "../components/Presenter";
 import About from "./about";
+import { allMuscles } from "../../public/musclesConst";
 import Help from "./help";
 
 export default function Home() {
@@ -15,6 +15,8 @@ export default function Home() {
   const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(
     selectionSchemeTexts[0]
   );
+  const [muscleSelectOrDeselect, setMuscleSelectOrDeselect] =
+    useState("Select");
 
   const [idFromSetId, setnewId] = useState();
   const [isClosed, setIsClosed] = useState();
@@ -72,11 +74,17 @@ export default function Home() {
       : setMuscleSelectionScheme(selectionSchemeTexts[0]);
   }
 
+  function applyMuscleSelectionFunctionality() {
+    muscleSelectOrDeselect === "Select"
+      ? (setSelectedMuscles(allMuscles), setMuscleSelectOrDeselect("Deselect"))
+      : (setSelectedMuscles([]), setMuscleSelectOrDeselect("Select"));
+  }
+
   return (
     <div className="font-[NeueHaasDisplay] tracking-wider">
       {/* Title and Button */}
-      <div className="flex justify-between items-center py-0 px-8 w-full absolute w-[100%] h-[4%] left-[0%] top-[1%]">
-        <div className="flex-grow-0">
+      <div className="flex justify-between items-center py-0 px-8 w-full absolute h-[4%] left-[0%] top-[1%]">
+        <div className="cursor-default flex-grow-0">
           <h1
             className="text-4xl sm:text-2xl md:text-3xl lg:text-4xl text-[#E2E1EF]"
             style={{ fontFamily: "Bandar" }}
@@ -113,6 +121,8 @@ export default function Home() {
             onClick={onMuscleClicked}
             onSelectionSchemeButtonClick={switchMuscleSelectionScheme}
             selectionScheme={muscleSelectionScheme}
+            onMuscleSelectionButtonClick={applyMuscleSelectionFunctionality}
+            selectOrDeselect={muscleSelectOrDeselect}
             selectedMuscles={selectedMuscles}
             selectedExercises={selectedExercises}
           />
