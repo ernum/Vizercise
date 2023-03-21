@@ -5,6 +5,13 @@ function About() {
         <div>
             <div className="about-section">
                 <h1 className="text-2xl font-bold mb-2" style={{ marginTop: "20px", marginBottom: "15px", textAlign: "center" }}>About Us</h1>
+                <h2 className="text-center text-4x1 font-bold" style={{ marginBottom: "15px", marginTop: "10px", fontSize: "20px"}}>The Project</h2>
+                    <div className="row" style={{ marginLeft: "10px", marginRight: "10px", textAlign: 'center' }}>
+                        Vizercise is an visualization tool that allows users to explore exercises based on activated muscle groups, exercise mechanics, difficulty, and other factors. 
+                        The motivation behind this project was to bring visual representation and interactivity to exercise data by mapping it to the human body.
+                        ‎
+                    </div>
+
                 <h2 className="text-center text-4x1 font-bold" style={{ marginBottom: "15px", marginTop: "10px", fontSize: "20px"}}>Our Team</h2>
                     <div className="row" style={{ textAlign: 'center' }}>
 
