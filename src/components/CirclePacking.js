@@ -103,7 +103,6 @@ export default function CirclePacking(props) {
             https://observablehq.com/@d3/zoomable-circle-packing
   */
   function drawChart() {
-    let isReRender = true;
     removePrevious();
     const root = sizingScheme === "popularity"
       ? packByPopularity(exerciseData)
@@ -127,7 +126,6 @@ export default function CirclePacking(props) {
         setCurrentFocus(focus);
         return;
       }
-      /* !isReRender && zoom(event, focus.parent), event.stopPropagation(); */
       zoom(event, focus.parent), event.stopPropagation();
     });
 
@@ -141,13 +139,11 @@ export default function CirclePacking(props) {
     } else if (prevSelectionScheme !== props.selectionScheme) {
       setPrevSelectionScheme(props.selectionScheme);
     }
-    /* currentFocus && console.log(currentFocus); */
     currentFocus && adjustZoomFocus(currentFocus);
     zoomTo([focus.x, focus.y, focus.r * 2]);
     labelTransition(zoomInitTransition);
     // Put the hierarchy display in front of CPC
     d3.selectAll("#hierarchyContainer").raise();
-    isReRender = false;
 
     /*
         Adjusts the focus of newly drawn CP chart by finding the element that
@@ -412,12 +408,6 @@ export default function CirclePacking(props) {
               .style("top", (event.clientY - svgRect.top + toolTipOffsetY) + "px");
           })
           .on("click", function (event, d) {
-            /* if (d3.select(this).attr("id") === "node") {
-              zoom(event, d, false), event.stopPropagation();
-              isFirstZoom = false;
-            } else {
-              props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation();
-            } */
             d3.select(this).attr("id") === "node"
               ? (zoom(event, d), event.stopPropagation())
               : props.onExerciseClick(d3.select(this).attr("className")), event.stopPropagation();
@@ -676,6 +666,7 @@ export default function CirclePacking(props) {
       .attr("text-anchor", "middle")
   }
 
+  // Updates hierarchy display when sorting filters have been added
   function updateHierarchyDisplayOnAdd(capitalizedKey) {
     if (sortingScheme.length === 0) {
       d3.select("#levelOne")
@@ -696,6 +687,7 @@ export default function CirclePacking(props) {
     }
   }
 
+  // Updates hierarchy display when sorting filters have been removed
   function updateHierarchyDisplayOnRemove(removedIndex) {
     // If 4 filters were selected before removal
     if (sortingScheme.length === 4) {
@@ -751,12 +743,8 @@ export default function CirclePacking(props) {
       } 
       // If second sorting filter was removed
       else if (removedIndex === 1) {
-        // Removed filter below previous focus, nothing to do
-        if (d3.select("#levelOne").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
         // Previous focus depth === 2 --> new focus depth === 1
-        else if (d3.select("#levelTwo").attr("fill") === "DarkSlateGray") {
+        if (d3.select("#levelTwo").attr("fill") === "DarkSlateGray") {
           d3.selectAll(".hierarchyRect").attr("fill", function () {
             if (d3.select(this).attr("id") === "levelOne") 
               return "DarkSlateGray";
@@ -799,16 +787,8 @@ export default function CirclePacking(props) {
       } 
       // If third sorting filter was removed
       else if (removedIndex === 2) {
-        // Removed filter below previous focus, nothing to do
-        if (d3.select("#levelOne").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
-        // Removed filter below previous focus, nothing to do
-        else if (d3.select("#levelTwo").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
         // Previous focus depth === 3 --> new focus depth === 2
-        else if (d3.select("#levelThree").attr("fill") === "DarkSlateGray") {
+        if (d3.select("#levelThree").attr("fill") === "DarkSlateGray") {
           d3.selectAll(".hierarchyRect").attr("fill", function () {
             if (d3.select(this).attr("id") === "levelTwo") 
               return "DarkSlateGray";
@@ -837,20 +817,8 @@ export default function CirclePacking(props) {
       } 
       // If fourth sorting filter was removed
       else {
-        // Removed filter below previous focus, nothing to do
-        if (d3.select("#levelOne").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
-        // Removed filter below previous focus, nothing to do
-        else if (d3.select("#levelTwo").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
-        // Removed filter below previous focus, nothing to do
-        else if (d3.select("#levelThree").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
         // Previous focus depth === 4 --> new focus depth === 3
-        else if (d3.select("#levelFour").attr("fill") === "DarkSlateGray") {
+        if (d3.select("#levelFour").attr("fill") === "DarkSlateGray") {
           d3.selectAll(".hierarchyRect").attr("fill", function () {
             if (d3.select(this).attr("id") === "levelThree") 
               return "DarkSlateGray";
@@ -909,12 +877,8 @@ export default function CirclePacking(props) {
       } 
       // If second sorting filter was removed
       else if (removedIndex === 1) {
-        // Removed filter below previous focus, nothing to do
-        if (d3.select("#levelOne").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
         // Previous focus depth === 2 --> new focus depth === 1
-        else if (d3.select("#levelTwo").attr("fill") === "DarkSlateGray") {
+        if (d3.select("#levelTwo").attr("fill") === "DarkSlateGray") {
           d3.selectAll(".hierarchyRect").attr("fill", function () {
             if (d3.select(this).attr("id") === "levelOne") 
               return "DarkSlateGray";
@@ -943,16 +907,8 @@ export default function CirclePacking(props) {
       } 
       // If third sorting filter was removed
       else {
-        // Removed filter below previous focus, nothing to do
-        if (d3.select("#levelOne").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
-        // Removed filter below previous focus, nothing to do
-        else if (d3.select("#levelTwo").attr("fill") === "DarkSlateGray") {
-          // Do nothing
-        }
         // Previous focus depth === 3 --> new focus depth === 2
-        else if (d3.select("#levelThree").attr("fill") === "DarkSlateGray") {
+        if (d3.select("#levelThree").attr("fill") === "DarkSlateGray") {
           d3.selectAll(".hierarchyRect").attr("fill", function () {
             if (d3.select(this).attr("id") === "levelTwo") 
               return "DarkSlateGray";
@@ -1043,6 +999,7 @@ export default function CirclePacking(props) {
     }
   }
 
+  // Called when zoom() is called
   function updateHierarchyFocus(newFocus, oldFocus) {
     if (newFocus.depth === 0) {
       d3.selectAll(".hierarchyRect")
