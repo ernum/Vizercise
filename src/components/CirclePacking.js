@@ -681,8 +681,8 @@ export default function CirclePacking(props) {
             );
           } else {
             sizingScheme === "popularity"
-              ? setSizingScheme("muscleSum")
-              : setSizingScheme("popularity");
+              ? (setSizingScheme("muscleSum"), event.stopPropagation())
+              : (setSizingScheme("popularity"), event.stopPropagation());
           }
         })
         .on("mouseover", function () {
