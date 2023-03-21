@@ -518,10 +518,10 @@ export default function CirclePacking(props) {
         .on("mouseover", function (event, d) {
           if (d.parent === focus) {
             d3.select(this).attr("stroke", "#000");
-            d3.select(this).attr("id") === "leaf" ||
-              d3.select(this).attr("id") === "selectedleaf";
+            (d3.select(this).attr("id") === "leaf" ||
+              d3.select(this).attr("id") === "selectedleaf") &&
+              showToolTip(d.data, event);
           }
-          showToolTip(d.data, event);
         })
         .on("mouseout", function () {
           d3.select(this).attr("id") !== "selectedleaf" &&
@@ -529,7 +529,10 @@ export default function CirclePacking(props) {
           toolTip.style("visibility", "hidden");
         })
         .on("mousemove", function (event, d) {
-          if (d.parent === focus) showToolTip(d.data, event);
+          if (d.parent === focus)
+            (d3.select(this).attr("id") === "leaf" ||
+              d3.select(this).attr("id") === "selectedleaf") &&
+              showToolTip(d.data, event);
         })
         .on("click", function (event, d) {
           d3.select(this).attr("id") === "node"
