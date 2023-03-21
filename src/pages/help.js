@@ -26,7 +26,7 @@ function Help() {
                     <a className="text-center p-2 text-blue-600 py-2 font-normal " href="https://musclewiki.com/">Data was scrapped from MuscleWiki</a>
                     <h1 className="text-2xl font-bold mb-2" style={{ marginTop: "20px", marginBottom: "15px", textAlign: "center" }}>Demo Video</h1>
                     
-                    <a className="text-center p-2 text-blue-600 py-2 font-normal " href="https://youtu.be/dQw4w9WgXcQ" target='_blank'>Click here to access Demo Video</a>
+                    <a className="text-center p-2 text-blue-600 py-2 font-normal " href="https://youtu.be/dQw4w9WgXcQ" target='_blank' rel="noreferrer">Click here to access Demo Video</a>
                 </div>
             </div>
 
