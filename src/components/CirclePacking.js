@@ -17,8 +17,7 @@ export default function CirclePacking(props) {
   const height = 500;
   const popularityNorm = 4; // Somewhat arbitrary popularity normalizer
 
-  const [toolTipExercise, setToolTipExercise] = useState();
-  const [toolTipMuscles, setToolTipMuscles] = useState();
+  const toolTipMuscles = {};
 
   const [sortingScheme, setSortingScheme] = useState([]);
   const [sizingScheme, setSizingScheme] = useState("popularity");
@@ -43,7 +42,7 @@ export default function CirclePacking(props) {
     if (svgRef.current) {
       drawChart(d3.select(svgRef.current));
     }
-  }, [svgRef, exerciseData, toolTipExercise]);
+  }, [svgRef, exerciseData, toolTipMuscles]);
 
   // Update the data displayed in CP chart when a muscle or sorting button is clicked
   useEffect(() => {
@@ -107,7 +106,7 @@ export default function CirclePacking(props) {
       return "selectedleaf";
     });
     d3.selectAll("#selectedleaf").attr("stroke", "#000");
-  }, [props.selectedExercises, exerciseData, toolTipExercise]);
+  }, [props.selectedExercises, exerciseData, toolTipMuscles]);
 
   // Necessary "preprocessing" of data to be able to use it in CP chart
   function packByPopularity(data) {
@@ -431,10 +430,57 @@ export default function CirclePacking(props) {
         .text((d) => d.data.name);
     }
 
-    // Create nodes and define behavior in CP chart
-    function nodeSetup() {
+    function createToolTipList(exercise) {
+      let muscles = [];
+      const muscleGroups = [
+        exercise.primaryMuscles,
+        exercise.secondaryMuscles,
+        exercise.tertiaryMuscles,
+      ];
+
+      for (let i = 0; i < 3; i++)
+        if (muscleGroups[i])
+          for (const muscle of muscleGroups[i])
+            if (!muscles.includes(muscle)) muscles.push(muscle);
+
+      const listItems = muscles.map((muscle) => {
+        return (
+          <li className="ml-6 mr-2" key={muscle}>
+            {muscle}
+          </li>
+        );
+      });
+
+      const JSX = (
+        <div>
+          <p className="font-bold">{exercise.name}</p>
+          <ol className="list-decimal">{listItems}</ol>
+        </div>
+      );
+
+      toolTipMuscles[exercise.id] = ReactDOMServer.renderToStaticMarkup(JSX);
+
+      return toolTipMuscles[exercise.id];
+    }
+
+    function showToolTip(exercise, event) {
       const toolTipOffsetX = 40;
       const toolTipOffsetY = 20;
+      toolTip.style("visibility", "visible");
+      const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
+
+      toolTip
+        .html(
+          toolTipMuscles[exercise.id]
+            ? toolTipMuscles[exercise.id]
+            : createToolTipList(exercise)
+        )
+        .style("left", event.clientX - svgRect.left - toolTipOffsetX + "px")
+        .style("top", event.clientY - svgRect.top + toolTipOffsetY + "px");
+    }
+
+    // Create nodes and define behavior in CP chart
+    function nodeSetup() {
       return svg
         .append("g")
         .attr("id", "realRoot")
@@ -460,8 +506,9 @@ export default function CirclePacking(props) {
         .on("mouseover", function (event, d) {
           if (d.parent === focus) {
             d3.select(this).attr("stroke", "#000");
-            (d3.select(this).attr("id") === "leaf" ||
-              d3.select(this).attr("id") === "selectedleaf")
+            d3.select(this).attr("id") === "leaf" ||
+              d3.select(this).attr("id") === "selectedleaf";
+            showToolTip(d.data, event);
           }
         })
         .on("mouseout", function () {
@@ -470,48 +517,7 @@ export default function CirclePacking(props) {
           toolTip.style("visibility", "hidden");
         })
         .on("mousemove", function (event, d) {
-          function createToolTipList() {
-            const exercise = d.data;
-            if (toolTipExercise != exercise.name) {
-              let muscles = [];
-              const muscleGroups = [
-                exercise.primaryMuscles,
-                exercise.secondaryMuscles,
-                exercise.tertiaryMuscles,
-              ];
-
-              for (let i = 0; i < 3; i++)
-                if (muscleGroups[i])
-                  for (const muscle of muscleGroups[i])
-                    if (!muscles.includes(muscle)) muscles.push(muscle);
-
-              const listItems = muscles.map((muscle) => {
-                return (
-                  <li className="ml-6 mr-2" key={muscle}>
-                    {muscle}
-                  </li>
-                );
-              });
-
-              const JSX = (
-                <div>
-                  <p className="font-bold">{exercise.name}</p>
-                  <ol className="list-decimal">{listItems}</ol>
-                </div>
-              );
-
-              setToolTipExercise(exercise.name);
-              setToolTipMuscles(ReactDOMServer.renderToStaticMarkup(JSX));
-            }
-            return toolTipMuscles;
-          }
-
-          toolTip.style("visibility", "visible");
-          const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
-          toolTip
-            .html(createToolTipList)
-            .style("left", event.clientX - svgRect.left - toolTipOffsetX + "px")
-            .style("top", event.clientY - svgRect.top + toolTipOffsetY + "px");
+          showToolTip(d.data, event);
         })
         .on("click", function (event, d) {
           d3.select(this).attr("id") === "node"
