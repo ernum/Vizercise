@@ -17,10 +17,13 @@ function GetExercises(currentMuscle) {
 function getIntersectionExercises(currentMuscle) {
   return currentMuscle == null
     ? dataReq
-    : dataReq.filter((exercise) =>
-        exercise.primaryMuscles.includes(currentMuscle) ||
-        (exercise.secondaryMuscles && exercise.secondaryMuscles.includes(currentMuscle)) ||
-        (exercise.tertiaryMuscles && exercise.tertiaryMuscles.includes(currentMuscle))
+    : dataReq.filter(
+        (exercise) =>
+          exercise.primaryMuscles.includes(currentMuscle) ||
+          (exercise.secondaryMuscles &&
+            exercise.secondaryMuscles.includes(currentMuscle)) ||
+          (exercise.tertiaryMuscles &&
+            exercise.tertiaryMuscles.includes(currentMuscle))
       );
 }
 
@@ -39,23 +42,25 @@ function transformElementToObject(elementToTransform) {
 function nestByAttributes(attributeArray) {
   let nodeArray = [];
   attributeArray.forEach((elem) => {
-    nodeArray = 
-      [...nodeArray,
-        {
-          name: elem,
-          children: GetUniqueValuesByAttribute(elem).map(transformElementToObject)
-        }
-      ]
-    })
-  if (attributeArray.length > 3 ) {
+    nodeArray = [
+      ...nodeArray,
+      {
+        name: elem,
+        children: GetUniqueValuesByAttribute(elem).map(
+          transformElementToObject
+        ),
+      },
+    ];
+  });
+  if (attributeArray.length > 3) {
     nodeArray[2].children.forEach((elem) => {
       elem.children = JSON.parse(JSON.stringify(nodeArray[3].children));
-    })
+    });
   }
   if (attributeArray.length > 2) {
     nodeArray[1].children.forEach((elem) => {
       elem.children = JSON.parse(JSON.stringify(nodeArray[2].children));
-    })
+    });
   }
   if (attributeArray.length > 1) {
     nodeArray[0].children.forEach((elem) => {
@@ -84,8 +89,9 @@ function getNestedData(exerciseArray, attributeArray) {
   const firstLevel = getArrayByAttribute(attributeArray[0], exerciseArray);
 
   if (depth > 1) {
-    const secondLevel = firstLevel.map((elem) => 
-      getArrayByAttribute(attributeArray[1], elem));
+    const secondLevel = firstLevel.map((elem) =>
+      getArrayByAttribute(attributeArray[1], elem)
+    );
 
     if (depth === 2) {
       for (let i = 0; i < rootObject.children.length; i++) {
@@ -96,22 +102,46 @@ function getNestedData(exerciseArray, attributeArray) {
     } else if (depth === 3) {
       for (let i = 0; i < rootObject.children.length; i++) {
         for (let j = 0; j < rootObject.children[i].children.length; j++) {
-          let exercises = getArrayByAttribute(attributeArray[2], secondLevel[i][j]);
-          for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
-            rootObject.children[i].children[j].children[k].children = exercises[k];
+          let exercises = getArrayByAttribute(
+            attributeArray[2],
+            secondLevel[i][j]
+          );
+          for (
+            let k = 0;
+            k < rootObject.children[i].children[j].children.length;
+            k++
+          ) {
+            rootObject.children[i].children[j].children[k].children =
+              exercises[k];
           }
         }
       }
     } else if (depth === 4) {
       const thirdLevel = secondLevel.map((outerElem) =>
         outerElem.map((innerElem) =>
-          getArrayByAttribute(attributeArray[2], innerElem)));
+          getArrayByAttribute(attributeArray[2], innerElem)
+        )
+      );
       for (let i = 0; i < rootObject.children.length; i++) {
         for (let j = 0; j < rootObject.children[i].children.length; j++) {
-          for (let k = 0; k < rootObject.children[i].children[j].children.length; k++) {
-            let exercises = getArrayByAttribute(attributeArray[3], thirdLevel[i][j][k]);
-            for (let l = 0; l < rootObject.children[i].children[j].children[k].children.length; l++) {
-              rootObject.children[i].children[j].children[k].children[l].children = exercises[l];
+          for (
+            let k = 0;
+            k < rootObject.children[i].children[j].children.length;
+            k++
+          ) {
+            let exercises = getArrayByAttribute(
+              attributeArray[3],
+              thirdLevel[i][j][k]
+            );
+            for (
+              let l = 0;
+              l <
+              rootObject.children[i].children[j].children[k].children.length;
+              l++
+            ) {
+              rootObject.children[i].children[j].children[k].children[
+                l
+              ].children = exercises[l];
             }
           }
         }
@@ -241,21 +271,37 @@ function calculateMusclesInvolved(exercise) {
   return sum;
 }
 
-function createExplainText(elemToAppendTo,textToCreate, xOffset, yOffset, fontSize) {
-  d3.select(elemToAppendTo).append('text').text(textToCreate)
-    .style('font', 'NeueHaasDisplay')
-    .attr('class', 'explainText')
-    .attr('x', xOffset)
-    .attr('y', yOffset)
-    .attr('text-anchor', 'left')
-    .attr('fill', 'black')
-    .attr('font-size', fontSize)
-    .attr('font-weight', 'bold')
-    .attr('font-variant', 'small-caps')
-    .attr("pointer-events", "none")
+function createExplainText(
+  elemToAppendTo,
+  textToCreate,
+  xOffset,
+  yOffset,
+  fontSize
+) {
+  d3.select(elemToAppendTo)
+    .append("text")
+    .text(textToCreate)
+    .style("font", "NeueHaasDisplay")
+    .attr("class", "explainText")
+    .attr("x", xOffset)
+    .attr("y", yOffset)
+    .attr("text-anchor", "left")
+    .attr("fill", "black")
+    .attr("font-size", fontSize)
+    .attr("font-weight", "bold")
+    .attr("font-variant", "small-caps")
+    .attr("pointer-events", "none");
 }
 
-function createExplainTextNoD3(svgW, svgH, textToCreate, xOffset, yOffset, fontSize, anchor) {
+function createExplainTextNoD3(
+  svgW,
+  svgH,
+  textToCreate,
+  xOffset,
+  yOffset,
+  fontSize,
+  anchor
+) {
   return (
     <svg width={svgW} height={svgH}>
       <text
@@ -273,11 +319,22 @@ function createExplainTextNoD3(svgW, svgH, textToCreate, xOffset, yOffset, fontS
         {textToCreate}
       </text>
     </svg>
-  )
+  );
 }
 
-function createButtonNoD3(id, x, y, width, height, fillColor, clickHandler,
-  pointerEvents, cursorType, mouseEnterHandler, mouseLeaveHandler) {
+function createButtonNoD3(
+  id,
+  x,
+  y,
+  width,
+  height,
+  fillColor,
+  clickHandler,
+  pointerEvents,
+  cursorType,
+  mouseEnterHandler,
+  mouseLeaveHandler
+) {
   return (
     <rect
       className="buttonRect"
@@ -295,7 +352,7 @@ function createButtonNoD3(id, x, y, width, height, fillColor, clickHandler,
       onMouseEnter={mouseEnterHandler}
       onMouseLeave={mouseLeaveHandler}
     />
-  )
+  );
 }
 
 function createButtonImage(id, x, y, imgPath, height, opacity) {
@@ -310,7 +367,7 @@ function createButtonImage(id, x, y, imgPath, height, opacity) {
       pointerEvents={"none"}
       opacity={opacity}
     />
-  )
+  );
 }
 
 function createMouseOverText(textToShow, expandWidth, fontColor) {
@@ -324,7 +381,7 @@ function createMouseOverText(textToShow, expandWidth, fontColor) {
     >
       {textToShow}
     </text>
-  )
+  );
 }
 
 export {
@@ -341,5 +398,5 @@ export {
   createButtonNoD3,
   createButtonImage,
   createMouseOverText,
-  getIntersectionExercises
+  getIntersectionExercises,
 };

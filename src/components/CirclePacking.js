@@ -267,7 +267,7 @@ export default function CirclePacking(props) {
           }
         }
       } else {
-        /*
+      /*
           If a sorting filter has been ADDED to the CP chart OR if a muscle has
           been selected or deselected in the body map.
           To find the correct element we start at the new root and traverse

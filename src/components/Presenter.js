@@ -27,9 +27,5 @@ export default function Presenter(props) {
     }
   }
 
-  return (
-    
-      <div className="h-full">{videoOrExercise(exerciseOrVideo)}</div>
-    
-  );
+  return <div className="h-full">{videoOrExercise(exerciseOrVideo)}</div>;
 }
