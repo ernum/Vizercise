@@ -5,17 +5,21 @@ import CirclePacking from "@/src/components/CirclePacking";
 import Detail from "../components/ExerciseDetail";
 import Presenter from "../components/Presenter";
 import About from "./about";
+import Help from "./help";
 
 export default function Home() {
   const selectionSchemeTexts = ["Union", "Intersection"];
   const [exerciseSelected, setExerciseSelected] = useState(null);
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [selectedMuscles, setSelectedMuscles] = useState([]);
-  const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(selectionSchemeTexts[0]);
+  const [muscleSelectionScheme, setMuscleSelectionScheme] = useState(
+    selectionSchemeTexts[0]
+  );
 
   const [idFromSetId, setnewId] = useState();
   const [isClosed, setIsClosed] = useState();
   const [showPopup, setShowPopup] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
 
   function detailPopup() {
     if (isClosed == true)
@@ -27,6 +31,9 @@ export default function Home() {
     setShowPopup(false);
   }
 
+    function closeHelp() {
+        setShowHelp(false);
+    }
   // This seems like a bad solution but for some reason I can't get it to work the same
   // way that onMuscleClicked() works (array is not appended to, only replaces the elem)
   useEffect(() => {
@@ -77,7 +84,13 @@ export default function Home() {
             Vizercise
           </h1>
         </div>
-        <div className="flex-grow-0">
+              <div className="flex-grow-0">
+                  <button
+                      className="bg-gray-100 hover:bg-gray-200 text-sm sm:text-xs md:text-sm lg:text-base text-gray-700 font-bold py-1 px-5 rounded mr-2"
+                      onClick={() => setShowHelp(true)}
+                  >
+                      Help
+                      </button>
           <button
             className="bg-gray-100 hover:bg-gray-200 text-sm sm:text-xs md:text-sm lg:text-base text-gray-700 font-bold py-1 px-3 rounded"
             onClick={() => setShowPopup(true)}
@@ -133,7 +146,7 @@ export default function Home() {
           onSetIsClosed={setIsClosed}
         />
       </div>
-      
+
       {/*About Us PopUp Bloc*/}
       {showPopup && (
         <div
@@ -151,7 +164,26 @@ export default function Home() {
             <About />
           </div>
         </div>
-      )}
+          )}
+
+          {/*Help PopUp Bloc*/}
+          {showHelp && (
+              <div
+                  className="hover:cursor-pointer absolute inset-0 flex justify-center items-center bg-opacity-70 z-20 bg-neutral-800"
+                  onClick={closeHelp}
+              >
+                  <div
+                      className="hover:cursor-default shadow-2xl bg-[#E2E1EF]
+                    rounded-3xl h-[85vh] w-1/2 m-auto min-w-min z-20 overflow-y-scroll"
+                      style={{ direction: "rtl" }}
+                  >
+                      <style>
+                          {`::-webkit-scrollbar { direction: rtl; background: transparent; width: 0px }`}
+                      </style>
+                      <Help />
+                  </div>
+              </div>
+          )}
     </div>
   );
 }
