@@ -3,13 +3,13 @@ import * as d3 from "d3";
 import {
   GetExercises,
   getNestedData,
-  dataReq,
   calculateMusclesInvolved,
   createExplainText,
   getIntersectionExercises,
 } from "./Functions";
 import { ColorLegend } from "./ColorLegend";
 import ReactDOMServer from "react-dom/server";
+import { allMuscles } from "@/public/musclesConst";
 
 export default function CirclePacking(props) {
   const svgRef = useRef();
@@ -24,7 +24,10 @@ export default function CirclePacking(props) {
   const [sizingScheme, setSizingScheme] = useState("popularity");
   const [removedElemIndex, setRemovedElemIndex] = useState(null);
   const [exerciseData, setExerciseData] = useState(
-    getNestedData(dataReq, sortingScheme)
+    getNestedData(
+      [...new Set(props.selectedMuscles.flatMap(GetExercises))],
+      sortingScheme
+    )
   );
   const [lastFocus, setLastFocus] = useState();
   const [currentFocus, setCurrentFocus] = useState();
@@ -72,7 +75,12 @@ export default function CirclePacking(props) {
         );
       }
     } else {
-      setExerciseData(getNestedData(dataReq, sortingScheme));
+      setExerciseData(
+        getNestedData(
+          [...new Set(allMuscles.flatMap(GetExercises))],
+          sortingScheme
+        )
+      );
     }
   }, [
     props.selectedMuscles,
@@ -267,7 +275,7 @@ export default function CirclePacking(props) {
           }
         }
       } else {
-      /*
+        /*
           If a sorting filter has been ADDED to the CP chart OR if a muscle has
           been selected or deselected in the body map.
           To find the correct element we start at the new root and traverse
@@ -453,8 +461,7 @@ export default function CirclePacking(props) {
           if (d.parent === focus) {
             d3.select(this).attr("stroke", "#000");
             (d3.select(this).attr("id") === "leaf" ||
-              d3.select(this).attr("id") === "selectedleaf") &&
-              toolTip.style("visibility", "visible");
+              d3.select(this).attr("id") === "selectedleaf")
           }
         })
         .on("mouseout", function () {
@@ -499,6 +506,7 @@ export default function CirclePacking(props) {
             return toolTipMuscles;
           }
 
+          toolTip.style("visibility", "visible");
           const svgRect = d3.select("#outerSvg").node().getBoundingClientRect();
           toolTip
             .html(createToolTipList)
