@@ -483,8 +483,8 @@ export default function CirclePacking(props) {
 
       toolTip
         .html(
-          toolTipMuscles[exercise.id]
-            ? toolTipMuscles[exercise.id]
+          toolTipMuscles[exercise.name]
+            ? toolTipMuscles[exercise.name]
             : createToolTipList(exercise)
         )
         .style("left", event.clientX - svgRect.left - toolTipOffsetX + "px")
@@ -529,7 +529,7 @@ export default function CirclePacking(props) {
           toolTip.style("visibility", "hidden");
         })
         .on("mousemove", function (event, d) {
-          showToolTip(d.data, event);
+          if (d.parent === focus) showToolTip(d.data, event);
         })
         .on("click", function (event, d) {
           d3.select(this).attr("id") === "node"
