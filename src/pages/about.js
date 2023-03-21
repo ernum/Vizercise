@@ -71,7 +71,7 @@ function About() {
 
                                 <h2 className="text-center p-2 text-neutral-600 py-2 font-bold">Marine Czaplinski</h2>
                                     <p className="text-center p-2 text-neutral-600 py-2 font-normal">Frontend Development, UI/UX Design</p>
-                                <p className="text-center p-2 text-neutral-600 py-2 font-normal">I wanted to improve my digital drawing skills, and also focus on UI/UX Design. I learned also about JavaScript, CSS, React and D3.js, so I'm really satisfied after this project</p>
+                                <p className="text-center p-2 text-neutral-600 py-2 font-normal">I wanted to improve my digital drawing skills, and also focus on UI/UX Design. I learned also about JavaScript, CSS, React and D3.js, so I&apos;m really satisfied after this project</p>
                                 <p className="text-center p-2 text-neutral-600 py-2 font-normal">marinec@kth.se</p>
                                 <a href="https://www.linkedin.com/in/marine-czaplinski/" className="text-center p-2 text-blue-600 py-2 font-normal">Linkedin</a>
 
