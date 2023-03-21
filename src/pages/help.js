@@ -27,7 +27,7 @@ function Help() {
                     <a className="text-center p-2 text-blue-600 py-2 font-normal " href="https://github.com/ernum/Vizercise" target='_blank' rel="noreferrer">Source code is available on Github</a>
                     <h1 className="text-2xl font-bold mb-2" style={{ marginTop: "20px", marginBottom: "15px", textAlign: "center" }}>Demo Video</h1>
                     
-                    <a className="text-center p-2 text-blue-600 py-2 font-normal " href="https://youtu.be/5H7QNZI6wRY" target='_blank' rel="noreferrer">Click here to access Demo Video</a>
+                    <a className="text-center p-2 text-blue-600 py-2 font-normal " href="https://youtu.be/pWXeIh5N4EM" target='_blank' rel="noreferrer">Click here to access Demo Video</a>
                 </div>
             </div>
 
