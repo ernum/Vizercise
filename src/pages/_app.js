@@ -6,7 +6,9 @@ export default function App({ Component, pageProps }) {
     <div>
       <Head>
         <link rel="icon" href="/icons/favicon-32x32.png" />
-        <title>Vizercise | Exercises Visualized with Interactive Body Maps</title>
+        <title>
+          Vizercise | Exercises Visualized with Interactive Body Maps
+        </title>
       </Head>
       <Component {...pageProps} />
     </div>
