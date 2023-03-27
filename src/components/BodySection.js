@@ -705,7 +705,7 @@ export default function BodySection(props) {
   return (
     <div id="body_div">
       <Script src="https://d3js.org/d3.v7.min.js" />
-      <div className="translate-y-10 flex justify-center">
+      <div className="mt-10 flex justify-center">
         <BodyButton
           menuOrientation="left"
           action={() => {
@@ -716,7 +716,7 @@ export default function BodySection(props) {
         />
       </div>
       <svg
-        className="-translate-y-6"
+        className="-translate-y-16"
         id="selectionButtonContainer"
         width={150}
         height={200}
