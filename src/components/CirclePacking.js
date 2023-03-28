@@ -579,9 +579,9 @@ export default function CirclePacking(props) {
   }
 
   function buttonSetup() {
-    createExplainText("#outerSvg", "Sorting Filters", 12, 90, 12);
-    createExplainText("#outerSvg", "Circle Size", 12, 265, 12);
-    createExplainText("#outerSvg", "Hierarchy", 12, 335, 12);
+    createExplainText("#outerSvg", "Sorting Filters", 12, 25, 12);
+    createExplainText("#outerSvg", "Circle Size", 12, 200, 12);
+    createExplainText("#outerSvg", "Hierarchy", 12, 270, 12);
     // BUTTON 1
     let b1_font_color = "black";
     if (sortingScheme.includes("equipment")) {
@@ -590,7 +590,7 @@ export default function CirclePacking(props) {
     let b1_img_path = "/icons/dumbbell.svg";
     createButton(
       "Equipment",
-      80,
+      15,
       b1_font_color,
       b1_img_path,
       "sortButton",
@@ -603,7 +603,7 @@ export default function CirclePacking(props) {
       b2_font_color = "white";
     }
     let b2_img_path = "/icons/force.svg";
-    createButton("Force", 115, b2_font_color, b2_img_path, "sortButton", 100);
+    createButton("Force", 50, b2_font_color, b2_img_path, "sortButton", 100);
 
     // BUTTON 3
     let b3_font_color = "black";
@@ -613,7 +613,7 @@ export default function CirclePacking(props) {
     let b3_img_path = "/icons/gear.svg";
     createButton(
       "Mechanic",
-      150,
+      85,
       b3_font_color,
       b3_img_path,
       "sortButton",
@@ -628,7 +628,7 @@ export default function CirclePacking(props) {
     let b4_img_path = "/icons/difficulty.svg";
     createButton(
       "Difficulty",
-      185,
+      120,
       b4_font_color,
       b4_img_path,
       "sortButton",
@@ -638,7 +638,7 @@ export default function CirclePacking(props) {
     // sizingScheme button
     createButton(
       "Google search volume",
-      255,
+      190,
       "black",
       "/icons/circleSize.svg",
       "sizeButton",
@@ -762,12 +762,12 @@ export default function CirclePacking(props) {
       .scaleOrdinal()
       .domain(["Beginner", "Intermediate", "Advanced"])
       .range(["#75c47c", "#fcd405", "#fa684c"]);
-
+      
     d3.select("#outerSvg")
       .append("rect")
       .style("cursor", "default")
       .attr("class", "legendContainer")
-      .attr("x", 10)
+      .attr("x", 130)
       .attr("y", 10)
       .attr("width", 100)
       .attr("height", 60)
@@ -781,7 +781,7 @@ export default function CirclePacking(props) {
       .style("font", "10px NeueHaasDisplay")
       .style("cursor", "default")
       .attr("class", "legend")
-      .attr("transform", `translate(25,25)`)
+      .attr("transform", `translate(145,25)`)
       .attr("pointer-events", "none")
       .call(ColorLegend, {
         colorScale,
@@ -810,10 +810,10 @@ export default function CirclePacking(props) {
     }
     return (
       <g id="hierarchyContainer">
-        {createHierarchyLevel("levelOne", 10, 340, 100, 18, "white")}
-        {createHierarchyLevel("levelTwo", 15, 360, 90, 18, "white")}
-        {createHierarchyLevel("levelThree", 20, 380, 80, 18, "white")}
-        {createHierarchyLevel("levelFour", 25, 400, 70, 18, "white")}
+        {createHierarchyLevel("levelOne", 10, 275, 100, 18, "white")}
+        {createHierarchyLevel("levelTwo", 15, 295, 90, 18, "white")}
+        {createHierarchyLevel("levelThree", 20, 315, 80, 18, "white")}
+        {createHierarchyLevel("levelFour", 25, 335, 70, 18, "white")}
       </g>
     );
   }
@@ -838,16 +838,16 @@ export default function CirclePacking(props) {
   function updateHierarchyDisplayOnAdd(capitalizedKey) {
     if (sortingScheme.length === 0) {
       d3.select("#levelOne").style("visibility", "visible");
-      createHierarchyText("levelOneText", 60, 352, capitalizedKey, "black");
+      createHierarchyText("levelOneText", 60, 287, capitalizedKey, "black");
     } else if (sortingScheme.length === 1) {
       d3.select("#levelTwo").style("visibility", "visible");
-      createHierarchyText("levelTwoText", 60, 372, capitalizedKey, "black");
+      createHierarchyText("levelTwoText", 60, 307, capitalizedKey, "black");
     } else if (sortingScheme.length === 2) {
       d3.select("#levelThree").style("visibility", "visible");
-      createHierarchyText("levelThreeText", 60, 392, capitalizedKey, "black");
+      createHierarchyText("levelThreeText", 60, 327, capitalizedKey, "black");
     } else {
       d3.select("#levelFour").style("visibility", "visible");
-      createHierarchyText("levelFourText", 60, 412, capitalizedKey, "black");
+      createHierarchyText("levelFourText", 60, 347, capitalizedKey, "black");
     }
   }
 
